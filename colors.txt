@@ -1,0 +1,14 @@
+VALID_PATTERN_COLORS = {
+    "RED": Color.RED,
+    "YELLOW": Color.YELLOW,
+    "GREEN": Color.GREEN,
+    "BLUE": Color.BLUE
+}
+
+white = Color(h=346, s=19, v=99) || Color(h=20, s=31, v=99)
+red = Color(h=359, s=98, v=83) || 
+yellow = Color(h=47, s=97, v=99)
+green = Color(h=131, s=92, v=45)
+blue = Color(h=131, s=92, v=45)
+gray = Color(h=210, s=3, v=59)
+black = Color(h=288, s=34, v=19) || Color(h=60, s=24, v=9)
