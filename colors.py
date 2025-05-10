@@ -9,7 +9,7 @@ def decodeHSV(hsv):
         return Color.BLACK
     elif (hue > 180 or hue < 240) and value > 50 and value < 70 and saturation < 30:
         return Color.GRAY
-    elif (hue > 340 or hue < 20) and value > 70 and value < 90:
+    elif (hue > 340 or hue < 20) and value > 70 and value < 90 and saturation > 70:
         return Color.RED
     elif (hue > 30 and hue < 70) and value > 80 and saturation > 60:
         return Color.YELLOW
