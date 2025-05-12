@@ -1,0 +1,8 @@
+{
+    "files": [
+        "main.py",
+        "communication_example.py",
+        "TrainsView/Main.qml",
+        "TrainsView/qmldir"
+    ]
+}
