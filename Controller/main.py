@@ -2,8 +2,10 @@ from communication import Devices
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
+from qasync import QEventLoop
 
 from pathlib import Path
+import asyncio
 import sys
 
 if __name__ == '__main__':
@@ -11,6 +13,9 @@ if __name__ == '__main__':
     QGuiApplication.setOrganizationName("arProjects")
     QGuiApplication.setApplicationName("Lego Trains Controller")
     engine = QQmlApplicationEngine()
+    loop = QEventLoop(app)
+    asyncio.set_event_loop(loop)
+
     devices = Devices()
 
     engine.addImportPath(Path(__file__).parent)
@@ -20,6 +25,5 @@ if __name__ == '__main__':
     if not engine.rootObjects():
         sys.exit(-1)
 
-    exit_code = app.exec()
-    del engine
-    sys.exit(exit_code)
+    with loop:
+        loop.run_forever()
