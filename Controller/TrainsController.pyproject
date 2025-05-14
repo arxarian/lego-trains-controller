@@ -2,6 +2,7 @@
     "files": [
         "main.py",
         "communication_example.py",
+        "communication.py",
         "TrainsView/Main.qml",
         "TrainsView/qmldir"
     ]

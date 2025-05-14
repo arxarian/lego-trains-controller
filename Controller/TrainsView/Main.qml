@@ -16,5 +16,10 @@ ApplicationWindow {
             text: "Hello from QML"
             font.pixelSize: 24
         }
+
+        Button {
+            text: "Click me"
+            onClicked: devices.connect_to("Pybricks Hub")
+        }
     }
 }
