@@ -6,12 +6,8 @@ from PySide6.QtCore import QObject, Slot #Property, Signal
 
 import asyncio
 from bleak import BleakScanner, BleakClient
-from bleak.backends.winrt.util import allow_sta
 
 PYBRICKS_COMMAND_EVENT_CHAR_UUID = "c5f50002-8280-46da-89f4-6d8051e4aeef"
-
-sys.coinit_flags = 0
-allow_sta()
 
 class Devices(QObject):
 
@@ -31,8 +27,16 @@ class Devices(QObject):
 
             print("Found", hub_name)
 
+            ready_event = asyncio.Event()
+
             def handle_rx(_, data: bytearray):
-                print("Received", data)
+                if data[0] == 0x01:  # "write stdout" event (0x01)
+                    payload = data[1:]
+
+                    if payload == b"rdy":
+                        ready_event.set()
+                    else:
+                        print("Received:", payload)
 
                 # Connect to the hub.
             async with BleakClient(device) as client:   # TOOD add handle disconnect
@@ -41,6 +45,9 @@ class Devices(QObject):
 
                 # Shorthand for sending some data to the hub.
                 async def send(data):
+                    await ready_event.wait()
+                    ready_event.clear()
+
                     # Send the data to the hub.
                     await client.write_gatt_char(
                         PYBRICKS_COMMAND_EVENT_CHAR_UUID,
@@ -51,7 +58,6 @@ class Devices(QObject):
                 # Tell user to start program on the hub.
                 print("Start the program on the hub now with the button.")
 
-                await asyncio.sleep(5)
                 await send(b"fwd")
                 await asyncio.sleep(1)
                 await send(b"stp")

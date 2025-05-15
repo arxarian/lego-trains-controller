@@ -25,5 +25,5 @@ if __name__ == '__main__':
     if not engine.rootObjects():
         sys.exit(-1)
 
-    with loop:
+    with loop:  # TODO - why not to use app.exec()
         loop.run_forever()
