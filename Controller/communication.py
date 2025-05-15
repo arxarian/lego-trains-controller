@@ -51,4 +51,10 @@ class Devices(QObject):
                 # Tell user to start program on the hub.
                 print("Start the program on the hub now with the button.")
 
+                await asyncio.sleep(5)
+                await send(b"fwd")
+                await asyncio.sleep(1)
+                await send(b"stp")
+
+
         asyncio.create_task(async_connect_to())
