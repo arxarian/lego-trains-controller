@@ -14,7 +14,7 @@ ApplicationWindow {
         Column {
             anchors.fill: parent
             Text {
-                text: "Hello from QML"
+                text: "Welcome to Lego Trains Contoller!"
                 font.pixelSize: 24
             }
 
@@ -24,8 +24,18 @@ ApplicationWindow {
             }
 
             Button {
-                text: "FWD"
+                text: "Forward"
                 onClicked: devices.send("fwd")
+            }
+
+            Button {
+                text: "Reverse"
+                onClicked: devices.send("rev")
+            }
+
+            Button {
+                text: "Stop"
+                onClicked: devices.send("stp")
             }
 
         }

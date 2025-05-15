@@ -23,7 +23,7 @@ class Devices(QObject):
             # Send the data to the hub.
             await self.client.write_gatt_char(
                 PYBRICKS_COMMAND_EVENT_CHAR_UUID,
-                b"\x06" + b"fwd",#data,  # prepend "write stdin" command (0x06)
+                b"\x06" + data.encode(),  # prepend "write stdin" command (0x06)
                 response=True
             )
 
