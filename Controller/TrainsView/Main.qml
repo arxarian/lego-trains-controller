@@ -11,15 +11,23 @@ ApplicationWindow {
         anchors.fill: parent
         color: "lightblue"
 
-        Text {
-            anchors.centerIn: parent
-            text: "Hello from QML"
-            font.pixelSize: 24
-        }
+        Column {
+            anchors.fill: parent
+            Text {
+                text: "Hello from QML"
+                font.pixelSize: 24
+            }
 
-        Button {
-            text: "Click me"
-            onClicked: devices.connect_to("Pybricks Hub")
+            Button {
+                text: "Connect"
+                onClicked: devices.connect_to("Pybricks Hub")
+            }
+
+            Button {
+                text: "FWD"
+                onClicked: devices.send("fwd")
+            }
+
         }
     }
 }

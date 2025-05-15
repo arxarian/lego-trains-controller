@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import sys
-
 from PySide6.QtCore import QObject, Slot #Property, Signal
 
 import asyncio
@@ -13,6 +11,35 @@ class Devices(QObject):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.client = None  # TODO - make an array
+        self.ready_event = asyncio.Event()
+
+    @Slot(str)
+    def send(self, data):
+        async def async_send(data):
+            await self.ready_event.wait()
+            self.ready_event.clear()
+
+            # Send the data to the hub.
+            await self.client.write_gatt_char(
+                PYBRICKS_COMMAND_EVENT_CHAR_UUID,
+                b"\x06" + b"fwd",#data,  # prepend "write stdin" command (0x06)
+                response=True
+            )
+
+        asyncio.create_task(async_send(data))
+
+    async def set_rx_method(self):
+        def handle_rx(_, data: bytearray):
+            if data[0] == 0x01:  # "write stdout" event (0x01)
+                payload = data[1:]
+
+                if payload == b"rdy":
+                    self.ready_event.set()
+                else:
+                    print("Received:", payload)
+
+        await self.client.start_notify(PYBRICKS_COMMAND_EVENT_CHAR_UUID, handle_rx)
 
     @Slot(str)
     def connect_to(self, hub_name):
@@ -27,40 +54,16 @@ class Devices(QObject):
 
             print("Found", hub_name)
 
-            ready_event = asyncio.Event()
+            client = BleakClient(device)    # TODO add handle disconnect
+            await client.connect()
+            if client.is_connected:
+                print("Connected")
+                self.client = client
+            else:
+                print("Connection to", hub_name, "failed")
 
-            def handle_rx(_, data: bytearray):
-                if data[0] == 0x01:  # "write stdout" event (0x01)
-                    payload = data[1:]
+            await self.set_rx_method()
 
-                    if payload == b"rdy":
-                        ready_event.set()
-                    else:
-                        print("Received:", payload)
-
-                # Connect to the hub.
-            async with BleakClient(device) as client:   # TOOD add handle disconnect
-                # Subscribe to notifications from the hub.
-                await client.start_notify(PYBRICKS_COMMAND_EVENT_CHAR_UUID, handle_rx)
-
-                # Shorthand for sending some data to the hub.
-                async def send(data):
-                    await ready_event.wait()
-                    ready_event.clear()
-
-                    # Send the data to the hub.
-                    await client.write_gatt_char(
-                        PYBRICKS_COMMAND_EVENT_CHAR_UUID,
-                        b"\x06" + data,  # prepend "write stdin" command (0x06)
-                        response=True
-                    )
-
-                # Tell user to start program on the hub.
-                print("Start the program on the hub now with the button.")
-
-                await send(b"fwd")
-                await asyncio.sleep(1)
-                await send(b"stp")
-
+            print("Start the program on the hub now with the button.")
 
         asyncio.create_task(async_connect_to())
