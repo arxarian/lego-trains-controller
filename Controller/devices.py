@@ -12,7 +12,7 @@ class Devices(QObject):
         self.devices = []
 
     @Slot(result=QObject)
-    def firstDevice(self):  # TODO - change to a proper property
+    def firstDevice(self):  # TODO - change to a real model
         return self.devices[-1]
 
     @Slot(str)

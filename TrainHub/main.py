@@ -1,11 +1,13 @@
 from pybricks.pupdevices import DCMotor
 from pybricks.parameters import Port
 from pybricks.tools import wait
+from pybricks.hubs import CityHub
 
 # Standard MicroPython modules
 from usys import stdin, stdout
 from uselect import poll
 
+hub = CityHub()
 train_motor = DCMotor(Port.A)
 
 # Optional: Register stdin for polling. This allows
@@ -33,6 +35,8 @@ while True:
         train_motor.dc(-25)
     elif cmd == b"bye":
         break
+    elif cmd == b"vol":
+        stdout.buffer.write(b"vol" + hub.battery.voltage().to_bytes(2, 'big'))
     else:
         train_motor.stop()
 

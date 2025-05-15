@@ -15,10 +15,12 @@ class Device(QObject):
     async def set_rx_method(self):
         def handle_rx(_, data: bytearray):
             if data[0] == 0x01:  # "write stdout" event (0x01)
-                payload = data[1:]
+                payload = data[1:4]
 
                 if payload == b"rdy":
                     self.ready_event.set()
+                elif payload == b"vol":
+                    print("Voltage:", int.from_bytes(data[4:], 'big'))
                 else:
                     print("Received:", payload)
 

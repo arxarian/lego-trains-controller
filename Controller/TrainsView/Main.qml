@@ -38,6 +38,11 @@ ApplicationWindow {
                 onClicked: devices.firstDevice().send("stp")
             }
 
+            Button {
+                text: "Voltage"
+                onClicked: devices.firstDevice().send("vol")
+            }
+
         }
     }
 }
