@@ -25,17 +25,17 @@ ApplicationWindow {
 
             Button {
                 text: "Forward"
-                onClicked: devices.send("fwd")
+                onClicked: devices.firstDevice().send("fwd")
             }
 
             Button {
                 text: "Reverse"
-                onClicked: devices.send("rev")
+                onClicked: devices.firstDevice().send("rev")
             }
 
             Button {
                 text: "Stop"
-                onClicked: devices.send("stp")
+                onClicked: devices.firstDevice().send("stp")
             }
 
         }

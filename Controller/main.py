@@ -1,4 +1,4 @@
-from communication import Devices
+from devices import Devices
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
