@@ -24,17 +24,19 @@ while True:
     stdout.buffer.write(b"rdy")
 
     lastColor = Color.NONE
+    lastSentColor = Color.NONE
 
     # Optional: Check available input.
     while not keyboard.poll(0):
         # Optional: Do something here.
         hsv = sensor.hsv()
         color = colors.decodeHSV(hsv)
-
-        if color != lastColor:
-            lastColor = color
+        if color == lastColor and color != lastSentColor:
+            lastSentColor = color
             strColor = str(color).split('.')[-1]
             stdout.buffer.write(b"clr" + bytes(strColor, "utf-8"))
+
+        lastColor = color
 
         wait(10)
 
