@@ -7,7 +7,7 @@ def decodeHSV(hsv):
     value = hsv.v
     if value < 20 and saturation < 40:
         return Color.BLACK
-    elif (hue > 180 or hue < 240) and value > 50 and value < 70 and saturation < 30:
+    elif (hue > 150 and hue < 280) and value > 50 and value < 70 and saturation < 15:
         return Color.GRAY
     elif (hue > 340 or hue < 20) and value > 70 and value < 90 and saturation > 70:
         return Color.RED
@@ -15,7 +15,7 @@ def decodeHSV(hsv):
         return Color.YELLOW
     elif (hue > 200 and hue < 250) and value > 35 and saturation > 80:
         return Color.BLUE
-    elif (hue > 100 and hue < 150) and value > 35:
+    elif (hue > 100 and hue < 150) and value > 35 and saturation > 30:
         return Color.GREEN
     elif (hue > 340 or hue < 30) and value > 90:
         return Color.WHITE
