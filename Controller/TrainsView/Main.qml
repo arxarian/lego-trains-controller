@@ -43,6 +43,20 @@ ApplicationWindow {
                 onClicked: devices.firstDevice().send("vol")
             }
 
+            Rectangle {
+                id: detectedColor
+                width: 50
+                height: 50
+                border.width: 2
+                // color: devices.firstDevice().color
+
+                MouseArea { // TODO - remove this hack
+                    anchors.fill: parent
+                    onClicked: {
+                        parent.color = Qt.binding(function() {return devices.firstDevice().color})
+                    }
+                }
+            }
         }
     }
 }
