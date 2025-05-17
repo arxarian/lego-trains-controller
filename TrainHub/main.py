@@ -1,5 +1,5 @@
-from pybricks.pupdevices import DCMotor
-from pybricks.parameters import Port
+from pybricks.pupdevices import DCMotor, ColorDistanceSensor
+from pybricks.parameters import Port, Color
 from pybricks.tools import wait
 from pybricks.hubs import CityHub
 
@@ -7,8 +7,11 @@ from pybricks.hubs import CityHub
 from usys import stdin, stdout
 from uselect import poll
 
+import colors
+
 hub = CityHub()
 train_motor = DCMotor(Port.A)
+sensor = ColorDistanceSensor(Port.B)
 
 # Optional: Register stdin for polling. This allows
 # you to wait for incoming data without blocking.
@@ -20,9 +23,19 @@ while True:
     # Let the remote program know we are ready for a command.
     stdout.buffer.write(b"rdy")
 
+    lastColor = Color.NONE
+
     # Optional: Check available input.
     while not keyboard.poll(0):
         # Optional: Do something here.
+        hsv = sensor.hsv()
+        color = colors.decodeHSV(hsv)
+
+        if color != lastColor:
+            lastColor = color
+            strColor = str(color).split('.')[-1]
+            stdout.buffer.write(b"clr" + bytes(strColor, "utf-8"))
+
         wait(10)
 
     # Read three bytes.
@@ -39,4 +52,3 @@ while True:
         stdout.buffer.write(b"vol" + hub.battery.voltage().to_bytes(2, 'big'))
     else:
         train_motor.stop()
-
