@@ -50,6 +50,15 @@ class Device(QObject):
         await self.set_rx_method()
         print("Start the program on the hub now with the button.")
 
+    @Slot()
+    def disconnect(self):
+        print("Disconnected")
+        async def async_disconnect():
+            self.send("bye")
+            await self.client.disconnect()
+
+        asyncio.create_task(async_disconnect())
+
     @Slot(str)
     def send(self, data):
         async def async_send(data):

@@ -15,6 +15,16 @@ class Devices(QObject):
     def firstDevice(self):  # TODO - change to a real model
         return self.devices[-1]
 
+    @Slot()
+    def discover(self):
+        print("Discovering...")
+
+        async def async_disover():
+            devices = await BleakScanner.discover()
+            print(devices)
+
+        asyncio.create_task(async_disover())
+
     @Slot(str)
     def connect_to(self, hub_name):
         print("Wanna connect to", hub_name)

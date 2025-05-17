@@ -19,8 +19,18 @@ ApplicationWindow {
             }
 
             Button {
+                text: "Discover"
+                onClicked: devices.discover()
+            }
+
+            Button {
                 text: "Connect"
                 onClicked: devices.connect_to("Pybricks Hub")
+            }
+
+            Button {
+                text: "Disconnect"
+                onClicked: devices.firstDevice().disconnect()
             }
 
             Button {
