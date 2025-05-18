@@ -4,17 +4,23 @@ import asyncio
 
 from PySide6.QtCore import QObject, Slot, Property, Signal
 from PySide6.QtGui import QColor
+from PySide6.QtQml import QmlElement
+
+QML_IMPORT_NAME = "TrainsView"
+QML_IMPORT_MAJOR_VERSION = 1
 
 PYBRICKS_COMMAND_EVENT_CHAR_UUID = "c5f50002-8280-46da-89f4-6d8051e4aeef"
 TRANSPARENT_COLOR = QColor(0, 0, 0, 0)
 
+@QmlElement
 class Device(QObject):
 
-    def __init__(self, client, parent=None):
+    def __init__(self, client, hub_name="unknown", parent=None):
         super().__init__(parent)
         self.client = client
         self.ready_event = asyncio.Event()
         self._color = TRANSPARENT_COLOR
+        self._name = hub_name
 
     def color(self):
         return self._color
@@ -25,6 +31,16 @@ class Device(QObject):
 
     color_changed = Signal()
     color = Property(QColor, color, set_color, notify=color_changed)
+
+    def name(self):
+        return self._name
+
+    def set_name(self, value):
+        self._name = value
+        self.name_changed.emit()
+
+    name_changed = Signal()
+    name = Property(str, name, set_name, notify=name_changed)
 
     async def set_rx_method(self):
         def handle_rx(_, data: bytearray):

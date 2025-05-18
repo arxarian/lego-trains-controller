@@ -1,26 +1,50 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QObject, Slot, Property, Signal
+from enum import IntEnum
+from PySide6.QtCore import QAbstractListModel, Slot, Property, Signal
+from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
+
 from bleak import BleakScanner, BleakClient
 from device import Device
 
 import asyncio
 
-class Devices(QObject):
-    def __init__(self, parent=None):
+class Devices(QAbstractListModel):
+
+    @QEnum
+    class DeviceRole(IntEnum):
+        ObjectRole = Qt.ItemDataRole.UserRole
+
+    def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        self.devices = []
+        self._devices = []
         self._discovered = []
+
+    def rowCount(self, parent=QModelIndex()):
+        return len(self._devices)
+
+    def data(self, index: QModelIndex, role: int):
+        row = index.row()
+        if row < self.rowCount():
+            if role == Devices.DeviceRole.ObjectRole:
+                return self._devices[row]
+        return None
+
+    def roleNames(self):
+        roles = super().roleNames()
+        roles[Devices.DeviceRole.ObjectRole] = QByteArray(b"object")
+        return roles
+
+    def append(self, device):
+        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+        self._devices.append(device)
+        self.endInsertRows()
 
     def discovered(self):
         return self._discovered
 
     discovered_changed = Signal()
     discovered = Property(list, discovered, notify=discovered_changed)
-
-    @Slot(result=QObject)
-    def firstDevice(self):  # TODO - change to a real model
-        return self.devices[-1]
 
     @Slot()
     def discover(self):
@@ -52,10 +76,9 @@ class Devices(QObject):
             await client.connect()
             if client.is_connected:
                 print("Connected")
-                self.devices.append(Device(client))
+                self.append(Device(client, hub_name))
+                await self._devices[-1].configure()
             else:
                 print("Connection to", hub_name, "failed")
-
-            await self.devices[-1].configure()
 
         asyncio.create_task(async_connect_to())

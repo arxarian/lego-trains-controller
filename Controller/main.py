@@ -6,7 +6,7 @@ from qasync import QEventLoop
 
 from pathlib import Path
 import asyncio
-import sys
+import sys, os
 
 if __name__ == '__main__':
     app = QGuiApplication(sys.argv)
@@ -19,6 +19,7 @@ if __name__ == '__main__':
     devices = Devices()
 
     engine.addImportPath(Path(__file__).parent)
+    engine.addImportPath(os.path.join(Path(__file__).parent, "TrainsView"))
     engine.rootContext().setContextProperty("devices", devices)
     engine.loadFromModule("TrainsView", "Main")
 

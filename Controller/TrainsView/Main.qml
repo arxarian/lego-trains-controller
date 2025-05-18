@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 
 ApplicationWindow {
     visible: true
@@ -8,17 +9,31 @@ ApplicationWindow {
     title: "Lego Trains Controller"
     color: "lightblue"
 
-    Item {
+    ColumnLayout {
         anchors.fill: parent
+        spacing: 0
 
-        Column {
-            anchors.fill: parent
-            Text {
-                text: "Welcome to Lego Trains Contoller!"
-                font.pixelSize: 24
+        Text {
+            Layout.preferredHeight: contentHeight + 5
+            Layout.fillWidth: true
+
+            text: "Welcome to Lego Trains Contoller!"
+            font.pixelSize: 24
+            horizontalAlignment: Text.AlignHCenter
+
+            Rectangle {
+                z: -1
+                anchors.fill: parent
+                color: "gold"
             }
+        }
+
+        Row {
+            Layout.preferredHeight: discoverButton.availableHeight * 1.5
+            Layout.fillWidth: true
 
             Button {
+                id: discoverButton
                 text: "Discover"
                 onClicked: {
                     discoveredDevices.open()
@@ -27,48 +42,23 @@ ApplicationWindow {
             }
 
             Button {
-                text: "Connect"
+                text: "Connect to Pybricks Hub"
                 onClicked: devices.connect_to("Pybricks Hub")
             }
+        }
 
-            Button {
-                text: "Disconnect"
-                onClicked: devices.firstDevice().disconnect()
-            }
+        ListView {
+            id: view
+            model: devices
+            orientation: Qt.Horizontal
 
-            Button {
-                text: "Forward"
-                onClicked: devices.firstDevice().send("fwd")
-            }
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.margins: 5
 
-            Button {
-                text: "Reverse"
-                onClicked: devices.firstDevice().send("rev")
-            }
-
-            Button {
-                text: "Stop"
-                onClicked: devices.firstDevice().send("stp")
-            }
-
-            Button {
-                text: "Voltage"
-                onClicked: devices.firstDevice().send("vol")
-            }
-
-            Rectangle {
-                id: detectedColor
-                width: 50
-                height: 50
-                border.width: 2
-                // color: devices.firstDevice().color
-
-                MouseArea { // TODO - remove this hack
-                    anchors.fill: parent
-                    onClicked: {
-                        parent.color = Qt.binding(function() {return devices.firstDevice().color})
-                    }
-                }
+            delegate: TrainControlPanel {
+                height: parent.height
+                width: 70
             }
         }
     }
