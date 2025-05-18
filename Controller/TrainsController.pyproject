@@ -5,6 +5,7 @@
         "devices.py",
         "device.py",
         "TrainsView/Main.qml",
-        "TrainsView/qmldir"
+        "TrainsView/qmldir",
+        "TrainsView/DiscoverDevices.qml"
     ]
 }

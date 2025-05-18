@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QObject, Slot #Property, Signal
+from PySide6.QtCore import QObject, Slot, Property, Signal
 from bleak import BleakScanner, BleakClient
 from device import Device
 
@@ -10,6 +10,13 @@ class Devices(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.devices = []
+        self._discovered = []
+
+    def discovered(self):
+        return self._discovered
+
+    discovered_changed = Signal()
+    discovered = Property(list, discovered, notify=discovered_changed)
 
     @Slot(result=QObject)
     def firstDevice(self):  # TODO - change to a real model
@@ -18,12 +25,15 @@ class Devices(QObject):
     @Slot()
     def discover(self):
         print("Discovering...")
+        self._discovered = []
+        self.discovered_changed.emit()
 
-        async def async_disover():
+        async def async_disover(self):
             devices = await BleakScanner.discover()
-            print(devices)
+            self._discovered = [device.name for device in devices if device.name is not None]
+            self.discovered_changed.emit()
 
-        asyncio.create_task(async_disover())
+        asyncio.create_task(async_disover(self))
 
     @Slot(str)
     def connect_to(self, hub_name):

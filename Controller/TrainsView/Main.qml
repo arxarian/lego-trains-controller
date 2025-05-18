@@ -6,10 +6,10 @@ ApplicationWindow {
     width: 400
     height: 300
     title: "Lego Trains Controller"
+    color: "lightblue"
 
-    Rectangle {
+    Item {
         anchors.fill: parent
-        color: "lightblue"
 
         Column {
             anchors.fill: parent
@@ -20,7 +20,10 @@ ApplicationWindow {
 
             Button {
                 text: "Discover"
-                onClicked: devices.discover()
+                onClicked: {
+                    discoveredDevices.open()
+                    devices.discover()
+                }
             }
 
             Button {
@@ -68,5 +71,12 @@ ApplicationWindow {
                 }
             }
         }
+    }
+
+    DiscoverDevices {
+        id: discoveredDevices
+        anchors.centerIn: Overlay.overlay
+        height: Overlay.overlay.height - 40
+        width: Overlay.overlay.width - 40
     }
 }
