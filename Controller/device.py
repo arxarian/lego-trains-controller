@@ -15,6 +15,8 @@ TRANSPARENT_COLOR = QColor(0, 0, 0, 0)
 @QmlElement
 class Device(QObject):
 
+    disconnected = Signal(QObject)
+
     def __init__(self, client, hub_name="unknown", parent=None):
         super().__init__(parent)
         self.client = client
@@ -68,10 +70,11 @@ class Device(QObject):
 
     @Slot()
     def disconnect(self):
-        print("Disconnected")
+        print("About to disconnect...")
         async def async_disconnect():
             self.send("bye")
             await self.client.disconnect()
+            self.disconnected.emit(self)
 
         asyncio.create_task(async_disconnect())
 

@@ -57,7 +57,7 @@ ApplicationWindow {
             Layout.margins: 5
 
             delegate: TrainControlPanel {
-                height: parent.height
+                height: view.height
                 width: 70
             }
         }

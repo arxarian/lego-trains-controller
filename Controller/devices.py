@@ -38,7 +38,22 @@ class Devices(QAbstractListModel):
     def append(self, device):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self._devices.append(device)
+        device.disconnected.connect(self.device_disconnected)
         self.endInsertRows()
+
+    def remove(self, device):
+        index = self._devices.index(device)
+        if index > -1:
+            self.beginRemoveRows(QModelIndex(), index, index)
+            self._devices.remove(device)
+            self.endRemoveRows()
+
+    def device_disconnected(self, device):
+        if device in self._devices:
+            self.remove(device)
+            print("Disconnected")
+        else:
+            print("Unable to remove the device")
 
     def discovered(self):
         return self._discovered
