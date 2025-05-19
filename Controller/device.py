@@ -11,6 +11,7 @@ QML_IMPORT_MAJOR_VERSION = 1
 
 PYBRICKS_COMMAND_EVENT_CHAR_UUID = "c5f50002-8280-46da-89f4-6d8051e4aeef"
 TRANSPARENT_COLOR = QColor(0, 0, 0, 0)
+VOLTAGE_REFRESH_INTERVAL = 60
 
 @QmlElement
 class Device(QObject):
@@ -23,6 +24,14 @@ class Device(QObject):
         self.ready_event = asyncio.Event()
         self._color = TRANSPARENT_COLOR
         self._name = hub_name
+        self._voltage = 0
+        asyncio.create_task(self.async_voltage_status())
+
+    async def async_voltage_status(self):
+        await self.ready_event.wait()
+        self.send("vol")
+        await asyncio.sleep(VOLTAGE_REFRESH_INTERVAL)
+        asyncio.create_task(self.async_voltage_status())
 
     def color(self):
         return self._color
@@ -33,6 +42,17 @@ class Device(QObject):
 
     color_changed = Signal()
     color = Property(QColor, color, set_color, notify=color_changed)
+
+    def voltage(self):
+        return self._voltage
+
+    def set_voltage(self, value):
+        print("Voltage:", value)
+        self._voltage = value
+        self.voltage_changed.emit()
+
+    voltage_changed = Signal()
+    voltage = Property(int, voltage, set_voltage, notify=voltage_changed)
 
     def name(self):
         return self._name
@@ -52,7 +72,7 @@ class Device(QObject):
                 if payload == b"rdy":
                     self.ready_event.set()
                 elif payload == b"vol":
-                    print("Voltage:", int.from_bytes(data[4:], 'big'))
+                    self.set_voltage(int.from_bytes(data[4:], 'big'))
                 elif payload == b"clr":
                     color = data[4:].decode("utf-8")
                     if color == "NONE":

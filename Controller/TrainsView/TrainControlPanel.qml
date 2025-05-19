@@ -31,9 +31,8 @@ Column {
         onClicked: root.device.send("stp")
     }
 
-    Button {
-        text: "Voltage"
-        onClicked: root.device.send("vol")
+    Text {
+        text: "Voltage " + (root.device.voltage / 1000).toFixed(1) + " V"
     }
 
     Rectangle {
