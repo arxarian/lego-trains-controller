@@ -5,7 +5,7 @@ import QtQuick.Layouts
 ApplicationWindow {
     visible: true
     width: 400
-    height: 300
+    height: 500
     title: "Lego Trains Controller"
     color: "lightblue"
 

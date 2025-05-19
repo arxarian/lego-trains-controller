@@ -45,9 +45,11 @@ while True:
 
     # Decide what to do based on the command.
     if cmd == b"fwd":
-        train_motor.dc(25)
+        speed = int.from_bytes(stdin.buffer.read(2), 'big')
+        train_motor.dc(speed)
     elif cmd == b"rev":
-        train_motor.dc(-25)
+        speed = int.from_bytes(stdin.buffer.read(2), 'big')
+        train_motor.dc(-speed)
     elif cmd == b"bye":
         break
     elif cmd == b"vol":

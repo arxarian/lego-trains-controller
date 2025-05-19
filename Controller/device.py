@@ -25,6 +25,7 @@ class Device(QObject):
         self._color = TRANSPARENT_COLOR
         self._name = hub_name
         self._voltage = 0
+        self._speed = 0
         asyncio.create_task(self.async_voltage_status())
 
     async def async_voltage_status(self):
@@ -42,6 +43,21 @@ class Device(QObject):
 
     color_changed = Signal()
     color = Property(QColor, color, set_color, notify=color_changed)
+
+    def speed(self):
+        return self._speed
+
+    def set_speed(self, value):
+        if value != self._speed:
+            self._speed = value
+            print("Speed:", value)
+
+            if value < 0:
+                self.send("rev", abs(value).to_bytes(2, 'big'))
+            else:
+                self.send("fwd", abs(value).to_bytes(2, 'big'))
+
+    speed = Property(int, speed, set_speed)
 
     def voltage(self):
         return self._voltage
@@ -86,7 +102,7 @@ class Device(QObject):
 
     async def configure(self):
         await self.set_rx_method()
-        print("Start the program on the hub now with the button.")
+        print("Start the program on the hub now with the button")
 
     @Slot()
     def disconnect(self):
@@ -99,16 +115,16 @@ class Device(QObject):
         asyncio.create_task(async_disconnect())
 
     @Slot(str)
-    def send(self, data):
-        async def async_send(data):
+    def send(self, cmd, data = b""):
+        async def async_send(cmd, data):
             await self.ready_event.wait()
             self.ready_event.clear()
 
             # Send the data to the hub.
             await self.client.write_gatt_char(
                 PYBRICKS_COMMAND_EVENT_CHAR_UUID,
-                b"\x06" + data.encode(),  # prepend "write stdin" command (0x06)
+                b"\x06" + cmd.encode() + data,  # prepend "write stdin" command (0x06)
                 response=True
             )
 
-        asyncio.create_task(async_send(data))
+        asyncio.create_task(async_send(cmd, data))
