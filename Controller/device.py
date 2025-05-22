@@ -91,6 +91,7 @@ class Device(QObject):
                     self.set_voltage(int.from_bytes(data[4:], 'big'))
                 elif payload == b"clr":
                     color = data[4:].decode("utf-8")
+                    print("Color:", color)
                     if color == "NONE":
                         self.set_color(TRANSPARENT_COLOR)
                     else:

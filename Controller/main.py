@@ -1,4 +1,5 @@
 from devices import Devices
+import Railways.rails_rc
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
@@ -20,6 +21,7 @@ if __name__ == '__main__':
 
     engine.addImportPath(Path(__file__).parent)
     engine.addImportPath(os.path.join(Path(__file__).parent, "TrainsView"))
+    engine.addImportPath(os.path.join(Path(__file__).parent, "Railsways"))
     engine.rootContext().setContextProperty("devices", devices)
     engine.loadFromModule("TrainsView", "Main")
 

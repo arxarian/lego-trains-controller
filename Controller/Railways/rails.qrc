@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>curved.png</file>
+        <file>straight.png</file>
+        <file>switch left.png</file>
+        <file>switch right.png</file>
+    </qresource>
+</RCC>

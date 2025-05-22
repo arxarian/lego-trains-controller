@@ -1,12 +1,15 @@
 {
     "files": [
         "main.py",
+        "Railways/rails_rc.py",
         "communication_example.py",
         "devices.py",
         "device.py",
         "TrainsView/Main.qml",
         "TrainsView/qmldir",
         "TrainsView/DiscoverDevices.qml",
-        "TrainsView/TrainControlPanel.qml"
+        "TrainsView/TrainControlPanel.qml",
+        "TrainsView/TrackEditor.qml",
+        "TrainsView/TrackPiece.qml"
     ]
 }
