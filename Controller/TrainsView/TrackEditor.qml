@@ -5,6 +5,7 @@ Item {
 
     property real scaleFactor: 0.05
     property real minimalScale: 0.05
+    property real maximalScale: 1
 
     MouseArea {
         id: mouseArea
@@ -31,7 +32,7 @@ Item {
         id: wheel
         onWheel: (event) => {
             if (event.angleDelta.y > 0) {
-                area.scale += scaleFactor
+                area.scale = Math.min(maximalScale, area.scale + scaleFactor)
             } else {
                 area.scale = Math.max(minimalScale, area.scale - scaleFactor)
             }
