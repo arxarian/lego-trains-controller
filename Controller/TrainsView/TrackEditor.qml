@@ -1,16 +1,40 @@
 import QtQuick
 
-MouseArea {
+Item {
     id: root
 
     property real scaleFactor: 0.05
     property real minimalScale: 0.05
 
-    onWheel: {
-        if (wheel.angleDelta.y > 0) {
-            area.scale += scaleFactor
-        } else {
-            area.scale = Math.max(minimalScale, area.scale - scaleFactor)
+    MouseArea {
+        id: mouseArea
+
+        property real offsetX: 0
+        property real offsetY: 0
+        property real startX: 0
+        property real startY: 0
+
+        anchors.fill: parent
+        onPressed: (mouse) => {
+            mouseArea.startX = area.x
+            mouseArea.startY = area.y
+            mouseArea.offsetX = mouse.x
+            mouseArea.offsetY = mouse.y
+        }
+        onPositionChanged: (mouse) => {
+            area.x = mouse.x - mouseArea.offsetX + mouseArea.startX
+            area.y = mouse.y - mouseArea.offsetY + mouseArea.startY
+        }
+    }
+
+    WheelHandler {
+        id: wheel
+        onWheel: (event) => {
+            if (event.angleDelta.y > 0) {
+                area.scale += scaleFactor
+            } else {
+                area.scale = Math.max(minimalScale, area.scale - scaleFactor)
+            }
         }
     }
 
@@ -24,7 +48,6 @@ MouseArea {
         })
 
         if (sibling) {
-            console.log("heyy")
             sprite.x = sibling.x - sibling.width
         }
     }
@@ -33,7 +56,8 @@ MouseArea {
 
     Item {
         id: area
-        anchors.fill: parent
+        height: parent.height
+        width: parent.width
         scale: 0.3
     }
 }
