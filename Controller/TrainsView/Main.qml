@@ -68,6 +68,10 @@ ApplicationWindow {
         }
     }
 
+    TrackEditor {
+        anchors.fill: parent
+    }
+
     DiscoverDevices {
         id: discoveredDevices
         anchors.centerIn: Overlay.overlay
