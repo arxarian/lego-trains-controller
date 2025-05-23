@@ -114,9 +114,17 @@ class Device(QObject):
 
         asyncio.create_task(async_disconnect())
 
+    @Slot()
+    def shutDown(self):
+        async def async_shutDown():
+            self.send("sht", b"", False)
+            self.disconnected.emit(self)
+
+        asyncio.create_task(async_shutDown())
+
     @Slot(str)
-    def send(self, cmd, data = b""):
-        async def async_send(cmd, data):
+    def send(self, cmd, data = b"", response = True):
+        async def async_send(cmd, data, response):
             await self.ready_event.wait()
             self.ready_event.clear()
 
@@ -124,7 +132,7 @@ class Device(QObject):
             await self.client.write_gatt_char(
                 PYBRICKS_COMMAND_EVENT_CHAR_UUID,
                 b"\x06" + cmd.encode() + data,  # prepend "write stdin" command (0x06)
-                response=True
+                response=response
             )
 
-        asyncio.create_task(async_send(cmd, data))
+        asyncio.create_task(async_send(cmd, data, response))

@@ -50,6 +50,11 @@ Rectangle {
             onClicked: speedSlider.value = 0
         }
 
+        Button {
+            text: "Shut down"
+            onClicked: root.device.shutDown()
+        }
+
         Text {
             text: "Voltage " + (root.device.voltage / 1000).toFixed(1) + " V"
         }
