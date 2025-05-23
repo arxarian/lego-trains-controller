@@ -45,6 +45,11 @@ ApplicationWindow {
                 text: "Connect to Pybricks Hub"
                 onClicked: devices.connect_to("Pybricks Hub")
             }
+
+            Button {
+                text: "Connect to Express Train"
+                onClicked: devices.connect_to("Express Train")
+            }
         }
 
         ListView {
