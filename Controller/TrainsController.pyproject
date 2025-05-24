@@ -11,6 +11,8 @@
         "TrainsView/TrainControlPanel.qml",
         "TrainsView/TrackEditor.qml",
         "TrainsView/CurvedTrackPiece.qml",
-        "TrainsView/StraightTrackPiece.qml"
+        "TrainsView/StraightTrackPiece.qml",
+        "TrainsView/SwitchTrackPiece.qml",
+        "TrainsView/TrackPiece.qml"
     ]
 }

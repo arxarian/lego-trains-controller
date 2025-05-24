@@ -1,45 +1,39 @@
 import QtQuick
 
-Image {
+TrackPiece {
     id: root
-
-    signal add(var dir)
-
-    property bool leftVisible: true
-    property bool rightVisible: true
 
     source: "qrc:/straight.png"
 
     Rectangle {
-        visible: root.leftVisible
-        anchors.left: parent.left
-        width: 20
-        height: parent.height
+        visible: root.topVisible
+        width: parent.width
+        height: 50
         
-        color: "#88FF00FF"
+        color: "#55FF00FF"
         
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add("left")
-                root.leftVisible = false
+                root.add({dir: 1})
+                root.topVisible = false
             }
         }
     }
 
     Rectangle {
-        visible: root.rightVisible
-        anchors.left: parent.right
-        width: 20
-        height: parent.height
+        visible: root.bottomVisible
+        anchors.bottom: parent.bottom
+        width: parent.width
+        height: 50
 
-        color: "#88FF00FF"
+        color: "#55FF00FF"
 
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add("right")
-                root.rightVisible = false
+                root.add({dir: -1})
+                root.bottomVisible = false
             }
         }
     }

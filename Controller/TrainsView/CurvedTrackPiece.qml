@@ -1,12 +1,7 @@
 import QtQuick
 
-Image {
+TrackPiece {
     id: root
-
-    signal add(var dir)
-
-    property bool topVisible: true
-    property bool bottomVisible: true
 
     source: "qrc:/curved.png"
 
@@ -17,13 +12,13 @@ Image {
         rotation: -22.5
         width: parent.width * 0.74
         height: 50
-        
+
         color: "#55FF00FF"
-        
+
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add(1)
+                root.add({dir: 1})
                 root.topVisible = false
             }
         }
@@ -41,7 +36,7 @@ Image {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add(-1)
+                root.add({dir: -1})
                 root.bottomVisible = false
             }
         }
