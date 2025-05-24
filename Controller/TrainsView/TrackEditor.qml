@@ -66,47 +66,34 @@ Item {
 
     function createCurvedTrackPiece(sibling, dir) {
         let component = Qt.createComponent("CurvedTrackPiece.qml");
-        let radius = 1330
-        for (let i = 0; i < 16; i++) {
-                let p = calcXY(i, radius)
-                let sprite = component.createObject(area, {
-                    x: p.x,
-                    y: p.y,
-                    rotation: i * -22.5
-                });
-                sprite.transformOrigin = Item.BottomRight
+        const radius = 1330
+        let index = (sibling ? (Math.abs(sibling.rotation) / 22.5 + 1) : 0) * dir
+        let p = calcXY(index, radius)
+        let sprite = component.createObject(area, {
+                                                x: p.x,
+                                                y: p.y,
+                                                rotation: index * -22.5
+                                            });
+        sprite.transformOrigin = Item.BottomRight
+        if (sibling) {
+            if (dir > 0) {
+                sprite.bottomVisible = false
+            } else {
+                sprite.topVisible = false
             }
+        }
+
+        sprite["add"].connect (function (dir) {
+            createCurvedTrackPiece(sprite, dir)
+        })
     }
-        // let index = sibling ? (Math.abs(sibling.rotation) / 22.5 + 1) : 0
-        // let angle = index * -22.5
-        // let radius = 704
-        // let p = calcXY(index, radius)
-        // let sprite = component.createObject(area, {x: p.x, y: p.y});
-        // sprite.transformOrigin = Item.BottomLeft
-        // sprite.rotation = angle
 
-        // sprite["add"].connect (function (dir) {
-        //     createCurvedTrackPiece(sprite, dir)
-        // })
-    // }
-
-    Component.onCompleted: root.createCurvedTrackPiece()
+    Component.onCompleted: root.createCurvedTrackPiece(undefined, 1)
 
     Item {
         id: area
         height: parent.height
         width: parent.width
         scale: 0.3
-
-        // Canvas {
-        //     anchors.fill: parent
-        //     onPaint: {
-        //         var ctx = getContext("2d");
-        //         ctx.beginPath();
-        //         ctx.fillStyle = Qt.rgba(1, 0, 0, 0.5);
-        //         ctx.ellipse(0, 0, 352 * 3, 352 * 3)
-        //         ctx.fill();
-        //     }
-        // }
     }
 }

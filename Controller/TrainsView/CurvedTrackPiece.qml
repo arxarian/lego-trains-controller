@@ -5,8 +5,8 @@ Image {
 
     signal add(var dir)
 
-    property bool topVisible: false
-    property bool bottomVisible: false
+    property bool topVisible: true
+    property bool bottomVisible: true
 
     source: "qrc:/curved.png"
 
@@ -23,7 +23,7 @@ Image {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add("top")
+                root.add(1)
                 root.topVisible = false
             }
         }
@@ -41,7 +41,7 @@ Image {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add("bottom")
+                root.add(-1)
                 root.bottomVisible = false
             }
         }
