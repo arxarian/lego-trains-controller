@@ -10,6 +10,7 @@
         "TrainsView/DiscoverDevices.qml",
         "TrainsView/TrainControlPanel.qml",
         "TrainsView/TrackEditor.qml",
-        "TrainsView/TrackPiece.qml"
+        "TrainsView/CurvedTrackPiece.qml",
+        "TrainsView/StraightTrackPiece.qml"
     ]
 }

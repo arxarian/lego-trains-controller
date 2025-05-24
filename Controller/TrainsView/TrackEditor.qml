@@ -3,9 +3,9 @@ import QtQuick
 Item {
     id: root
 
-    property real scaleFactor: 0.05
+    property real scaleFactor: 0.2
     property real minimalScale: 0.05
-    property real maximalScale: 1
+    property real maximalScale: 3
 
     MouseArea {
         id: mouseArea
@@ -39,26 +39,74 @@ Item {
         }
     }
 
-    function createSpriteObjects(sibling) {
-        var component = Qt.createComponent("TrackPiece.qml");
+    function createStraightTrackPiece(sibling, dir) {
+        var component = Qt.createComponent("StraightTrackPiece.qml");
         var sprite = component.createObject(area, {x: 0, y: 0});
 
-        sprite.source = "qrc:/straight.png"
-        sprite["add"].connect (function () {
-            createSpriteObjects(sprite)
+        sprite["add"].connect (function (dir) {
+            createStraightTrackPiece(sprite, dir)
         })
 
         if (sibling) {
-            sprite.x = sibling.x - sibling.width
+            if (dir === "left") {
+                sprite.x = sibling.x - sibling.width
+                sprite.rightVisible = false
+            } else {
+                sprite.x = sibling.x + sibling.width
+                sprite.leftVisible = false
+            }
         }
     }
 
-    Component.onCompleted: root.createSpriteObjects()
+    function calcXY(index, radius) {
+        let x = radius * Math.cos(-index / 8 * Math.PI)
+        let y = radius * Math.sin(-index / 8 * Math.PI)
+        return {x, y}
+    }
+
+    function createCurvedTrackPiece(sibling, dir) {
+        let component = Qt.createComponent("CurvedTrackPiece.qml");
+        let radius = 1330
+        for (let i = 0; i < 16; i++) {
+                let p = calcXY(i, radius)
+                let sprite = component.createObject(area, {
+                    x: p.x,
+                    y: p.y,
+                    rotation: i * -22.5
+                });
+                sprite.transformOrigin = Item.BottomRight
+            }
+    }
+        // let index = sibling ? (Math.abs(sibling.rotation) / 22.5 + 1) : 0
+        // let angle = index * -22.5
+        // let radius = 704
+        // let p = calcXY(index, radius)
+        // let sprite = component.createObject(area, {x: p.x, y: p.y});
+        // sprite.transformOrigin = Item.BottomLeft
+        // sprite.rotation = angle
+
+        // sprite["add"].connect (function (dir) {
+        //     createCurvedTrackPiece(sprite, dir)
+        // })
+    // }
+
+    Component.onCompleted: root.createCurvedTrackPiece()
 
     Item {
         id: area
         height: parent.height
         width: parent.width
         scale: 0.3
+
+        // Canvas {
+        //     anchors.fill: parent
+        //     onPaint: {
+        //         var ctx = getContext("2d");
+        //         ctx.beginPath();
+        //         ctx.fillStyle = Qt.rgba(1, 0, 0, 0.5);
+        //         ctx.ellipse(0, 0, 352 * 3, 352 * 3)
+        //         ctx.fill();
+        //     }
+        // }
     }
 }
