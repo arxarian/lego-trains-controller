@@ -93,49 +93,25 @@ Item {
         let x = sibling ? sibling.x : 0
         let y = sibling ? sibling.y : 0
 
-        console.log("sibling: x, y", x, y)
-
         var component = Qt.createComponent("StraightTrackPiece.qml");
         var sprite = component.createObject(area, {x: x, y: y, rotation: rotation});
+        sprite.transformOrigin = Item.BottomRight
 
-        if (transformation.dir > 0) {
-            sprite.x -= sprite.height * Math.sin(Math.PI / 8)
-            sprite.y -= sprite.height * Math.cos(Math.PI / 8)
-            sprite.bottomVisible = false
-        } else {
-            sprite.y += sibling ? sibling.height : 0
+        if (sibling) {
+            if (transformation.dir > 0) {
+                sprite.x -= sprite.height * Math.sin(Math.PI / 8 * (rotation / -22.5))
+                sprite.y -= sprite.height * Math.cos(Math.PI / 8 * (rotation / -22.5))
+                sprite.bottomVisible = false
+            } else {
+                sprite.x += sprite.height * Math.sin(Math.PI / 8 * (rotation / -22.5))
+                sprite.y += sprite.height * Math.cos(Math.PI / 8 * (rotation / -22.5))
+                sprite.topVisible = false
+            }
         }
 
-        // sprite.x += transformation.offsetX - sprite.width       // TODO sibling?
-        // sprite.y = (sibling ? sibling.y : 0) - sprite.height    // TODO offsetY
-
-        // console.log("after offset: x, y", x, y)
-
-        // sprite.x -= sibling ? 185 : 0
-        // sprite.y -= sibling ? -37 : 0
-        // console.log("cos, sin",
-        //             (Math.cos(Math.PI / 8) * sprite.height).toFixed(1),
-        //             (Math.sin(Math.PI / 8)  * sprite.height).toFixed(1))
-
-        // sprite.x -= sibling ? (Math.cos(Math.PI / 8) * sprite.width) : 0
-        //sprite.y -= sibling ? (sprite.width - Math.sin(Math.PI / 8)  * sprite.width) : 0
-
-        console.log("sprite", sprite.width, sprite.height, rotation, x, y)
         sprite["add"].connect (function (transformation) {
             createTrackPiece(sprite, transformation)
         })
-
-        sprite.transformOrigin = Item.BottomRight
-
-        // if (sibling) {
-        //     if (transformation.angle > 0) {
-        //         sprite.y = sibling.y - sprite.height
-        //         sprite.bottomVisible = false
-        //     } else {
-        //         sprite.y = sibling.y + sibling.height
-        //         sprite.topVisible = false
-        //     }
-        // }
     }
 
     function createSwitchTrackPiece(sibling, transformation) {
@@ -191,8 +167,8 @@ Item {
 
     Item {
         id: area
-        x: 200
-        y: 400
+        // x: 200
+        // y: 400
         height: parent.height
         width: parent.width
         // scale: 0.7
