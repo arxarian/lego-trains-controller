@@ -7,7 +7,7 @@ Item {
     property real minimalScale: 0.05
     property real maximalScale: 3
 
-    property int trackType: 1
+    property int trackType: 0
 
     MouseArea {
         id: mouseArea
@@ -89,32 +89,57 @@ Item {
     }
 
     function createStraightTrackPiece(sibling, transformation) {
-        let index = (sibling ? (Math.abs(sibling.rotation) / 22.5) : 0) * transformation.dir
-        let rotation = sibling ? sibling.rotation : 0
-        let p = calcXY(index)
+        let rotation = (sibling ? sibling.rotation : 0) - 22.5 * transformation.angle
+        let x = sibling ? sibling.x : 0
+        let y = sibling ? sibling.y : 0
+
+        console.log("sibling: x, y", x, y)
 
         var component = Qt.createComponent("StraightTrackPiece.qml");
-        var sprite = component.createObject(area, {x: p.x, y: p.y, rotation: rotation});
+        var sprite = component.createObject(area, {x: x, y: y, rotation: rotation});
 
+        if (transformation.dir > 0) {
+            sprite.x -= sprite.height * Math.sin(Math.PI / 8)
+            sprite.y -= sprite.height * Math.cos(Math.PI / 8)
+            sprite.bottomVisible = false
+        } else {
+            sprite.y += sibling ? sibling.height : 0
+        }
+
+        // sprite.x += transformation.offsetX - sprite.width       // TODO sibling?
+        // sprite.y = (sibling ? sibling.y : 0) - sprite.height    // TODO offsetY
+
+        // console.log("after offset: x, y", x, y)
+
+        // sprite.x -= sibling ? 185 : 0
+        // sprite.y -= sibling ? -37 : 0
+        // console.log("cos, sin",
+        //             (Math.cos(Math.PI / 8) * sprite.height).toFixed(1),
+        //             (Math.sin(Math.PI / 8)  * sprite.height).toFixed(1))
+
+        // sprite.x -= sibling ? (Math.cos(Math.PI / 8) * sprite.width) : 0
+        //sprite.y -= sibling ? (sprite.width - Math.sin(Math.PI / 8)  * sprite.width) : 0
+
+        console.log("sprite", sprite.width, sprite.height, rotation, x, y)
         sprite["add"].connect (function (transformation) {
             createTrackPiece(sprite, transformation)
         })
 
-        console.log("dir", transformation.dir)
+        sprite.transformOrigin = Item.BottomRight
 
-        if (sibling) {
-            if (transformation.dir > 0) {
-                sprite.y = sibling.y - sprite.height
-                sprite.bottomVisible = false
-            } else {
-                sprite.y = sibling.y + sibling.height
-                sprite.topVisible = false
-            }
-        }
+        // if (sibling) {
+        //     if (transformation.angle > 0) {
+        //         sprite.y = sibling.y - sprite.height
+        //         sprite.bottomVisible = false
+        //     } else {
+        //         sprite.y = sibling.y + sibling.height
+        //         sprite.topVisible = false
+        //     }
+        // }
     }
 
     function createSwitchTrackPiece(sibling, transformation) {
-        let index = (sibling ? (Math.abs(sibling.rotation) / 22.5) : 0) * transformation.dir
+        let index = (sibling ? (Math.abs(sibling.rotation) / 22.5) : 0) * transformation.angle
         let rotation = sibling ? sibling.rotation : 0
         let p = calcXY(index)
 
@@ -126,13 +151,13 @@ Item {
         })
 
         if (sibling) {
-            if (transformation.dir === 1) {
+            if (transformation.angle === 1) {
                 sprite.y = sibling.y - sprite.height
                 sprite.bottomVisible = false
-            } else if (transformation.dir === 2 ) {
+            } else if (transformation.angle === 2 ) {
                 sprite.y = sibling.y - sprite.height
                 sprite.bottomVisible = false
-            } else if (transformation.dir === -1) {
+            } else if (transformation.angle === -1) {
                 sprite.y = sibling.y + sibling.height
                 sprite.topRightVisible = false
             }
@@ -140,14 +165,14 @@ Item {
     }
 
     function createCurvedTrackPiece(sibling, transformation) {
-        let index = (sibling ? (Math.abs(sibling.rotation) / 22.5 + 1) : 0) * transformation.dir
+        let index = (sibling ? (Math.abs(sibling.rotation) / 22.5 + 1) : 0) * transformation.angle
         let rotation = index * -22.5
         let p = calcXY(index)
 
         let component = Qt.createComponent("CurvedTrackPiece.qml");
         let sprite = component.createObject(area, { x: p.x, y: p.y, rotation: rotation });
 
-        sprite.transformOrigin = Item.BottomRight
+        // sprite.transformOrigin = Item.BottomRight
 
         if (sibling) {
             if (rotation < 0) {
@@ -162,13 +187,14 @@ Item {
         })
     }
 
-    Component.onCompleted: root.createTrackPiece(undefined, {dir: 2})
+    Component.onCompleted: root.createTrackPiece(undefined, {angle: 1, offsetX: 0, offsetY: 0})
 
     Item {
         id: area
-        x: -300
+        x: 200
+        y: 400
         height: parent.height
         width: parent.width
-        scale: 0.3
+        // scale: 0.7
     }
 }

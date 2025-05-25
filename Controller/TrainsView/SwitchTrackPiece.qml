@@ -36,7 +36,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({dir: 1, offsetX: 226, offsetY: 0, rotationOrigin: Item.BottomRight})
+                root.add({angle: 1, offsetX: 226, offsetY: 0, rotationOrigin: Item.BottomRight})
                 root.topLeftVisible = false
             }
         }
@@ -72,7 +72,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({dir: 0, offsetX: root.width, offsetY: 55, rotationOrigin: Item.BottomRight})
+                root.add({angle: 0, offsetX: root.width, offsetY: 55, rotationOrigin: Item.BottomRight})
                 root.topRightVisible = false
             }
         }
@@ -96,7 +96,6 @@ TrackPiece {
         }
     }
 
-
     Rectangle {
         visible: root.bottomVisible
         anchors.right: parent.right
@@ -109,7 +108,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({dir: -1, offsetX: root.width, offsetY: parent.height, rotationOrigin: Item.BottomRight})
+                root.add({angle: -1, offsetX: root.width, offsetY: parent.height, rotationOrigin: Item.BottomRight})
                 root.bottomVisible = false
             }
         }
