@@ -172,5 +172,9 @@ Item {
         height: parent.height
         width: parent.width
         // scale: 0.7
+
+        Behavior on scale {
+            NumberAnimation { duration: area.scale > 1.5 ? 150 : 250 }
+        }
     }
 }
