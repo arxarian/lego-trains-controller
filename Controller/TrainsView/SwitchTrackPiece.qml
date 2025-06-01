@@ -4,6 +4,7 @@ TrackPiece {
     id: root
 
     source: "qrc:/switch left.png"
+    trackType: 2
 
     Rectangle {
         z: 1
