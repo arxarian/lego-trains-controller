@@ -22,7 +22,4 @@ Image {
     //     color: "transparent"
     //     border.width: 4
     // }
-
-    // onHeightChanged: console.log(width, height)
-    // onWidthChanged: console.log(width, height)
 }

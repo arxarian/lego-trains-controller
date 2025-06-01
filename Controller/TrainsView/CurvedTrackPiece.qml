@@ -55,7 +55,7 @@ TrackPiece {
         height: 20
         radius: width
         opacity: 0.8
-        color: "gold"
+        color: "red"
 
         Rectangle {
             anchors.centerIn: parent

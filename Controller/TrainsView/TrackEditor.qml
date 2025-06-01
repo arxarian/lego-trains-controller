@@ -159,136 +159,74 @@ Item {
         }
     }
 
-    function point_on_circle(radius, initial_angle_deg, delta_angle_deg) {
-        let angleRad = (initial_angle_deg + delta_angle_deg) * Math.PI / 180
-        x = radius * Math.cos(angleRad)
-        y = radius * Math.sin(angleRad)
+    function pointOnCircle(sibling) {
+        // notes: y ax is reversed!
+        // * so the 0 rotation equals to 90 degrees
+        // * for x ax is used sinus
+        // * for y ax is used cosinus
+
+        const radius = 1358
+        const basicAngleIncrement = 22.5
+        const defaultRotation = 90
+
+        // find the center
+        let angleRadius = Math.PI / 8 * ((-sibling.rotation + defaultRotation) / basicAngleIncrement)
+        let cx = sibling.x + sibling.width - radius * Math.sin(angleRadius)
+        let cy = sibling.y + sibling.height - radius * Math.cos(angleRadius)
+
+        // console.log("p", sibling.x + sibling.width, sibling.y + sibling.height, -sibling.rotation + defaultRotation)
+        // console.log("center", cx, cy)
+
+        // find the next point
+        angleRadius = Math.PI / 8 * ((-sibling.rotation + basicAngleIncrement + defaultRotation) / basicAngleIncrement)
+        let x = cx + radius * Math.sin(angleRadius)
+        let y = cy + radius * Math.cos(angleRadius)
+
+        // console.log("p next", x, y)
+
         return {x, y}
     }
 
     function createCurvedTrackPiece(sibling, transformation) {
-
-        if (sibling) transformation.angle = 1
 
         let rotation = (sibling ? sibling.rotation : 0) - 22.5 * transformation.angle
         let x = sibling ? sibling.x : 0
         let y = sibling ? sibling.y : 0
 
         let component = Qt.createComponent("CurvedTrackPiece.qml");
-        let sprite = component.createObject(area, { x: x, y: y, rotation: rotation });
+        let sprite = component.createObject(area);
+
+        if (sibling) {
+            if (transformation.dir > 0) {
+                let p = pointOnCircle(sibling)
+                sprite.x = p.x - sprite.width
+                        // + sprite.bottomOffsetX - sibling.topOffsetX  // connects curved to straight
+                sprite.y = p.y - sprite.height
+                sprite.bottomVisible = false
+            } else {
+                sprite.topVisible = false
+            }
+        }
+
         sprite.transformOrigin = Item.BottomRight
-
-
-        // find the center
-        let r = 1361
-        let angle_r = Math.PI / 8 * (90 / 22.5)
-        let cx = sprite.width - r * Math.sin(angle_r)
-        let cy = sprite.height - r * Math.cos(angle_r)
-        console.log("x1, y1", sprite.width, sprite.height)
-        console.log("cx, cy", cx, cy)
-        center.x = cx
-        center.y = cy
-
-        angle_r = Math.PI / 8 * (112.5 / 22.5)
-        let x2 = cx + r * Math.sin(angle_r)
-        let y2 = cy + r * Math.cos(angle_r)
-        console.log("x2, y2", x2.toFixed(1), y2.toFixed(1))
-        p2.x = x2 - p2.width / 2
-        p2.y = y2 - p2.height / 2
-
-        angle_r = Math.PI / 8 * (135 / 22.5)
-        let x3 = cx + r * Math.sin(angle_r)
-        let y3 = cy + r * Math.cos(angle_r)
-        console.log("x3, y3", x3.toFixed(1), y3.toFixed(1))
-        p3.x = x3 - p3.width / 2
-        p3.y = y3 - p3.height / 2
-
-
-        // console.log("rotation", rotation / -22.5, transformation.angle, sprite.height)
-        // if (sibling) {
-        //     // calc the center
-        //     let r = 1361
-        //     let p1x = x + sprite.width
-        //     let p1y = y + sprite.height
-
-        //     let p2 = rotatePoint(p1x, p1y, p1x - r, p1y, rotation)
-
-        //     // console.log(point_on_circle(r, ))
-
-        //     console.log("new point", p2.x, p2.y)
-        //     sprite.x = p2.x - sprite.width
-        //     sprite.y = p2.y - sprite.height
-        //     sprite.bottomVisible = false
-        //     sibling.topVisible = false
-
-
-        //     // sprite.rotation += 22.5
-        //     // rotation += 22.5
-        //     // radius 1361
-        //     // if (transformation.dir > 0) {
-        //     //     sprite.x -= (r/*sprite.height/* - sibling.topOffsetX*/) * Math.sin(Math.PI / 8 * (rotation / -22.5))
-        //     //             // + -transformation.offsetX
-        //     //             // + sibling.topOffsetX
-        //     //             // + sprite.bottomOffsetX - sibling.topOffsetX  // connects curved to straight
-        //     //     sprite.y -= (r/*sprite.height/* - sibling.topOffsetX*/) * Math.cos(Math.PI / 8 * (rotation / -22.5))
-        //     //     sprite.bottomVisible = false
-        //     // } else {
-        //     //     sprite.topVisible = false
-        //     // }
-        // }
+        sprite.rotation = rotation
 
         sprite["add"].connect (function (transformation) {
             createTrackPiece(sprite, transformation)
         })
 
-        console.log("x, y", sprite.x, sprite.y)
-
         return sprite
     }
 
-    Component.onCompleted: {
-//          root.createTrackPiece(undefined, {angle: 0, offsetX: 0, offsetY: 0})
-// return
-        var sibling = undefined
-        for (let i = 0; i < 1; i++) {
-            sibling = root.createCurvedTrackPiece(sibling, {angle: 0, dir: 1})
-        }
-    }
+    Component.onCompleted: root.createTrackPiece(undefined, {angle: 0, dir: 1})
 
     Item {
         id: area
-        x: 200
+        x: 400
         y: 200
         height: parent.height
         width: parent.width
-        scale: 0.2
-
-        Rectangle {
-            id: center
-            z: 10
-            width: 40
-            height: 40
-            radius: 20
-            color: "green"
-        }
-
-        Rectangle {
-            id: p2
-            z: 10
-            width: 40
-            height: 40
-            radius: 20
-            color: "red"
-        }
-
-        Rectangle {
-            id: p3
-            z: 10
-            width: 40
-            height: 40
-            radius: 20
-            color: "blue"
-        }
+        scale: 0.5
 
         Behavior on scale {
             NumberAnimation { duration: area.scale > 1.5 ? 150 : 250 }
