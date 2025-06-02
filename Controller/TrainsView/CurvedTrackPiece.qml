@@ -40,7 +40,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({angle: 1, dir: 1, offsetX: 226, offsetY: 0})
+                root.add({angle: 1, dir: 1, offsetX: 227.62, offsetY: 0.32})
                 root.topVisible = false
             }
         }

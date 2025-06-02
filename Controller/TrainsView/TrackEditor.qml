@@ -198,18 +198,26 @@ Item {
         let sprite = component.createObject(area);
 
         if (sibling) {
-            if (transformation.dir > 0) {
-                let p = pointOnCircle(sibling, true)
-                sprite.x = p.x - sprite.width
-                        // + sprite.bottomOffsetX - sibling.topOffsetX  // connects curved to straight
-                sprite.y = p.y - sprite.height
-                sprite.bottomVisible = false
-            } else {
-                let p = pointOnCircle(sibling, false)
-                sprite.x = p.x - sprite.width
-                sprite.y = p.y - sprite.height
-                sprite.topVisible = false
-                rotation += 22.5
+            console.log("sibling type", sibling.trackType)
+            if (sibling.trackType === 1) {
+                if (transformation.dir > 0) {
+                    let p = pointOnCircle(sibling, true)
+                    sprite.x = p.x - sprite.width
+                    // + sprite.bottomOffsetX - sibling.topOffsetX  // connects curved to straight
+                    sprite.y = p.y - sprite.height
+                    sprite.bottomVisible = false
+                } else {
+                    let p = pointOnCircle(sibling, false)
+                    sprite.x = p.x - sprite.width
+                    sprite.y = p.y - sprite.height
+                    sprite.topVisible = false
+                    rotation += 22.5
+                }
+            } else if (sibling.trackType === 0) {
+                if (transformation.dir > 0) {
+                    sprite.x -= sprite.bottomOffsetX
+                    sprite.y -= sprite.height
+                }
             }
         }
 
@@ -224,9 +232,9 @@ Item {
     }
 
     Component.onCompleted: {
-        root.trackType = 1
+        root.trackType = 0
         root.createTrackPiece(undefined, {angle: 0, dir: 1})
-        // root.trackType = 1
+        root.trackType = 1
     }
 
     Item {
