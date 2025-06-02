@@ -8,7 +8,7 @@ Item {
     property real minimalScale: 0.1
     property real maximalScale: 3
 
-    property int trackType: 0
+    property int trackType: Globals.rail.straight
 
     MouseArea {
         id: mouseArea
@@ -38,24 +38,24 @@ Item {
         anchors.rightMargin: 20
 
         Button {
-            checked: root.trackType === 0
+            checked: root.trackType === Globals.rail.straight
             checkable: true
             text: "Straight"
-            onClicked: root.trackType = 0
+            onClicked: root.trackType = Globals.rail.straight
         }
 
         Button {
-            checked: root.trackType === 1
+            checked: root.trackType === Globals.rail.curved
             checkable: true
             text: "Curved"
-            onClicked: root.trackType = 1
+            onClicked: root.trackType = Globals.rail.curved
         }
 
         Button {
-            checked: root.trackType === 2
+            checked: root.trackType === Globals.rail.switchRail
             checkable: true
             text: "Switch"
-            onClicked: root.trackType = 2
+            onClicked: root.trackType = Globals.rail.switchRail
         }
     }
 
@@ -80,11 +80,11 @@ Item {
     }
 
     function createTrackPiece(sibling, transformation) {
-        if (root.trackType === 0) {
+        if (root.trackType === Globals.rail.straight) {
             createStraightTrackPiece(sibling, transformation)
-        } else if (root.trackType === 1) {
+        } else if (root.trackType === Globals.rail.curved) {
             createCurvedTrackPiece(sibling, transformation)
-        } else if (root.trackType === 2) {
+        } else if (root.trackType === Globals.rail.switchRail) {
             createSwitchTrackPiece(sibling, transformation)
         }
     }
@@ -99,11 +99,11 @@ Item {
         sprite.transformOrigin = Item.BottomRight
 
         if (sibling) {
-            if (transformation.dir > 0) {
+            if (transformation.dir === Globals.dir.up) {
                 sprite.x -= sprite.height * Math.sin(Math.PI / 8 * (rotation / -22.5))
                 sprite.y -= sprite.height * Math.cos(Math.PI / 8 * (rotation / -22.5))
                 sprite.bottomVisible = false
-            } else {
+            } else if (transformation.dir === Globals.dir.down) {
                 sprite.x += sprite.height * Math.sin(Math.PI / 8 * (rotation / -22.5))
                 sprite.y += sprite.height * Math.cos(Math.PI / 8 * (rotation / -22.5))
                 sprite.topVisible = false
@@ -199,24 +199,27 @@ Item {
 
         if (sibling) {
             console.log("sibling type", sibling.trackType)
-            if (sibling.trackType === 1) {
-                if (transformation.dir > 0) {
+            if (sibling.trackType === Globals.rail.straight) {
+                if (transformation.dir === Globals.dir.up) {
+                    sprite.x -= sprite.bottomOffsetX
+                    sprite.y -= sprite.height
+                    sprite.bottomVisible = false
+                } else if (transformation.dir === Globals.dir.down) {
+                    //
+                }
+            } else if (sibling.trackType === Globals.rail.curved) {
+                if (transformation.dir === Globals.dir.up) {
                     let p = pointOnCircle(sibling, true)
                     sprite.x = p.x - sprite.width
                     // + sprite.bottomOffsetX - sibling.topOffsetX  // connects curved to straight
                     sprite.y = p.y - sprite.height
                     sprite.bottomVisible = false
-                } else {
+                } else if (transformation.dir === Globals.dir.down) {
                     let p = pointOnCircle(sibling, false)
                     sprite.x = p.x - sprite.width
                     sprite.y = p.y - sprite.height
                     sprite.topVisible = false
                     rotation += 22.5
-                }
-            } else if (sibling.trackType === 0) {
-                if (transformation.dir > 0) {
-                    sprite.x -= sprite.bottomOffsetX
-                    sprite.y -= sprite.height
                 }
             }
         }
@@ -232,9 +235,9 @@ Item {
     }
 
     Component.onCompleted: {
-        root.trackType = 0
+        root.trackType = Globals.rail.curved
         root.createTrackPiece(undefined, {angle: 0, dir: 1})
-        root.trackType = 1
+        // root.trackType = 1
     }
 
     Item {

@@ -1,3 +1,4 @@
 module TrainView
 Main 1.0 Main.qml
 DiscoverDevices 1.0 DiscoverDevices.qml
+singleton Globals 1.0 Globals.qml

@@ -4,7 +4,7 @@ TrackPiece {
     id: root
 
     source: "qrc:/straight.png"
-    trackType: 0
+    trackType: Globals.rail.straight
 
     // Rectangle {
     //     rotation: 22.5
@@ -40,7 +40,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({angle: 0, dir: 1, offsetX: parent.width, offsetY: 0})
+                root.add({angle: 0, dir: Globals.dir.up, offsetX: parent.width, offsetY: 0})
                 root.topVisible = false
             }
         }
@@ -75,7 +75,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({angle: 0, dir: -1, offsetX: parent.width, offsetY: parent.height})
+                root.add({angle: 0, dir: Globals.dir.down, offsetX: parent.width, offsetY: parent.height})
                 root.bottomVisible = false
             }
         }

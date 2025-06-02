@@ -4,7 +4,7 @@ TrackPiece {
     id: root
 
     source: "qrc:/switch left.png"
-    trackType: 2
+    trackType: Globals.rail.switchRail
 
     Rectangle {
         z: 1

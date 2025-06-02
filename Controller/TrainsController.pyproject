@@ -13,6 +13,7 @@
         "TrainsView/CurvedTrackPiece.qml",
         "TrainsView/StraightTrackPiece.qml",
         "TrainsView/SwitchTrackPiece.qml",
-        "TrainsView/TrackPiece.qml"
+        "TrainsView/TrackPiece.qml",
+        "TrainsView/Globals.qml"
     ]
 }

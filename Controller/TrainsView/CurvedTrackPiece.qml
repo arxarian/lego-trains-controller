@@ -4,7 +4,7 @@ TrackPiece {
     id: root
 
     source: "qrc:/curved.png"
-    trackType: 1
+    trackType: Globals.rail.curved
 
     topOffsetX: 104
     bottomOffsetX: 89
@@ -40,7 +40,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({angle: 1, dir: 1, offsetX: 227.62, offsetY: 0.32})
+                root.add({angle: 1, dir: Globals.dir.up, offsetX: 227.62, offsetY: 0.32})
                 root.topVisible = false
             }
         }
@@ -77,7 +77,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({angle: 0, dir: -1, offsetX: root.width, offsetY: parent.height})
+                root.add({angle: 0, dir: Globals.dir.down, offsetX: root.width, offsetY: parent.height})
                 root.bottomVisible = false
             }
         }
