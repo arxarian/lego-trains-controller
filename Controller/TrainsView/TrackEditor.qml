@@ -8,7 +8,7 @@ Item {
     property real minimalScale: 0.1
     property real maximalScale: 3
 
-    property int trackType: 1
+    property int trackType: 0
 
     MouseArea {
         id: mouseArea
@@ -159,7 +159,7 @@ Item {
         }
     }
 
-    function pointOnCircle(sibling) {
+    function pointOnCircle(sibling, anticlockwise = true) {
         // notes: y ax is reversed!
         // * so the 0 rotation equals to 90 degrees
         // * for x ax is used sinus
@@ -174,15 +174,16 @@ Item {
         let cx = sibling.x + sibling.width - radius * Math.sin(angleRadius)
         let cy = sibling.y + sibling.height - radius * Math.cos(angleRadius)
 
-        // console.log("p", sibling.x + sibling.width, sibling.y + sibling.height, -sibling.rotation + defaultRotation)
-        // console.log("center", cx, cy)
+        console.log("p", sibling.x + sibling.width, sibling.y + sibling.height, -sibling.rotation + defaultRotation)
+        console.log("center", cx, cy)
 
         // find the next point
-        angleRadius = Math.PI / 8 * ((-sibling.rotation + basicAngleIncrement + defaultRotation) / basicAngleIncrement)
+        angleRadius = Math.PI / 8 * ((-sibling.rotation + basicAngleIncrement * (anticlockwise ? 1 : -1)
+                                      + defaultRotation) / basicAngleIncrement)
         let x = cx + radius * Math.sin(angleRadius)
         let y = cy + radius * Math.cos(angleRadius)
 
-        // console.log("p next", x, y)
+        console.log("p next", x, y)
 
         return {x, y}
     }
@@ -198,13 +199,17 @@ Item {
 
         if (sibling) {
             if (transformation.dir > 0) {
-                let p = pointOnCircle(sibling)
+                let p = pointOnCircle(sibling, true)
                 sprite.x = p.x - sprite.width
                         // + sprite.bottomOffsetX - sibling.topOffsetX  // connects curved to straight
                 sprite.y = p.y - sprite.height
                 sprite.bottomVisible = false
             } else {
+                let p = pointOnCircle(sibling, false)
+                sprite.x = p.x - sprite.width
+                sprite.y = p.y - sprite.height
                 sprite.topVisible = false
+                rotation += 22.5
             }
         }
 
@@ -218,7 +223,11 @@ Item {
         return sprite
     }
 
-    Component.onCompleted: root.createTrackPiece(undefined, {angle: 0, dir: 1})
+    Component.onCompleted: {
+        root.trackType = 1
+        root.createTrackPiece(undefined, {angle: 0, dir: 1})
+        // root.trackType = 1
+    }
 
     Item {
         id: area
