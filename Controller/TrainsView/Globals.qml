@@ -13,4 +13,8 @@ QtObject {
         readonly property int up: 1
         readonly property int down: -1
     }
+
+    readonly property real curveRadius: 1358
+    readonly property real basicAngleIncrement: 22.5
+    readonly property real defaultRotation: 90
 }

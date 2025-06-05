@@ -159,27 +159,23 @@ Item {
         }
     }
 
-    function pointOnCircle(sibling, anticlockwise = true) {
+    function pointOnCircle(sibling, radius, anticlockwise = true) {
         // notes: y ax is reversed!
         // * so the 0 rotation equals to 90 degrees
         // * for x ax is used sinus
         // * for y ax is used cosinus
 
-        const radius = 1358
-        const basicAngleIncrement = 22.5
-        const defaultRotation = 90
-
         // find the center
-        let angleRadius = Math.PI / 8 * ((-sibling.rotation + defaultRotation) / basicAngleIncrement)
+        let angleRadius = Math.PI / 8 * ((-sibling.rotation + Globals.defaultRotation) / Globals.basicAngleIncrement)
         let cx = sibling.x + sibling.width - radius * Math.sin(angleRadius)
         let cy = sibling.y + sibling.height - radius * Math.cos(angleRadius)
 
-        console.log("p", sibling.x + sibling.width, sibling.y + sibling.height, -sibling.rotation + defaultRotation)
+        console.log("p", sibling.x + sibling.width, sibling.y + sibling.height, -sibling.rotation + Globals.defaultRotation)
         console.log("center", cx, cy)
 
         // find the next point
-        angleRadius = Math.PI / 8 * ((-sibling.rotation + basicAngleIncrement * (anticlockwise ? 1 : -1)
-                                      + defaultRotation) / basicAngleIncrement)
+        angleRadius = Math.PI / 8 * ((-sibling.rotation + Globals.basicAngleIncrement * (anticlockwise ? 1 : -1)
+                                      + Globals.defaultRotation) / Globals.basicAngleIncrement)
         let x = cx + radius * Math.sin(angleRadius)
         let y = cy + radius * Math.cos(angleRadius)
 
@@ -209,13 +205,13 @@ Item {
                 }
             } else if (sibling.trackType === Globals.rail.curved) {
                 if (transformation.dir === Globals.dir.up) {
-                    let p = pointOnCircle(sibling, true)
+                    let p = pointOnCircle(sibling, Globals.curveRadius, true)
                     sprite.x = p.x - sprite.width
                     // + sprite.bottomOffsetX - sibling.topOffsetX  // connects curved to straight
                     sprite.y = p.y - sprite.height
                     sprite.bottomVisible = false
                 } else if (transformation.dir === Globals.dir.down) {
-                    let p = pointOnCircle(sibling, false)
+                    let p = pointOnCircle(sibling, Globals.curveRadius, false)
                     sprite.x = p.x - sprite.width
                     sprite.y = p.y - sprite.height
                     sprite.topVisible = false
