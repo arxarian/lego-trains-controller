@@ -70,6 +70,11 @@ Item {
         }
     }
 
+    function findRotationPoint(sibling) {
+        var rotationPoint = Qt.point(sibling.width - sibling.topOffsetX, 0)
+        return sibling.mapToItem(area, rotationPoint)
+    }
+
     function calcXY(index) {
         const radius = 520//1330
 
@@ -99,14 +104,25 @@ Item {
         sprite.transformOrigin = Item.BottomRight
 
         if (sibling) {
-            if (transformation.dir === Globals.dir.up) {
-                sprite.x -= sprite.height * Math.sin(Math.PI / 8 * (rotation / -22.5))
-                sprite.y -= sprite.height * Math.cos(Math.PI / 8 * (rotation / -22.5))
-                sprite.bottomVisible = false
-            } else if (transformation.dir === Globals.dir.down) {
-                sprite.x += sprite.height * Math.sin(Math.PI / 8 * (rotation / -22.5))
-                sprite.y += sprite.height * Math.cos(Math.PI / 8 * (rotation / -22.5))
-                sprite.topVisible = false
+            if (sibling.trackType === Globals.rail.curved) {
+                if (transformation.dir === Globals.dir.up) {
+                    var rotationPoint = findRotationPoint(sibling)
+                    sprite.x = rotationPoint.x - sprite.width
+                    sprite.y = rotationPoint.y - sprite.height
+                    sprite.bottomVisible = false
+                } else if (transformation.dir === Globals.dir.down) {
+                    //
+                }
+            } else if (sibling.trackType === Globals.rail.straight) {
+                if (transformation.dir === Globals.dir.up) {
+                    sprite.x -= sprite.height * Math.sin(Math.PI / 8 * (rotation / -22.5))
+                    sprite.y -= sprite.height * Math.cos(Math.PI / 8 * (rotation / -22.5))
+                    sprite.bottomVisible = false
+                } else if (transformation.dir === Globals.dir.down) {
+                    sprite.x += sprite.height * Math.sin(Math.PI / 8 * (rotation / -22.5))
+                    sprite.y += sprite.height * Math.cos(Math.PI / 8 * (rotation / -22.5))
+                    sprite.topVisible = false
+                }
             }
         }
 
@@ -194,11 +210,11 @@ Item {
         let sprite = component.createObject(area);
 
         if (sibling) {
-            console.log("sibling type", sibling.trackType)
             if (sibling.trackType === Globals.rail.straight) {
                 if (transformation.dir === Globals.dir.up) {
-                    sprite.x -= sprite.bottomOffsetX
-                    sprite.y -= sprite.height
+                    var rotationPoint = findRotationPoint(sibling)
+                    sprite.x = rotationPoint.x - sprite.width
+                    sprite.y = rotationPoint.y - sprite.height
                     sprite.bottomVisible = false
                 } else if (transformation.dir === Globals.dir.down) {
                     //
@@ -207,7 +223,6 @@ Item {
                 if (transformation.dir === Globals.dir.up) {
                     let p = pointOnCircle(sibling, Globals.curveRadius, true)
                     sprite.x = p.x - sprite.width
-                    // + sprite.bottomOffsetX - sibling.topOffsetX  // connects curved to straight
                     sprite.y = p.y - sprite.height
                     sprite.bottomVisible = false
                 } else if (transformation.dir === Globals.dir.down) {
@@ -231,9 +246,9 @@ Item {
     }
 
     Component.onCompleted: {
+        root.trackType = Globals.rail.straight
+        root.createTrackPiece(undefined, {angle: 1, dir: 1})
         root.trackType = Globals.rail.curved
-        root.createTrackPiece(undefined, {angle: 0, dir: 1})
-        // root.trackType = 1
     }
 
     Item {
