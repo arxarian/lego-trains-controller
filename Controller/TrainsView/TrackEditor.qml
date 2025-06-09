@@ -262,7 +262,7 @@ Item {
         GridView {
             id: grid
 
-            property real size: 32
+            property real size: 40
 
             z: -1
             anchors.fill: parent
