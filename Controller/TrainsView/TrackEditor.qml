@@ -114,23 +114,14 @@ Item {
                     //
                 }
             } else if (sibling.trackType === Globals.rail.straight) {
-                if (transformation.dir === Globals.dir.up) {
-                    let rotationPoint = Qt.point(transformation.offsetX, transformation.offsetY)
-                    let origin = sibling.mapToItem(area, rotationPoint)
+                let rotationPoint = Qt.point(transformation.offsetX, transformation.offsetY)
+                let origin = sibling.mapToItem(area, rotationPoint)
 
-                    sprite.x = origin.x - sprite.width
-                    sprite.y = origin.y - sprite.height
+                sprite.x = origin.x - sprite.width
+                sprite.y = origin.y - (transformation.dir === Globals.dir.up ? sprite.height : 0)
 
-                    sprite.bottomVisible = false
-                } else if (transformation.dir === Globals.dir.down) {
-                    let rotationPoint = Qt.point(transformation.offsetX, transformation.offsetY)
-                    let origin = sibling.mapToItem(area, rotationPoint)
-
-                    sprite.x = origin.x - sprite.width
-                    sprite.y = origin.y
-
-                    sprite.topVisible = false
-                }
+                sprite.topVisible = (transformation.dir === Globals.dir.up)
+                sprite.bottomVisible = (transformation.dir === Globals.dir.down)
             }
         }
 
