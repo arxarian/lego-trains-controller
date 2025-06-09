@@ -104,25 +104,14 @@ Item {
         sprite.transformOrigin = transformation.rotationOrigin ? transformation.rotationOrigin : Item.BottomRight
 
         if (sibling) {
-            if (sibling.trackType === Globals.rail.curved) {
-                if (transformation.dir === Globals.dir.up) {
-                    let rotationPoint = findRotationPoint(sibling)
-                    sprite.x = rotationPoint.x - sprite.width
-                    sprite.y = rotationPoint.y - sprite.height
-                    sprite.bottomVisible = false
-                } else if (transformation.dir === Globals.dir.down) {
-                    //
-                }
-            } else if (sibling.trackType === Globals.rail.straight) {
-                let rotationPoint = Qt.point(transformation.offsetX, transformation.offsetY)
-                let origin = sibling.mapToItem(area, rotationPoint)
+            let rotationPoint = Qt.point(transformation.offsetX, transformation.offsetY)
+            let origin = sibling.mapToItem(area, rotationPoint)
 
-                sprite.x = origin.x - sprite.width
-                sprite.y = origin.y - (transformation.dir === Globals.dir.up ? sprite.height : 0)
+            sprite.x = origin.x - sprite.width
+            sprite.y = origin.y - (transformation.dir === Globals.dir.up ? sprite.height : 0)
 
-                sprite.topVisible = (transformation.dir === Globals.dir.up)
-                sprite.bottomVisible = (transformation.dir === Globals.dir.down)
-            }
+            sprite.topVisible = (transformation.dir === Globals.dir.up)
+            sprite.bottomVisible = (transformation.dir === Globals.dir.down)
         }
 
         sprite["add"].connect (function (transformation) {
