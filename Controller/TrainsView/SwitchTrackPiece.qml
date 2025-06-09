@@ -109,7 +109,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({angle: -1, offsetX: root.width, offsetY: parent.height, rotationOrigin: Item.BottomRight})
+                root.add({angle: -1, offsetX: root.width, offsetY: root.height, rotationOrigin: Item.BottomRight})
                 root.bottomVisible = false
             }
         }

@@ -6,12 +6,12 @@ TrackPiece {
     source: "qrc:/curved.png"
     trackType: Globals.rail.curved
 
-    topOffsetX: 104
-    bottomOffsetX: 89
+    topOffsetX: 296
+    bottomOffsetX: 106
 
     Rectangle {
         z: 1
-        x: 226 - width / 2
+        x: 296 - width / 2
         y: - height / 2
         width: 20
         height: 20
@@ -29,10 +29,10 @@ TrackPiece {
 
     Rectangle {
         visible: root.topVisible
-        x: -19
+        x: -25
         transformOrigin: Item.TopRight
         rotation: -22.5
-        width: parent.width * 0.74
+        width: parent.width * 0.75
         height: 50
 
         color: "#55FF00FF"
@@ -40,7 +40,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({angle: 1, dir: Globals.dir.up, offsetX: 227.62, offsetY: 0.32})
+                root.add({angle: 1, dir: Globals.dir.up, offsetX: 296, offsetY: 0})
                 root.topVisible = false
             }
         }
@@ -69,7 +69,7 @@ TrackPiece {
         visible: root.bottomVisible
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        width: parent.width * 0.74
+        width: parent.width * 0.75
         height: 50
 
         color: "#55FF00FF"
@@ -77,7 +77,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({angle: 0, dir: Globals.dir.down, offsetX: root.width, offsetY: parent.height})
+                root.add({angle: 0, dir: Globals.dir.down, offsetX: root.width, offsetY: root.height})
                 root.bottomVisible = false
             }
         }

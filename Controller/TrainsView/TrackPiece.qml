@@ -6,10 +6,10 @@ Image {
     // TODO is offset used?
     signal add(var tranformation)  //trans: int angle, int dir, real offsetX, real offsetY, int rotationOrigin
 
-    property bool topVisible: false
-    property bool bottomVisible: false
-    property bool topLeftVisible: false
-    property bool topRightVisible: false
+    property bool topVisible: true
+    property bool bottomVisible: true
+    property bool topLeftVisible: true
+    property bool topRightVisible: true
 
     property int trackType: -1
     property real topOffsetX: 0

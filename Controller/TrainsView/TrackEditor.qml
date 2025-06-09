@@ -71,7 +71,7 @@ Item {
     }
 
     function findRotationPoint(sibling) {
-        var rotationPoint = Qt.point(sibling.width - sibling.topOffsetX, 0)
+        let rotationPoint = Qt.point(sibling.width - sibling.topOffsetX, 0)
         return sibling.mapToItem(area, rotationPoint)
     }
 
@@ -101,12 +101,12 @@ Item {
 
         var component = Qt.createComponent("StraightTrackPiece.qml");
         var sprite = component.createObject(area, {x: x, y: y, rotation: rotation});
-        sprite.transformOrigin = Item.BottomRight
+        sprite.transformOrigin = transformation.rotationOrigin ? transformation.rotationOrigin : Item.BottomRight
 
         if (sibling) {
             if (sibling.trackType === Globals.rail.curved) {
                 if (transformation.dir === Globals.dir.up) {
-                    var rotationPoint = findRotationPoint(sibling)
+                    let rotationPoint = findRotationPoint(sibling)
                     sprite.x = rotationPoint.x - sprite.width
                     sprite.y = rotationPoint.y - sprite.height
                     sprite.bottomVisible = false
@@ -115,12 +115,20 @@ Item {
                 }
             } else if (sibling.trackType === Globals.rail.straight) {
                 if (transformation.dir === Globals.dir.up) {
-                    sprite.x -= sprite.height * Math.sin(Math.PI / 8 * (rotation / -22.5))
-                    sprite.y -= sprite.height * Math.cos(Math.PI / 8 * (rotation / -22.5))
+                    let rotationPoint = Qt.point(transformation.offsetX, transformation.offsetY)
+                    let origin = sibling.mapToItem(area, rotationPoint)
+
+                    sprite.x = origin.x - sprite.width
+                    sprite.y = origin.y - sprite.height
+
                     sprite.bottomVisible = false
                 } else if (transformation.dir === Globals.dir.down) {
-                    sprite.x += sprite.height * Math.sin(Math.PI / 8 * (rotation / -22.5))
-                    sprite.y += sprite.height * Math.cos(Math.PI / 8 * (rotation / -22.5))
+                    let rotationPoint = Qt.point(transformation.offsetX, transformation.offsetY)
+                    let origin = sibling.mapToItem(area, rotationPoint)
+
+                    sprite.x = origin.x - sprite.width
+                    sprite.y = origin.y
+
                     sprite.topVisible = false
                 }
             }
@@ -259,24 +267,37 @@ Item {
         width: parent.width
         scale: 0.5
 
-        GridView {
-            id: grid
+        // GridView {
+        //     id: grid
 
-            property real size: 40
+        //     property real size: 40
 
-            z: -1
-            anchors.fill: parent
-            cellHeight: grid.size
-            cellWidth: grid.size
-            model: 4096
-            delegate: Rectangle {
-                width: grid.cellWidth
-                height: grid.cellHeight
-                color: "transparent"
-                border.width: 1
-            }
+        //     z: -1
+        //     anchors.fill: parent
+        //     cellHeight: grid.size
+        //     cellWidth: grid.size
+        //     model: 4096
+        //     delegate: Rectangle {
+        //         width: grid.cellWidth
+        //         height: grid.cellHeight
+        //         color: "transparent"
+        //         border.width: 1
+        //     }
 
-        }
+        // }
+
+        // Rectangle {
+        //     id: p1
+        //     x: -20
+        //     y: -20
+        //     z: 5
+        //     height: 40
+        //     width: 40
+        //     radius: 20
+        //     color: "gold"
+        //     opacity: 0.5
+        // }
+
         Behavior on scale {
             NumberAnimation { duration: area.scale > 1.5 ? 150 : 250 }
         }
