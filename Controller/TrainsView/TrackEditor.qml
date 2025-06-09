@@ -212,7 +212,7 @@ Item {
         if (sibling) {
             if (sibling.trackType === Globals.rail.straight) {
                 if (transformation.dir === Globals.dir.up) {
-                    var rotationPoint = findRotationPoint(sibling)
+                    let rotationPoint = findRotationPoint(sibling)
                     sprite.x = rotationPoint.x - sprite.width
                     sprite.y = rotationPoint.y - sprite.height
                     sprite.bottomVisible = false
@@ -221,9 +221,9 @@ Item {
                 }
             } else if (sibling.trackType === Globals.rail.curved) {
                 if (transformation.dir === Globals.dir.up) {
-                    let p = pointOnCircle(sibling, Globals.curveRadius, true)
-                    sprite.x = p.x - sprite.width
-                    sprite.y = p.y - sprite.height
+                    let rotationPoint = findRotationPoint(sibling)
+                    sprite.x = rotationPoint.x - sprite.width
+                    sprite.y = rotationPoint.y - sprite.height
                     sprite.bottomVisible = false
                 } else if (transformation.dir === Globals.dir.down) {
                     let p = pointOnCircle(sibling, Globals.curveRadius, false)
