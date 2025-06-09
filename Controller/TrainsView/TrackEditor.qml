@@ -247,8 +247,8 @@ Item {
 
     Component.onCompleted: {
         root.trackType = Globals.rail.straight
-        root.createTrackPiece(undefined, {angle: 1, dir: 1})
-        root.trackType = Globals.rail.curved
+        root.createTrackPiece(undefined, {angle: 0, dir: 1})
+        // root.trackType = Globals.rail.curved
     }
 
     Item {
@@ -259,6 +259,24 @@ Item {
         width: parent.width
         scale: 0.5
 
+        GridView {
+            id: grid
+
+            property real size: 32
+
+            z: -1
+            anchors.fill: parent
+            cellHeight: grid.size
+            cellWidth: grid.size
+            model: 4096
+            delegate: Rectangle {
+                width: grid.cellWidth
+                height: grid.cellHeight
+                color: "transparent"
+                border.width: 1
+            }
+
+        }
         Behavior on scale {
             NumberAnimation { duration: area.scale > 1.5 ? 150 : 250 }
         }
