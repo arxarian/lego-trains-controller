@@ -1,4 +1,6 @@
 from devices import Devices
+from rotationdata import RotationData
+
 import Railways.rails_rc
 
 from PySide6.QtGui import QGuiApplication

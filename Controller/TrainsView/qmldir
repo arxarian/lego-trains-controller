@@ -1,4 +1,8 @@
 module TrainView
+singleton Globals 1.0 Globals.qml
 Main 1.0 Main.qml
 DiscoverDevices 1.0 DiscoverDevices.qml
-singleton Globals 1.0 Globals.qml
+TrackPiece 1.0 TrackPiece.qml
+StraightTrackPiece 1.0 StraightTrackPiece.qml
+CurvedTrackPiece 1.0 CurvedTrackPiece.qml
+SwitchTrackPiece 1.0 SwitchTrackPiece.qml

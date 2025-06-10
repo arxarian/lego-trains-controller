@@ -5,6 +5,7 @@
         "communication_example.py",
         "devices.py",
         "device.py",
+        "rotationdata.py",
         "TrainsView/Main.qml",
         "TrainsView/qmldir",
         "TrainsView/DiscoverDevices.qml",

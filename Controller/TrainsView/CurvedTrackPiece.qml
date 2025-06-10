@@ -7,11 +7,12 @@ TrackPiece {
     trackType: Globals.rail.curved
 
     topOffsetX: 296
-    bottomOffsetX: 106
+    topRotation: 1
+    bottomOffsetX: width
 
     Rectangle {
         z: 1
-        x: 296 - width / 2
+        x: root.topOffsetX - width / 2
         y: - height / 2
         width: 20
         height: 20
@@ -40,7 +41,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({angle: 1, dir: Globals.dir.up, offsetX: 296, offsetY: 0})
+                root.add({angle: 1, dir: Globals.dir.up, offsetX: root.topOffsetX, offsetY: 0})
                 root.topVisible = false
             }
         }
@@ -48,8 +49,7 @@ TrackPiece {
 
     Rectangle {
         z: 1
-        x: parent.width - width / 2
-        // x: 87 - width / 2
+        x: root.bottomOffsetX - width / 2
         y: parent.height - height / 2
         width: 20
         height: 20
@@ -77,7 +77,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({angle: 0, dir: Globals.dir.down, offsetX: root.width, offsetY: root.height})
+                root.add({angle: 0, dir: Globals.dir.down, offsetX: root.bottomOffsetX, offsetY: root.height})
                 root.bottomVisible = false
             }
         }

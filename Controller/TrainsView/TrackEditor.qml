@@ -104,7 +104,7 @@ Item {
         sprite.transformOrigin = transformation.rotationOrigin ? transformation.rotationOrigin : Item.BottomRight
 
         if (sibling) {
-            let rotationPoint = Qt.point(transformation.offsetX, transformation.offsetY)
+            let rotationPoint = Qt.point(transformation.point.x, transformation.point.y)
             let origin = sibling.mapToItem(area, rotationPoint)
 
             sprite.x = origin.x - sprite.width
@@ -200,12 +200,26 @@ Item {
         if (sibling) {
             if (sibling.trackType === Globals.rail.straight) {
                 if (transformation.dir === Globals.dir.up) {
-                    let rotationPoint = findRotationPoint(sibling)
-                    sprite.x = rotationPoint.x - sprite.width
-                    sprite.y = rotationPoint.y - sprite.height
+                    let rotationPoint = Qt.point(transformation.offsetX, transformation.offsetY)
+                    let origin = sibling.mapToItem(area, rotationPoint)
+
+                    sprite.x = origin.x - sprite.bottomOffsetX
+                    sprite.y = origin.y - sprite.height
                     sprite.bottomVisible = false
+
                 } else if (transformation.dir === Globals.dir.down) {
-                    //
+                    let rotationPoint = Qt.point(transformation.offsetX, transformation.offsetY)
+                    let origin = sibling.mapToItem(area, rotationPoint)
+
+                    sprite.x = origin.x - sprite.topOffsetX
+                    sprite.y = origin.y - (transformation.dir === Globals.dir.up ? sprite.height : 0)
+
+                    sprite.topVisible = (transformation.dir === Globals.dir.up)
+                    sprite.bottomVisible = (transformation.dir === Globals.dir.down)
+
+                    sprite.originX = sprite.topOffsetX
+                    sprite.angle = 22.5
+                    // rotation -= sprite.topRotation * 22.5
                 }
             } else if (sibling.trackType === Globals.rail.curved) {
                 if (transformation.dir === Globals.dir.up) {
@@ -223,7 +237,6 @@ Item {
             }
         }
 
-        sprite.transformOrigin = Item.BottomRight
         sprite.rotation = rotation
 
         sprite["add"].connect (function (transformation) {
