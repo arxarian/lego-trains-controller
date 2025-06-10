@@ -43,7 +43,6 @@ TrackPiece {
             anchors.fill: parent
             onClicked: {
                 root.add(rotationData[0])
-                // root.add({angle: 0, dir: Globals.dir.up, offsetX: root.width, offsetY: 0, rotationOrigin: Item.BottomRight})
                 root.topVisible = false
             }
         }
@@ -79,7 +78,6 @@ TrackPiece {
             anchors.fill: parent
             onClicked: {
                 root.add(rotationData[1])
-                // root.add({angle: 0, dir: Globals.dir.down, offsetX: root.width, offsetY: root.height, rotationOrigin: Item.TopRight})
                 root.bottomVisible = false
             }
         }

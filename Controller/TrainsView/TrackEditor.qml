@@ -95,23 +95,25 @@ Item {
     }
 
     function createStraightTrackPiece(sibling, transformation) {
-        let rotation = (sibling ? sibling.rotation : 0) - 22.5 * transformation.angle
-        let x = sibling ? sibling.x : 0
-        let y = sibling ? sibling.y : 0
+        let rotation = (sibling ? sibling.angle : 0) - 22.5 * transformation.angle
 
         var component = Qt.createComponent("StraightTrackPiece.qml");
-        var sprite = component.createObject(area, {x: x, y: y, rotation: rotation});
-        sprite.transformOrigin = transformation.rotationOrigin ? transformation.rotationOrigin : Item.BottomRight
+        var sprite = component.createObject(area);
+
+        sprite.angle = rotation
 
         if (sibling) {
-            let rotationPoint = Qt.point(transformation.point.x, transformation.point.y)
-            let origin = sibling.mapToItem(area, rotationPoint)
+            const up = (transformation.dir === Globals.dir.up)
+            let origin = sibling.mapToItem(area, transformation.point)
 
             sprite.x = origin.x - sprite.width
-            sprite.y = origin.y - (transformation.dir === Globals.dir.up ? sprite.height : 0)
+            sprite.y = origin.y - (up ? sprite.height : 0)
 
-            sprite.topVisible = (transformation.dir === Globals.dir.up)
-            sprite.bottomVisible = (transformation.dir === Globals.dir.down)
+            sprite.topVisible = up
+            sprite.bottomVisible = !up
+
+            sprite.originX = sprite.rotationData[up ? 1 : 0].point.x
+            sprite.originY = sprite.rotationData[up ? 1 : 0].point.y
         }
 
         sprite["add"].connect (function (transformation) {
@@ -248,7 +250,7 @@ Item {
 
     Component.onCompleted: {
         root.trackType = Globals.rail.straight
-        root.createTrackPiece(undefined, {angle: 0, dir: 1})
+        root.createTrackPiece(undefined, {angle: 1, dir: 1})
         // root.trackType = Globals.rail.curved
     }
 
