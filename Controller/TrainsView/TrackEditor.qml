@@ -192,12 +192,12 @@ Item {
 
     function createCurvedTrackPiece(sibling, transformation) {
 
-        let rotation = (sibling ? sibling.rotation : 0) - 22.5 * transformation.angle
-        let x = sibling ? sibling.x : 0
-        let y = sibling ? sibling.y : 0
+        let rotation = (sibling ? sibling.angle : 0) - 22.5 * transformation.angle
 
         let component = Qt.createComponent("CurvedTrackPiece.qml");
         let sprite = component.createObject(area);
+
+        sprite.angle = rotation
 
         if (sibling) {
             if (sibling.trackType === Globals.rail.straight) {
@@ -224,22 +224,20 @@ Item {
                     // rotation -= sprite.topRotation * 22.5
                 }
             } else if (sibling.trackType === Globals.rail.curved) {
-                if (transformation.dir === Globals.dir.up) {
-                    let rotationPoint = findRotationPoint(sibling)
-                    sprite.x = rotationPoint.x - sprite.width
-                    sprite.y = rotationPoint.y - sprite.height
-                    sprite.bottomVisible = false
-                } else if (transformation.dir === Globals.dir.down) {
-                    let p = pointOnCircle(sibling, Globals.curveRadius, false)
-                    sprite.x = p.x - sprite.width
-                    sprite.y = p.y - sprite.height
-                    sprite.topVisible = false
-                    rotation += 22.5
-                }
+                const up = (transformation.dir === Globals.dir.up)
+                let origin = sibling.mapToItem(area, transformation.point)
+
+                sprite.originX = sprite.rotationData[up ? 1 : 0].point.x
+                sprite.originY = sprite.rotationData[up ? 1 : 0].point.y
+
+                sprite.topVisible = up
+                sprite.bottomVisible = !up
+
+                sprite.x = origin.x - (up ? sprite.width : sprite.rotationData[0].point.x)
+                sprite.y = origin.y - (up ? sprite.height : 0)
+                sprite.angle += up ? 0 : 22.5
             }
         }
-
-        sprite.rotation = rotation
 
         sprite["add"].connect (function (transformation) {
             createTrackPiece(sprite, transformation)
@@ -249,8 +247,8 @@ Item {
     }
 
     Component.onCompleted: {
-        root.trackType = Globals.rail.straight
-        root.createTrackPiece(undefined, {angle: 1, dir: 1})
+        root.trackType = Globals.rail.curved
+        root.createTrackPiece(undefined, {angle: 0, dir: 1})
         // root.trackType = Globals.rail.curved
     }
 

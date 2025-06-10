@@ -1,4 +1,5 @@
 import QtQuick
+import TrainsView
 
 TrackPiece {
     id: root
@@ -6,13 +7,16 @@ TrackPiece {
     source: "qrc:/curved.png"
     trackType: Globals.rail.curved
 
-    topOffsetX: 296
-    topRotation: 1
-    bottomOffsetX: width
+    rotationData: [
+        RotationData { objectName: "up"; dir: Globals.dir.up;
+            angle: 1; point: Qt.point(296, 0) },
+        RotationData { objectName: "down"; dir: Globals.dir.down;
+            angle: 0; point: Qt.point(root.width, root.height) }
+    ]
 
     Rectangle {
         z: 1
-        x: root.topOffsetX - width / 2
+        x: rotationData[0].point.x - width / 2
         y: - height / 2
         width: 20
         height: 20
@@ -41,7 +45,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({angle: 1, dir: Globals.dir.up, offsetX: root.topOffsetX, offsetY: 0})
+                root.add(rotationData[0])
                 root.topVisible = false
             }
         }
@@ -49,8 +53,8 @@ TrackPiece {
 
     Rectangle {
         z: 1
-        x: root.bottomOffsetX - width / 2
-        y: parent.height - height / 2
+        x: rotationData[1].point.x - width / 2
+        y: rotationData[1].point.y - height / 2
         width: 20
         height: 20
         radius: width
@@ -77,7 +81,7 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add({angle: 0, dir: Globals.dir.down, offsetX: root.bottomOffsetX, offsetY: root.height})
+                root.add(rotationData[1])
                 root.bottomVisible = false
             }
         }

@@ -13,10 +13,6 @@ Image {
     property bool topRightVisible: true
 
     property int trackType: -1
-    property real topOffsetX: 0
-    property real bottomOffsetX: 0
-    property real topRotation: 0
-    property real bottomRotation: 0
 
     property real originX: 0
     property real originY: 0
