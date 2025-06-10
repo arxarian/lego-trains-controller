@@ -86,18 +86,18 @@ Item {
 
     function createTrackPiece(sibling, transformation) {
         if (root.trackType === Globals.rail.straight) {
-            createStraightTrackPiece(sibling, transformation)
+            createSpecifiedTrackPiece(sibling, transformation, "StraightTrackPiece.qml")
         } else if (root.trackType === Globals.rail.curved) {
-            createCurvedTrackPiece(sibling, transformation)
+            createSpecifiedTrackPiece(sibling, transformation, "CurvedTrackPiece.qml")
         } else if (root.trackType === Globals.rail.switchRail) {
             createSwitchTrackPiece(sibling, transformation)
         }
     }
 
-    function createStraightTrackPiece(sibling, transformation) {
+    function createSpecifiedTrackPiece(sibling, transformation, file) {
         let rotation = (sibling ? sibling.angle : 0) - 22.5 * transformation.angle
 
-        var component = Qt.createComponent("StraightTrackPiece.qml");
+        var component = Qt.createComponent(file);
         var sprite = component.createObject(area);
 
         sprite.angle = rotation
@@ -106,14 +106,17 @@ Item {
             const up = (transformation.dir === Globals.dir.up)
             let origin = sibling.mapToItem(area, transformation.point)
 
-            sprite.x = origin.x - sprite.width
-            sprite.y = origin.y - (up ? sprite.height : 0)
+            sprite.originX = sprite.rotationData[up ? 1 : 0].point.x
+            sprite.originY = sprite.rotationData[up ? 1 : 0].point.y
 
             sprite.topVisible = up
             sprite.bottomVisible = !up
 
-            sprite.originX = sprite.rotationData[up ? 1 : 0].point.x
-            sprite.originY = sprite.rotationData[up ? 1 : 0].point.y
+            sprite.x = origin.x - (up ? sprite.width : sprite.rotationData[0].point.x)
+            sprite.y = origin.y - (up ? sprite.height : 0)
+
+            let angle = sprite.rotationData[up ? 1 : 0].angle
+            sprite.angle += angle ? 22.5 : 0
         }
 
         sprite["add"].connect (function (transformation) {
@@ -188,37 +191,6 @@ Item {
         console.log("p next", x, y)
 
         return {x, y}
-    }
-
-    function createCurvedTrackPiece(sibling, transformation) {
-
-        let rotation = (sibling ? sibling.angle : 0) - 22.5 * transformation.angle
-
-        let component = Qt.createComponent("CurvedTrackPiece.qml");
-        let sprite = component.createObject(area);
-
-        sprite.angle = rotation
-
-        if (sibling) {
-            const up = (transformation.dir === Globals.dir.up)
-            let origin = sibling.mapToItem(area, transformation.point)
-
-            sprite.originX = sprite.rotationData[up ? 1 : 0].point.x
-            sprite.originY = sprite.rotationData[up ? 1 : 0].point.y
-
-            sprite.topVisible = up
-            sprite.bottomVisible = !up
-
-            sprite.x = origin.x - (up ? sprite.width : sprite.rotationData[0].point.x)
-            sprite.y = origin.y - (up ? sprite.height : 0)
-            sprite.angle += up ? 0 : 22.5
-        }
-
-        sprite["add"].connect (function (transformation) {
-            createTrackPiece(sprite, transformation)
-        })
-
-        return sprite
     }
 
     Component.onCompleted: {
