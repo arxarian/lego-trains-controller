@@ -200,43 +200,18 @@ Item {
         sprite.angle = rotation
 
         if (sibling) {
-            if (sibling.trackType === Globals.rail.straight) {
-                if (transformation.dir === Globals.dir.up) {
-                    let rotationPoint = Qt.point(transformation.offsetX, transformation.offsetY)
-                    let origin = sibling.mapToItem(area, rotationPoint)
+            const up = (transformation.dir === Globals.dir.up)
+            let origin = sibling.mapToItem(area, transformation.point)
 
-                    sprite.x = origin.x - sprite.bottomOffsetX
-                    sprite.y = origin.y - sprite.height
-                    sprite.bottomVisible = false
+            sprite.originX = sprite.rotationData[up ? 1 : 0].point.x
+            sprite.originY = sprite.rotationData[up ? 1 : 0].point.y
 
-                } else if (transformation.dir === Globals.dir.down) {
-                    let rotationPoint = Qt.point(transformation.offsetX, transformation.offsetY)
-                    let origin = sibling.mapToItem(area, rotationPoint)
+            sprite.topVisible = up
+            sprite.bottomVisible = !up
 
-                    sprite.x = origin.x - sprite.topOffsetX
-                    sprite.y = origin.y - (transformation.dir === Globals.dir.up ? sprite.height : 0)
-
-                    sprite.topVisible = (transformation.dir === Globals.dir.up)
-                    sprite.bottomVisible = (transformation.dir === Globals.dir.down)
-
-                    sprite.originX = sprite.topOffsetX
-                    sprite.angle = 22.5
-                    // rotation -= sprite.topRotation * 22.5
-                }
-            } else if (sibling.trackType === Globals.rail.curved) {
-                const up = (transformation.dir === Globals.dir.up)
-                let origin = sibling.mapToItem(area, transformation.point)
-
-                sprite.originX = sprite.rotationData[up ? 1 : 0].point.x
-                sprite.originY = sprite.rotationData[up ? 1 : 0].point.y
-
-                sprite.topVisible = up
-                sprite.bottomVisible = !up
-
-                sprite.x = origin.x - (up ? sprite.width : sprite.rotationData[0].point.x)
-                sprite.y = origin.y - (up ? sprite.height : 0)
-                sprite.angle += up ? 0 : 22.5
-            }
+            sprite.x = origin.x - (up ? sprite.width : sprite.rotationData[0].point.x)
+            sprite.y = origin.y - (up ? sprite.height : 0)
+            sprite.angle += up ? 0 : 22.5
         }
 
         sprite["add"].connect (function (transformation) {
@@ -247,9 +222,9 @@ Item {
     }
 
     Component.onCompleted: {
-        root.trackType = Globals.rail.curved
+        root.trackType = Globals.rail.straight
         root.createTrackPiece(undefined, {angle: 0, dir: 1})
-        // root.trackType = Globals.rail.curved
+        root.trackType = Globals.rail.curved
     }
 
     Item {
