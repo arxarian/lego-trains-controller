@@ -90,7 +90,7 @@ Item {
         } else if (root.trackType === Globals.rail.curved) {
             createSpecifiedTrackPiece(sibling, transformation, "CurvedTrackPiece.qml")
         } else if (root.trackType === Globals.rail.switchRail) {
-            createSwitchTrackPiece(sibling, transformation)
+            createSpecifiedTrackPiece(sibling, transformation, "SwitchTrackPiece.qml")
         }
     }
 
@@ -104,10 +104,12 @@ Item {
 
         if (sibling) {
             const up = (transformation.dir === Globals.dir.up)
+            const index = up ? 1 : 0
+
             let origin = sibling.mapToItem(area, transformation.point)
 
-            sprite.originX = sprite.rotationData[up ? 1 : 0].point.x
-            sprite.originY = sprite.rotationData[up ? 1 : 0].point.y
+            sprite.originX = sprite.rotationData[index].point.x
+            sprite.originY = sprite.rotationData[index].point.y
 
             sprite.topVisible = up
             sprite.bottomVisible = !up
@@ -115,7 +117,7 @@ Item {
             sprite.x = origin.x - (up ? sprite.width : sprite.rotationData[0].point.x)
             sprite.y = origin.y - (up ? sprite.height : 0)
 
-            let angle = sprite.rotationData[up ? 1 : 0].angle
+            let angle = sprite.rotationData[index].angle
             sprite.angle += angle ? 22.5 : 0
         }
 
@@ -124,85 +126,16 @@ Item {
         })
     }
 
-    function createSwitchTrackPiece(sibling, transformation) {
-        let index = (sibling ? (Math.abs(sibling.rotation) / 22.5) : 0) * transformation.angle
-        let rotation = sibling ? sibling.rotation : 0
-        let p = calcXY(index)
-
-        var component = Qt.createComponent("SwitchTrackPiece.qml");
-        var sprite = component.createObject(area, {x: p.x, y: p.y, rotation: rotation});
-
-        sprite["add"].connect (function (transformation) {
-            createTrackPiece(sprite, transformation)
-        })
-
-        if (sibling) {
-            if (transformation.angle === 1) {
-                sprite.y = sibling.y - sprite.height
-                sprite.bottomVisible = false
-            } else if (transformation.angle === 2 ) {
-                sprite.y = sibling.y - sprite.height
-                sprite.bottomVisible = false
-            } else if (transformation.angle === -1) {
-                sprite.y = sibling.y + sibling.height
-                sprite.topRightVisible = false
-            }
-        }
-    }
-
-    // working
-    function rotatePoint(x, y, cx, cy, angleDeg) {
-        let angleRad = angleDeg * Math.PI / 180
-
-        console.log("center", cx, cy)
-
-        let dx = x - cx
-        let dy = y - cy
-
-        let rx = dx * Math.cos(angleRad) - dy * Math.sin(angleRad)
-        let ry = dx * Math.sin(angleRad) + dy * Math.cos(angleRad)
-
-        return {
-            x: cx + rx,
-            y: cy + ry
-        }
-    }
-
-    function pointOnCircle(sibling, radius, anticlockwise = true) {
-        // notes: y ax is reversed!
-        // * so the 0 rotation equals to 90 degrees
-        // * for x ax is used sinus
-        // * for y ax is used cosinus
-
-        // find the center
-        let angleRadius = Math.PI / 8 * ((-sibling.rotation + Globals.defaultRotation) / Globals.basicAngleIncrement)
-        let cx = sibling.x + sibling.width - radius * Math.sin(angleRadius)
-        let cy = sibling.y + sibling.height - radius * Math.cos(angleRadius)
-
-        console.log("p", sibling.x + sibling.width, sibling.y + sibling.height, -sibling.rotation + Globals.defaultRotation)
-        console.log("center", cx, cy)
-
-        // find the next point
-        angleRadius = Math.PI / 8 * ((-sibling.rotation + Globals.basicAngleIncrement * (anticlockwise ? 1 : -1)
-                                      + Globals.defaultRotation) / Globals.basicAngleIncrement)
-        let x = cx + radius * Math.sin(angleRadius)
-        let y = cy + radius * Math.cos(angleRadius)
-
-        console.log("p next", x, y)
-
-        return {x, y}
-    }
-
     Component.onCompleted: {
-        root.trackType = Globals.rail.straight
+        root.trackType = Globals.rail.switchRail
         root.createTrackPiece(undefined, {angle: 0, dir: 1})
-        root.trackType = Globals.rail.curved
+        root.trackType = Globals.rail.straight
     }
 
     Item {
         id: area
-        x: 400
-        y: 200
+        // x: 400
+        y: -375
         height: parent.height
         width: parent.width
         scale: 0.5

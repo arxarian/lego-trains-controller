@@ -6,3 +6,4 @@ TrackPiece 1.0 TrackPiece.qml
 StraightTrackPiece 1.0 StraightTrackPiece.qml
 CurvedTrackPiece 1.0 CurvedTrackPiece.qml
 SwitchTrackPiece 1.0 SwitchTrackPiece.qml
+RotationPointMarker 1.0 RotationPointMarker.qml

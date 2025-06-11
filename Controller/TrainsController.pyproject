@@ -15,6 +15,7 @@
         "TrainsView/StraightTrackPiece.qml",
         "TrainsView/SwitchTrackPiece.qml",
         "TrainsView/TrackPiece.qml",
-        "TrainsView/Globals.qml"
+        "TrainsView/Globals.qml",
+        "TrainsView/RotationPointMarker.qml"
     ]
 }
