@@ -52,24 +52,26 @@ ApplicationWindow {
             }
         }
 
-        ListView {
-            id: view
-            model: devices
-            orientation: Qt.Horizontal
-
+        StackLayout {
+            z: -1
+            currentIndex: trainsView.count > 0 ? 1 : 0
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Layout.margins: 5
 
-            delegate: TrainControlPanel {
-                height: view.height
-                width: 70
+            TrackEditor {}
+
+            ListView {
+                id: trainsView
+                model: devices
+                orientation: Qt.Horizontal
+
+                delegate: TrainControlPanel {
+                    height: trainsView.height
+                    width: 70
+                }
             }
         }
-    }
 
-    TrackEditor {
-        anchors.fill: parent
     }
 
     DiscoverDevices {

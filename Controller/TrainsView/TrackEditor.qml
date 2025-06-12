@@ -31,49 +31,54 @@ Item {
         }
     }
 
-    Row {
+    Column {
         anchors.top: parent.top
-        anchors.topMargin: 50
+        anchors.topMargin: -24
         anchors.right: parent.right
         anchors.rightMargin: 20
+        z: 1
 
-        Button {
-            checked: root.trackType === Globals.rail.straight
-            checkable: true
-            text: "Straight"
-            onClicked: root.trackType = Globals.rail.straight
+        Row {
+            CheckBox {
+                text: "Grid"
+                checked: Globals.gridVisible
+                onClicked: Globals.gridVisible = checked
+            }
+
+            CheckBox {
+                text: "Track Frame"
+                checked: Globals.trackFrameVisible
+                onClicked: Globals.trackFrameVisible = checked
+            }
+
+            CheckBox {
+                text: "Rotation Points"
+                checked: Globals.rotationPointsVisible
+                onClicked: Globals.rotationPointsVisible = checked
+            }
         }
 
-        Button {
-            checked: root.trackType === Globals.rail.curved
-            checkable: true
-            text: "Curved"
-            onClicked: root.trackType = Globals.rail.curved
-        }
+        Row {
+            Button {
+                checked: root.trackType === Globals.rail.straight
+                checkable: true
+                text: "Straight"
+                onClicked: root.trackType = Globals.rail.straight
+            }
 
-        Button {
-            checked: root.trackType === Globals.rail.switchRail
-            checkable: true
-            text: "Switch"
-            onClicked: root.trackType = Globals.rail.switchRail
-        }
+            Button {
+                checked: root.trackType === Globals.rail.curved
+                checkable: true
+                text: "Curved"
+                onClicked: root.trackType = Globals.rail.curved
+            }
 
-        CheckBox {
-            text: "Grid"
-            checked: Globals.gridVisible
-            onClicked: Globals.gridVisible = checked
-        }
-
-        CheckBox {
-            text: "Track Frame"
-            checked: Globals.trackFrameVisible
-            onClicked: Globals.trackFrameVisible = checked
-        }
-
-        CheckBox {
-            text: "Rotation Points"
-            checked: Globals.rotationPointsVisible
-            onClicked: Globals.rotationPointsVisible = checked
+            Button {
+                checked: root.trackType === Globals.rail.switchRail
+                checkable: true
+                text: "Switch"
+                onClicked: root.trackType = Globals.rail.switchRail
+            }
         }
     }
 
