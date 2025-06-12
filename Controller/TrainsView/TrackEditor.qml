@@ -84,20 +84,21 @@ Item {
         return {x, y}
     }
 
-    function createTrackPiece(sibling, transformation) {
+    function trackBySelection() {
         if (root.trackType === Globals.rail.straight) {
-            createSpecifiedTrackPiece(sibling, transformation, "StraightTrackPiece.qml")
+            return "StraightTrackPiece.qml"
         } else if (root.trackType === Globals.rail.curved) {
-            createSpecifiedTrackPiece(sibling, transformation, "CurvedTrackPiece.qml")
+            return "CurvedTrackPiece.qml"
         } else if (root.trackType === Globals.rail.switchRail) {
-            createSpecifiedTrackPiece(sibling, transformation, "SwitchTrackPiece.qml")
+            return "SwitchTrackPiece.qml"
         }
     }
 
-    function createSpecifiedTrackPiece(sibling, transformation, file) {
-        let rotation = (sibling ? sibling.angle : 0) - 22.5 * transformation.angle
+    function createTrackPiece(sibling, transformation) {
+        const track = trackBySelection()
+        const rotation = (sibling ? sibling.angle : 0) - 22.5 * transformation.angle
 
-        var component = Qt.createComponent(file);
+        var component = Qt.createComponent(track);
         var sprite = component.createObject(area);
 
         sprite.angle = rotation
