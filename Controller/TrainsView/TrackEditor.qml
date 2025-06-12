@@ -57,6 +57,24 @@ Item {
             text: "Switch"
             onClicked: root.trackType = Globals.rail.switchRail
         }
+
+        CheckBox {
+            text: "Grid"
+            checked: Globals.gridVisible
+            onClicked: Globals.gridVisible = checked
+        }
+
+        CheckBox {
+            text: "Track Frame"
+            checked: Globals.trackFrameVisible
+            onClicked: Globals.trackFrameVisible = checked
+        }
+
+        CheckBox {
+            text: "Rotation Points"
+            checked: Globals.rotationPointsVisible
+            onClicked: Globals.rotationPointsVisible = checked
+        }
     }
 
     WheelHandler {
@@ -86,7 +104,7 @@ Item {
         var sprite = component.createObject(area);
 
 
-        sprite.angle = sibling ? sibling.angle : -22.5
+        sprite.angle = sibling ? sibling.angle : 0
 
         if (sibling) {
             const transformation = sibling.rotationData[index]
@@ -122,24 +140,26 @@ Item {
         width: parent.width
         scale: 0.3
 
-        // GridView {
-        //     id: grid
+        GridView {
+            id: grid
 
-        //     property real size: 40
+            property real size: 40
 
-        //     z: -1
-        //     anchors.fill: parent
-        //     cellHeight: grid.size
-        //     cellWidth: grid.size
-        //     model: 4096
-        //     delegate: Rectangle {
-        //         width: grid.cellWidth
-        //         height: grid.cellHeight
-        //         color: "transparent"
-        //         border.width: 1
-        //     }
-
-        // }
+            z: -1
+            anchors.fill: parent
+            anchors.margins: -15 * grid.size
+            visible: Globals.gridVisible
+            cellHeight: grid.size
+            cellWidth: grid.size
+            interactive: false
+            model: 4096
+            delegate: Rectangle {
+                width: grid.cellWidth
+                height: grid.cellHeight
+                color: "transparent"
+                border.width: 2
+            }
+        }
 
         Behavior on scale {
             NumberAnimation { duration: area.scale > 1.5 ? 150 : 250 }

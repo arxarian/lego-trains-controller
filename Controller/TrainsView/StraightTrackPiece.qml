@@ -39,24 +39,6 @@ TrackPiece {
     }
 
     Rectangle {
-        z: 1
-        x: parent.width - width / 2
-        y: parent.height - height / 2
-        width: 20
-        height: 20
-        radius: width
-        opacity: 0.8
-        color: "gold"
-
-        Rectangle {
-            anchors.centerIn: parent
-            width: 2
-            height: 2
-            color: "black"
-        }
-    }
-
-    Rectangle {
         visible: rotationData[1].visible
         anchors.bottom: parent.bottom
         width: parent.width

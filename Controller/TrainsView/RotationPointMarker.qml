@@ -2,6 +2,8 @@ import QtQuick
 import TrainsView
 
 Rectangle {
+    visible: Globals.rotationPointsVisible
+
     z: 1
     width: 20
     height: 20

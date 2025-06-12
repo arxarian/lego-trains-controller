@@ -14,7 +14,7 @@ QtObject {
         readonly property int down: -1
     }
 
-    readonly property real curveRadius: 1358
-    readonly property real basicAngleIncrement: 22.5
-    readonly property real defaultRotation: 90
+    property bool gridVisible: false
+    property bool trackFrameVisible: false
+    property bool rotationPointsVisible: false
 }

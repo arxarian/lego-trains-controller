@@ -21,6 +21,7 @@ Image {
 
     Rectangle {
         anchors.fill: parent
+        visible: Globals.trackFrameVisible
         color: "transparent"
         border.width: 4
     }
