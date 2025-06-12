@@ -14,6 +14,7 @@ class RotationData(QObject):
         self._dir = 0
         self._angle = 0
         self._point = QPoint(0, 0)
+        self._visible = True
 
     def angle(self):
         return self._angle
@@ -44,4 +45,14 @@ class RotationData(QObject):
 
     point_changed = Signal()
     point = Property(QPoint, point, set_point, notify=point_changed)
+
+    def visible(self):
+        return self._visible
+
+    def set_visible(self, value):
+        self._visible = value
+        self.visible_changed.emit()
+
+    visible_changed = Signal()
+    visible = Property(bool, visible, set_visible, notify=visible_changed)
 

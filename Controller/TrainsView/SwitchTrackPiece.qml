@@ -9,11 +9,11 @@ TrackPiece {
 
     rotationData: [
         RotationData { objectName: "up_straight"; dir: Globals.dir.up;
-            angle: 1; point: Qt.point(295, 0) },
+            angle: 1; point: Qt.point(295, 0); visible: true},
         RotationData { objectName: "up_curved"; dir: Globals.dir.up;
-            angle: 0; point: Qt.point(root.width, 103) },
+            angle: 0; point: Qt.point(root.width, 103); visible: true},
         RotationData { objectName: "down"; dir: Globals.dir.down;
-            angle: 0; point: Qt.point(root.width, root.height) }
+            angle: 0; point: Qt.point(root.width, root.height); visible: true}
     ]
 
     RotationPointMarker {
@@ -22,7 +22,7 @@ TrackPiece {
     }
 
     Rectangle {
-        visible: root.topLeftVisible
+        visible: rotationData[0].visible
         x: -25
         transformOrigin: Item.TopRight
         rotation: -22.5
@@ -34,8 +34,8 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add(rotationData[0])
-                root.topLeftVisible = false
+                root.add(0)
+                root.rotationData[0].visible = false
             }
         }
     }
@@ -46,7 +46,7 @@ TrackPiece {
     }
 
     Rectangle {
-        visible: root.topRightVisible
+        visible: rotationData[1].visible
         anchors.right: parent.right
         y: rotationData[1].point.y
         width: parent.width * 0.385
@@ -57,8 +57,8 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add(rotationData[1])
-                root.topRightVisible = false
+                root.add(1)
+                root.rotationData[1].visible = false
             }
         }
     }
@@ -69,7 +69,7 @@ TrackPiece {
     }
 
     Rectangle {
-        visible: root.bottomVisible
+        visible: rotationData[2].visible
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         width: parent.width * 0.39
@@ -80,8 +80,8 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add(rotationData[2])
-                root.bottomVisible = false
+                root.add(2)
+                root.rotationData[2].visible = false
             }
         }
     }
