@@ -70,7 +70,7 @@ class Devices(QAbstractListModel):
         async def async_disover(self):
             devices = await BleakScanner.discover()
             self._discovered = [device.name for device in devices if device.name is not None]
-            self.discovered_changed.emit()
+            self.discovered_changed.emit()  # TODO - when no device found, the busy indicator is still visible
 
         asyncio.create_task(async_disover(self))
 
