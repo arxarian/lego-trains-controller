@@ -9,31 +9,21 @@ TrackPiece {
 
     rotationData: [
         RotationData { objectName: "up"; dir: Globals.dir.up;
-            angle: 0; point: Qt.point(root.width, 0) },
+            angle: 0; point: Qt.point(root.width, 0); visible: true },
         RotationData { objectName: "down"; dir: Globals.dir.down;
-            angle: 0; point: Qt.point(root.width, root.height) }
+            angle: 0; point: Qt.point(root.width, root.height); visible: true }
     ]
 
-    Rectangle {
-        z: 1
-        x: parent.width - width / 2
-        y: - height / 2
-        width: 20
-        height: 20
-        radius: width
-        opacity: 0.8
-        color: "gold"
-
-        Rectangle {
-            anchors.centerIn: parent
-            width: 2
-            height: 2
-            color: "black"
+    Repeater {
+        model: root.rotationData.length
+        delegate: RotationPointMarker {
+            x: rotationData[index].point.x - width / 2
+            y: rotationData[index].point.y - height / 2
         }
     }
 
     Rectangle {
-        visible: root.topVisible
+        visible: rotationData[0].visible
         width: parent.width
         height: 50
         
@@ -42,8 +32,8 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add(rotationData[0])
-                root.topVisible = false
+                root.add(0)
+                rotationData[0].visible = false
             }
         }
     }
@@ -67,7 +57,7 @@ TrackPiece {
     }
 
     Rectangle {
-        visible: root.bottomVisible
+        visible: rotationData[1].visible
         anchors.bottom: parent.bottom
         width: parent.width
         height: 50
@@ -77,8 +67,8 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add(rotationData[1])
-                root.bottomVisible = false
+                root.add(1)
+                rotationData[1].visible = false
             }
         }
     }

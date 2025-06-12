@@ -70,20 +70,6 @@ Item {
         }
     }
 
-    function findRotationPoint(sibling) {
-        let rotationPoint = Qt.point(sibling.width - sibling.topOffsetX, 0)
-        return sibling.mapToItem(area, rotationPoint)
-    }
-
-    function calcXY(index) {
-        const radius = 520//1330
-
-        let x = radius * Math.sin(index / 8 * Math.PI)
-        let y = radius * Math.cos(index / 8 * Math.PI)
-
-        return {x, y}
-    }
-
     function trackBySelection() {
         if (root.trackType === Globals.rail.straight) {
             return "StraightTrackPiece.qml"
@@ -94,32 +80,30 @@ Item {
         }
     }
 
-    function createTrackPiece(sibling, transformation) {
+    function createTrackPiece(sibling, index = 0) { // the index is for sibling, what's the index for the new?
         const track = trackBySelection()
-        const rotation = (sibling ? sibling.angle : 0) - 22.5 * transformation.angle
-
         var component = Qt.createComponent(track);
         var sprite = component.createObject(area);
 
-        sprite.angle = rotation
+
+        sprite.angle = sibling ? sibling.angle : -22.5
 
         if (sibling) {
+            const transformation = sibling.rotationData[index]
             const up = (transformation.dir === Globals.dir.up)
-            const index = up ? 1 : 0
 
             let origin = sibling.mapToItem(area, transformation.point)
 
-            sprite.originX = sprite.rotationData[index].point.x
-            sprite.originY = sprite.rotationData[index].point.y
+            sprite.originX = sprite.rotationData[1 - index].point.x
+            sprite.originY = sprite.rotationData[1 - index].point.y
 
-            sprite.topVisible = up
-            sprite.bottomVisible = !up
+            sprite.rotationData[1 - index].visible = false
 
             sprite.x = origin.x - (up ? sprite.width : sprite.rotationData[0].point.x)
             sprite.y = origin.y - (up ? sprite.height : 0)
 
-            let angle = sprite.rotationData[index].angle
-            sprite.angle += angle ? 22.5 : 0
+            let angle = sprite.rotationData[1 - index].angle - transformation.angle
+            sprite.angle += angle * 22.5
         }
 
         sprite["add"].connect (function (transformation) {
@@ -128,18 +112,15 @@ Item {
     }
 
     Component.onCompleted: {
-        root.trackType = Globals.rail.switchRail
-        root.createTrackPiece(undefined, {angle: 0, dir: 1})
         root.trackType = Globals.rail.straight
+        root.createTrackPiece()
     }
 
     Item {
         id: area
-        // x: 400
-        y: -375
         height: parent.height
         width: parent.width
-        scale: 0.5
+        scale: 0.3
 
         // GridView {
         //     id: grid
@@ -158,18 +139,6 @@ Item {
         //         border.width: 1
         //     }
 
-        // }
-
-        // Rectangle {
-        //     id: p1
-        //     x: -20
-        //     y: -20
-        //     z: 5
-        //     height: 40
-        //     width: 40
-        //     radius: 20
-        //     color: "gold"
-        //     opacity: 0.5
         // }
 
         Behavior on scale {

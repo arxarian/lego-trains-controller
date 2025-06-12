@@ -16,9 +16,12 @@ TrackPiece {
             angle: 0; point: Qt.point(root.width, root.height); visible: true}
     ]
 
-    RotationPointMarker {
-        x: rotationData[0].point.x - width / 2
-        y: rotationData[0].point.y - height / 2
+    Repeater {
+        model: root.rotationData.length
+        delegate: RotationPointMarker {
+            x: rotationData[index].point.x - width / 2
+            y: rotationData[index].point.y - height / 2
+        }
     }
 
     Rectangle {
@@ -40,11 +43,6 @@ TrackPiece {
         }
     }
 
-    RotationPointMarker {
-        x: rotationData[1].point.x - width / 2
-        y: rotationData[1].point.y - height / 2
-    }
-
     Rectangle {
         visible: rotationData[1].visible
         anchors.right: parent.right
@@ -61,11 +59,6 @@ TrackPiece {
                 root.rotationData[1].visible = false
             }
         }
-    }
-
-    RotationPointMarker {
-        x: rotationData[2].point.x - width / 2
-        y: rotationData[2].point.y - height / 2
     }
 
     Rectangle {
