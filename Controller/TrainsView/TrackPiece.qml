@@ -4,7 +4,6 @@ import TrainsView
 Image {
     id: root
 
-    // TODO is offset used?
     signal add(int index)
 
     property int trackType: -1
@@ -13,7 +12,7 @@ Image {
     property real originY: 0
     property real angle: 0
 
-    property list<RotationData> rotationData    // TODO - required?
+    required property list<RotationData> rotationData
 
     opacity: 0.8
 

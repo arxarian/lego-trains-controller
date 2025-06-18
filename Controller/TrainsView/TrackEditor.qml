@@ -105,27 +105,26 @@ Item {
 
     function createTrackPiece(sibling, index = 0) { // the index is for sibling, what's the index for the new?
         const track = trackBySelection()
-        var component = Qt.createComponent(track);
-        var sprite = component.createObject(area);
-
+        var component = Qt.createComponent(track)
+        var sprite = component.createObject(area)
 
         sprite.angle = sibling ? sibling.angle : 0
 
         if (sibling) {
-            const transformation = sibling.rotationData[index]
+            const transformation = sibling.rotationData[1 - index]
             const up = (transformation.dir === Globals.dir.up)
 
             let origin = sibling.mapToItem(area, transformation.point)
 
-            sprite.originX = sprite.rotationData[1 - index].point.x
-            sprite.originY = sprite.rotationData[1 - index].point.y
+            sprite.originX = sprite.rotationData[index].point.x
+            sprite.originY = sprite.rotationData[index].point.y
 
-            sprite.rotationData[1 - index].visible = false
+            sprite.rotationData[0].visible = false
 
-            sprite.x = origin.x - (up ? sprite.width : sprite.rotationData[0].point.x)
+            sprite.x = origin.x - (up ? sprite.width : sprite.rotationData[1].point.x)
             sprite.y = origin.y - (up ? sprite.height : 0)
 
-            let angle = sprite.rotationData[1 - index].angle - transformation.angle
+            let angle = sprite.rotationData[index].angle - transformation.angle
             sprite.angle += angle * 22.5
         }
 

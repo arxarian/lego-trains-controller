@@ -8,10 +8,10 @@ TrackPiece {
     trackType: Globals.rail.straight
 
     rotationData: [
-        RotationData { objectName: "up"; dir: Globals.dir.up;
-            angle: 0; point: Qt.point(root.width, 0); visible: true },
         RotationData { objectName: "down"; dir: Globals.dir.down;
-            angle: 0; point: Qt.point(root.width, root.height); visible: true }
+            angle: 0; point: Qt.point(root.width, root.height); visible: true },
+        RotationData { objectName: "up"; dir: Globals.dir.up;
+            angle: 0; point: Qt.point(root.width, 0); visible: true }
     ]
 
     Repeater {
@@ -23,23 +23,27 @@ TrackPiece {
     }
 
     Rectangle {
-        visible: rotationData[0].visible
+        property int index: 0
+
+        visible: rotationData[index].visible
         width: parent.width
         height: 50
-        
+
         color: "#55FF00FF"
-        
+
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add(0)
-                rotationData[0].visible = false
+                root.add(parent.index)
+                rotationData[parent.index].visible = false
             }
         }
     }
 
     Rectangle {
-        visible: rotationData[1].visible
+        property int index: 1
+
+        visible: rotationData[index].visible
         anchors.bottom: parent.bottom
         width: parent.width
         height: 50
@@ -49,8 +53,8 @@ TrackPiece {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.add(1)
-                rotationData[1].visible = false
+                root.add(parent.index)
+                rotationData[parent.index].visible = false
             }
         }
     }
