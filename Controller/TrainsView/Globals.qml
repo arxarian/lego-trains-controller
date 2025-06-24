@@ -17,4 +17,6 @@ QtObject {
     property bool gridVisible: false
     property bool trackFrameVisible: false
     property bool rotationPointsVisible: false
+
+    property Item selectedTrack: null
 }
