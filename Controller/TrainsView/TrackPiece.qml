@@ -41,22 +41,8 @@ Image {
         border.color: "gold"
     }
 
-    Shortcut {
-        enabled: root.selected
-        sequences: ["R"]
-        onActivated: {
-            console.log("rotation not implemented")
-            // if no sibling...
-            // root.originX = root.width / 2
-            // root.originY = root.height / 2
-            // root.angle = (root.angle === 90 ? 0 : 90)
-        }
-    }
-
     MouseArea {
         anchors.fill: parent
         onClicked: Globals.selectedTrack = (root.selected ? null : root)
     }
-
-    // Behavior on angle {NumberAnimation {duration: 200}}
 }

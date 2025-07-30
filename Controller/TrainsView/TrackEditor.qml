@@ -165,8 +165,22 @@ Item {
             }
         }
 
+        Shortcut {
+            enabled: root.selected
+            sequences: ["R"]
+            onActivated: area.rotation = (area.rotation + 45) % 360
+        }
+
         Behavior on scale {
             NumberAnimation { duration: area.scale > 1.5 ? 150 : 250 }
+        }
+
+        Behavior on rotation {
+            RotationAnimator {
+                id: rotationAninamtion
+                direction: RotationAnimation.Clockwise
+                duration : 200
+            }
         }
     }
 }
