@@ -1,4 +1,6 @@
 from devices import Devices
+from rails import Rails
+from network import Network
 from rotationdata import RotationData
 
 import Railways.rails_rc
@@ -20,11 +22,15 @@ if __name__ == '__main__':
     asyncio.set_event_loop(loop)
 
     devices = Devices()
+    rails = Rails()
+    network = Network()
 
     engine.addImportPath(Path(__file__).parent)
     engine.addImportPath(os.path.join(Path(__file__).parent, "TrainsView"))
     engine.addImportPath(os.path.join(Path(__file__).parent, "Railsways"))
     engine.rootContext().setContextProperty("devices", devices)
+    engine.rootContext().setContextProperty("rails", rails)
+    engine.rootContext().setContextProperty("network", network)
     engine.loadFromModule("TrainsView", "Main")
 
     if not engine.rootObjects():
