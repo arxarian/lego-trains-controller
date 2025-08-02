@@ -104,11 +104,11 @@ Item {
     }
 
     function createTrackPiece(sibling, index = 0) { // the index is for sibling, what's the index for the new?
-        rails.createRail(Rail.Curved)
+        let rail = rails.createRail(Rail.Curved)
 
         const track = trackBySelection()
         var component = Qt.createComponent(track)
-        var sprite = component.createObject(area)
+        var sprite = component.createObject(area, {railData: rail})
 
         sprite.angle = sibling ? sibling.angle : 0
 

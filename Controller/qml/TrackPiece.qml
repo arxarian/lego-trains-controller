@@ -15,6 +15,7 @@ Image {
     readonly property bool selected: Globals.selectedTrack === root
 
     required property list<RotationData> rotationData
+    required property Rail railData
 
     transform: Rotation { origin.x: root.originX; origin.y: root.originY; angle: root.angle}
     z: Globals.selectedTrack === root ? 10 : 0
