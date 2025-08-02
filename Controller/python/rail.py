@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from enum import IntEnum
-from PySide6.QtCore import QObject, Slot, Property, Signal
+from PySide6.QtCore import QObject, Slot, Property, Signal, QEnum
 from PySide6.QtQml import QmlElement
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
+@QEnum
 class RailType(IntEnum):
     Unknown = -1
     Straight = 0
@@ -15,6 +16,7 @@ class RailType(IntEnum):
 
 @QmlElement
 class Rail(QObject):
+    QEnum(RailType)
 
     # id, pointer, index
     # type

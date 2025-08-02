@@ -5,7 +5,7 @@ TrackPiece {
     id: root
 
     source: "qrc:/curved.png"
-    trackType: Globals.rail.curved
+    trackType: Rail.Curved
 
     rotationData: [
         RotationData { objectName: "down"; dir: Globals.dir.down;

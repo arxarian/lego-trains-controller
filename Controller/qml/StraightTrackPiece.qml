@@ -5,7 +5,7 @@ TrackPiece {
     id: root
 
     source: "qrc:/straight.png"
-    trackType: Globals.rail.straight
+    trackType: Rail.Straight
 
     rotationData: [
         RotationData { objectName: "down"; dir: Globals.dir.down;

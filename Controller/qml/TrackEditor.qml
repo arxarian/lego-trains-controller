@@ -8,7 +8,7 @@ Item {
     property real minimalScale: 0.1
     property real maximalScale: 3
 
-    property int trackType: Globals.rail.straight
+    property int trackType: Rail.Straight
 
     MouseArea {
         id: mouseArea
@@ -60,24 +60,24 @@ Item {
 
         Row {
             Button {
-                checked: root.trackType === Globals.rail.straight
+                checked: root.trackType === Rail.Straight
                 checkable: true
                 text: "Straight"
-                onClicked: root.trackType = Globals.rail.straight
+                onClicked: root.trackType = Rail.Straight
             }
 
             Button {
-                checked: root.trackType === Globals.rail.curved
+                checked: root.trackType === Rail.Curved
                 checkable: true
                 text: "Curved"
-                onClicked: root.trackType = Globals.rail.curved
+                onClicked: root.trackType = Rail.Curved
             }
 
             Button {
-                checked: root.trackType === Globals.rail.switchRail
+                checked: root.trackType === Rail.Switch
                 checkable: true
                 text: "Switch"
-                onClicked: root.trackType = Globals.rail.switchRail
+                onClicked: root.trackType = Rail.Switch
             }
         }
     }
@@ -94,16 +94,18 @@ Item {
     }
 
     function trackBySelection() {
-        if (root.trackType === Globals.rail.straight) {
+        if (root.trackType === Rail.Straight) {
             return "StraightTrackPiece.qml"
-        } else if (root.trackType === Globals.rail.curved) {
+        } else if (root.trackType === Rail.Curved) {
             return "CurvedTrackPiece.qml"
-        } else if (root.trackType === Globals.rail.switchRail) {
+        } else if (root.trackType === Rail.Switch) {
             return "SwitchTrackPiece.qml"
         }
     }
 
     function createTrackPiece(sibling, index = 0) { // the index is for sibling, what's the index for the new?
+        rails.createRail(Rail.Curved)
+
         const track = trackBySelection()
         var component = Qt.createComponent(track)
         var sprite = component.createObject(area)
@@ -134,9 +136,9 @@ Item {
     }
 
     Component.onCompleted: {
-        root.trackType = Globals.rail.straight
+        root.trackType = Rail.Straight
         root.createTrackPiece()
-        root.trackType = Globals.rail.switchRail
+        root.trackType = Rail.Switch
     }
 
     Item {

@@ -5,6 +5,7 @@ from PySide6.QtCore import QAbstractListModel, Slot, Property, Signal
 from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
 
 from rail import Rail
+from rail import RailType
 
 class Rails(QAbstractListModel):
 
@@ -31,16 +32,21 @@ class Rails(QAbstractListModel):
         roles[Rails.Role.ObjectRole] = QByteArray(b"object")
         return roles
 
-    def append(self, device):
-        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-        self._railways.append(device)
-        device.disconnected.connect(self.device_disconnected)
-        self.endInsertRows()
+    @Slot(int)
+    def createRail(self, type):
+        print("wanna create", type)
 
-    def remove(self, device):
-        index = self._devices.index(device)
+    def append(self, rail):
+        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+        self._railways.append(rail)
+        rail.disconnected.connect(self.rail_disconnected)
+        self.endInsertRows()
+        print("appended")
+
+    def remove(self, rail):
+        index = self._railways.index(rail)
         if index > -1:
             self.beginRemoveRows(QModelIndex(), index, index)
-            self._railways.remove(device)
+            self._railways.remove(rail)
             self.endRemoveRows()
 
