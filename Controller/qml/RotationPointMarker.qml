@@ -1,5 +1,5 @@
 import QtQuick
-import TrainsView
+import TrainView
 
 Rectangle {
     visible: Globals.rotationPointsVisible

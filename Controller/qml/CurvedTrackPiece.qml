@@ -1,5 +1,5 @@
 import QtQuick
-import TrainsView
+import TrainView
 
 TrackPiece {
     id: root

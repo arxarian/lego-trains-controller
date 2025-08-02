@@ -136,6 +136,7 @@ Item {
     Component.onCompleted: {
         root.trackType = Globals.rail.straight
         root.createTrackPiece()
+        root.trackType = Globals.rail.switchRail
     }
 
     Item {
@@ -166,7 +167,6 @@ Item {
         }
 
         Shortcut {
-            enabled: root.selected
             sequences: ["R"]
             onActivated: area.rotation = (area.rotation + 45) % 360
         }

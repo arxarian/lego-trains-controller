@@ -1,5 +1,5 @@
 import QtQuick
-import TrainsView
+import TrainView
 
 Image {
     id: root
@@ -20,6 +20,12 @@ Image {
     z: Globals.selectedTrack === root ? 10 : 0
 
     Component.onCompleted: Globals.selectedTrack = root
+
+    Shortcut {
+        enabled: root.selected
+        sequences: ["F"]
+        onActivated: console.warn("flip not implemented")
+    }
 
     Rectangle {
         anchors.fill: parent

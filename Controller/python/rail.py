@@ -4,7 +4,7 @@ from enum import IntEnum
 from PySide6.QtCore import QObject, Slot, Property, Signal
 from PySide6.QtQml import QmlElement
 
-QML_IMPORT_NAME = "TrainsView"
+QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
 class RailType(IntEnum):

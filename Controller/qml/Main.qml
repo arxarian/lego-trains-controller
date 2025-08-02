@@ -54,19 +54,19 @@ ApplicationWindow {
 
         StackLayout {
             z: -1
-            currentIndex: trainsView.count > 0 ? 1 : 0
+            currentIndex: trainView.count > 0 ? 1 : 0
             Layout.fillHeight: true
             Layout.fillWidth: true
 
             TrackEditor {}
 
             ListView {
-                id: trainsView
+                id: trainView
                 model: devices
                 orientation: Qt.Horizontal
 
                 delegate: TrainControlPanel {
-                    height: trainsView.height
+                    height: trainView.height
                     width: 70
                 }
             }
