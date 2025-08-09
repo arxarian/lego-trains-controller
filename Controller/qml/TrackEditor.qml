@@ -93,21 +93,10 @@ Item {
         }
     }
 
-    function trackBySelection() {
-        if (root.trackType === Rail.Straight) {
-            return "StraightTrackPiece.qml"
-        } else if (root.trackType === Rail.Curved) {
-            return "CurvedTrackPiece.qml"
-        } else if (root.trackType === Rail.Switch) {
-            return "SwitchTrackPiece.qml"
-        }
-    }
-
     function createTrackPiece(sibling, index = 0) { // the index is for sibling, what's the index for the new?
-        let rail = rails.createRail(Rail.Curved)
+        let rail = rails.createRail(root.trackType)
 
-        const track = trackBySelection()
-        var component = Qt.createComponent(track)
+        var component = Qt.createComponent(rail.source())
         var sprite = component.createObject(area, {railData: rail})
 
         sprite.angle = sibling ? sibling.angle : 0

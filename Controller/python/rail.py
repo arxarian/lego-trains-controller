@@ -14,32 +14,60 @@ class RailType(IntEnum):
     Curved = 1
     Switch = 2
 
+RailSource = {
+  RailType.Straight: "StraightTrackPiece.qml",
+  RailType.Curved: "CurvedTrackPiece.qml",
+  RailType.Switch: "SwitchTrackPiece.qml"
+}
+
 @QmlElement
 class Rail(QObject):
     last_id = 0  # static variable
     QEnum(RailType)
 
+    @Slot(result=str)
+    def source(self) -> str:
+        return RailSource[self._type]
+
+
     def generateId():   # static method
         Rail.last_id += 1
         return Rail.last_id
 
-    # id, pointer, index
-    # type
-    # flipped
-    # siblings / connecting slots
-    # length
-    # possible routes (e.g. the switch rail is limited)
-    # position x, y
-    # rotation
+    # ✓ id
+    # ✓ type
+    #   length
+    # ✓ rotation
+    # ✓ position
+    #   - x
+    #   - y
+    #   ports
+    #   - port
+    #     - rotation center
+    #       - x
+    #       - y
+    #     - sibling [id, None]
+    #     - dir (straight, left, right)
+    #     - possible routes (e.g. the switch rail is limited)
+    #   markers
+    #   - color
+    #   - rotation
+    #   - position
+    #     - x
+    #     - y
+    #   - rotation center
+    #     - x
+    #     - y
 
-    def __init__(self, type: RailType, rotation: float=0, x: float=0, y: float=0, parent=None):
+    def __init__(self, type: RailType, parent=None):
         super().__init__(parent)
-        self._id = Rail.generateId()
-        self._type = type
-        self._rotation = rotation
-        self._x = x
-        self._y = y
-        self._connected_to = {} # dict
+        self._id = Rail.generateId()    # int
+        self._type = type               # RailType
+
+        self._rotation = 0              # float
+        self._x = 0                     # float
+        self._y = 0                     # float
+        self._connected_to = {}         # dict
 
         if self._type == RailType.Straight or self._type == RailType.Curved:
             self._ports = ["start", "end"]
