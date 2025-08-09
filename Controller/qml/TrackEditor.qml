@@ -99,7 +99,7 @@ Item {
         var component = Qt.createComponent(rail.source())
         var sprite = component.createObject(area, {railData: rail})
 
-        sprite.angle = sibling ? sibling.angle : 0
+        sprite.railData.rotation = sibling ? sibling.railData.rotation : 0
 
         if (sibling) {
             const transformation = sibling.rotationData[1 - index]
@@ -107,8 +107,8 @@ Item {
 
             let origin = sibling.mapToItem(area, transformation.point)
 
-            sprite.originX = sprite.rotationData[index].point.x
-            sprite.originY = sprite.rotationData[index].point.y
+            sprite.railData.rotation_x = sprite.rotationData[index].point.x
+            sprite.railData.rotation_y = sprite.rotationData[index].point.y
 
             sprite.rotationData[0].visible = false
 
@@ -116,7 +116,7 @@ Item {
             sprite.y = origin.y - (up ? sprite.height : 0)
 
             let angle = sprite.rotationData[index].angle - transformation.angle
-            sprite.angle += angle * 22.5
+            sprite.railData.rotation += angle * 22.5
         }
 
         sprite["add"].connect (function (transformation) {

@@ -37,8 +37,11 @@ class Rail(QObject):
     # ✓ id
     # ✓ type
     #   length
-    # ✓ rotation
-    # ✓ position
+    # ✓ rotation (move together with rotation center?)
+    # ½ position
+    #   - x
+    #   - y
+    # ½ rotation center
     #   - x
     #   - y
     #   ports
@@ -67,6 +70,8 @@ class Rail(QObject):
         self._rotation = 0              # float
         self._x = 0                     # float
         self._y = 0                     # float
+        self._rotation_x = 0            # float
+        self._rotation_y = 0            # float
         self._connected_to = {}         # dict
 
         if self._type == RailType.Straight or self._type == RailType.Curved:
@@ -128,3 +133,23 @@ class Rail(QObject):
 
     y_changed = Signal()
     y = Property(float, y, set_y, notify=y_changed)
+
+    def rotation_x(self):
+        return self._rotation_x
+
+    def set_rotation_x(self, value):
+        self._rotation_x = value
+        self.rotation_x_changed.emit()
+
+    rotation_x_changed = Signal()
+    rotation_x = Property(float, rotation_x, set_rotation_x, notify=rotation_x_changed)
+
+    def rotation_y(self):
+        return self._rotation_y
+
+    def set_rotation_y(self, value):
+        self._rotation_y = value
+        self.rotation_y_changed.emit()
+
+    rotation_y_changed = Signal()
+    rotation_y = Property(float, rotation_y, set_rotation_y, notify=rotation_y_changed)
