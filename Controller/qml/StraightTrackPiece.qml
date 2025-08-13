@@ -8,10 +8,11 @@ TrackPiece {
     trackType: Rail.Straight
 
     rotationData: [
-        RotationData { objectName: "down"; dir: Globals.dir.down;
-            angle: 0; point: Qt.point(root.width, root.height); visible: true },
         RotationData { objectName: "up"; dir: Globals.dir.up;
-            angle: 0; point: Qt.point(root.width, 0); visible: true }
+            angle: 0; point: Qt.point(0, 0); visible: true },
+        RotationData { objectName: "down"; dir: Globals.dir.down;
+            angle: 0; point: Qt.point(0, root.height); visible: true }
+
     ]
 
     Repeater {
@@ -22,39 +23,25 @@ TrackPiece {
         }
     }
 
-    Rectangle {
-        property int index: 0
+    Repeater {
+        model: root.rotationData.length
+        delegate: Rectangle {
 
-        visible: rotationData[index].visible
-        width: parent.width
-        height: 50
+            property RotationData config: rotationData[index]
 
-        color: "#55FF00FF"
+            visible: config ? config.visible : false
+            y: config ? config.point.y - (config.dir === Globals.dir.up ? 0 : height) : 0
+            width: parent.width
+            height: 50
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                root.add(parent.index)
-                rotationData[parent.index].visible = false
-            }
-        }
-    }
+            color: "#55FF00FF"
 
-    Rectangle {
-        property int index: 1
-
-        visible: rotationData[index].visible
-        anchors.bottom: parent.bottom
-        width: parent.width
-        height: 50
-
-        color: "#55FF00FF"
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                root.add(parent.index)
-                rotationData[parent.index].visible = false
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    root.add(index)
+                    config.visible = false
+                }
             }
         }
     }

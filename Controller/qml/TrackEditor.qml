@@ -102,25 +102,25 @@ Item {
         sprite.railData.rotation = sibling ? sibling.railData.rotation : 0
 
         if (sibling) {
-            const transformation = sibling.rotationData[1 - index]
+            const transformation = sibling.rotationData[index]
             const up = (transformation.dir === Globals.dir.up)
 
             let origin = sibling.mapToItem(area, transformation.point)
 
-            sprite.railData.rotation_x = sprite.rotationData[index].point.x
-            sprite.railData.rotation_y = sprite.rotationData[index].point.y
+            sprite.railData.rotation_x = sprite.rotationData[1 - index].point.x
+            sprite.railData.rotation_y = sprite.rotationData[1 - index].point.y
 
-            sprite.rotationData[0].visible = false
+            sprite.rotationData[1 - index].visible = false
 
-            sprite.x = origin.x - (up ? sprite.width : sprite.rotationData[1].point.x)
+            sprite.x = origin.x
             sprite.y = origin.y - (up ? sprite.height : 0)
 
             let angle = sprite.rotationData[index].angle - transformation.angle
             sprite.railData.rotation += angle * 22.5
         }
 
-        sprite["add"].connect (function (transformation) {
-            createTrackPiece(sprite, transformation)
+        sprite["add"].connect (function (index) {
+            createTrackPiece(sprite, index)
         })
     }
 
