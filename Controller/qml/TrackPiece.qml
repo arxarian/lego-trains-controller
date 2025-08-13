@@ -61,4 +61,29 @@ Image {
         anchors.fill: parent
         onClicked: Globals.selectedTrack = (root.selected ? null : root)
     }
+
+    Repeater {
+        model: root.rotationData.length
+        delegate: Rectangle {
+            property RotationData config: rotationData[index]
+
+            rotation: (config && config.angle) ? -22.5 : 0
+            transformOrigin: Item.TopLeft
+            visible: config ? config.visible : false
+            x: config ? config.point.x : 0
+            y: config ? config.point.y - (config.dir === Globals.dir.up ? 0 : height) : 0
+            width: 320
+            height: 50
+
+            color: "#55FF00FF"
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    root.add(index)
+                    config.visible = false
+                }
+            }
+        }
+    }
 }
