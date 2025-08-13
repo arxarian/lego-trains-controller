@@ -16,14 +16,6 @@ TrackPiece {
             angle: 0; point: Qt.point(root.width, 103); visible: true}
     ]
 
-    Repeater {
-        model: root.rotationData.length
-        delegate: RotationPointMarker {
-            x: rotationData[index].point.x - width / 2
-            y: rotationData[index].point.y - height / 2
-        }
-    }
-
     Rectangle {
         property int index: 0
 

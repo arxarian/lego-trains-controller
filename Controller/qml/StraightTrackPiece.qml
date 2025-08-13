@@ -17,14 +17,6 @@ TrackPiece {
 
     Repeater {
         model: root.rotationData.length
-        delegate: RotationPointMarker {
-            x: rotationData[index].point.x - width / 2
-            y: rotationData[index].point.y - height / 2
-        }
-    }
-
-    Repeater {
-        model: root.rotationData.length
         delegate: Rectangle {
 
             property RotationData config: rotationData[index]
