@@ -5,7 +5,6 @@ TrackPiece {
     id: root
 
     source: "qrc:/curved.png"
-    trackType: Rail.Curved
 
     rotationData: [
         RotationData { objectName: "up"; dir: Globals.dir.up;

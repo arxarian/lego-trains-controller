@@ -6,8 +6,6 @@ Image {
 
     signal add(int index)
 
-    property int trackType: -1
-
     readonly property bool selected: Globals.selectedTrack === root
 
     required property list<RotationData> rotationData

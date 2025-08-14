@@ -5,7 +5,6 @@ TrackPiece {
     id: root
 
     source: "qrc:/straight.png"
-    trackType: Rail.Straight
 
     rotationData: [
         RotationData { objectName: "up"; dir: Globals.dir.up;
