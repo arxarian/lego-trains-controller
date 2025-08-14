@@ -4,8 +4,8 @@ import QtQuick
 
 QtObject {
     readonly property QtObject dir: QtObject {
-        readonly property int up: 1
-        readonly property int down: -1
+        readonly property string start: "start"
+        readonly property string end: "end"
     }
 
     property bool gridVisible: false

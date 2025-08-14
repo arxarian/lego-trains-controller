@@ -51,6 +51,7 @@ Image {
         z: 10
         visible: root.selected
         color: "transparent"
+        opacity: 0.5
         border.width: 20
         border.color: "gold"
     }
@@ -65,11 +66,11 @@ Image {
         delegate: Rectangle {
             property RotationData config: rotationData[index]
 
-            rotation: (config && config.angle) ? -22.5 : 0
+            rotation: config ? (config.angle * -22.5) : 0
             transformOrigin: Item.TopLeft
-            visible: config ? config.visible : false
+            visible: config ? (config.visible && !config.objectName.endsWith("_flipped") ) : false
             x: config ? config.point.x : 0
-            y: config ? config.point.y - (config.dir === Globals.dir.up ? 0 : height) : 0
+            y: config ? config.point.y - (config.dir === Globals.dir.start ? 0 : height) : 0
             width: 320
             height: 50
 

@@ -34,7 +34,7 @@ class RotationData(QObject):
         self.dir_changed.emit()
 
     dir_changed = Signal()
-    dir = Property(int, dir, set_dir, notify=dir_changed)
+    dir = Property(str, dir, set_dir, notify=dir_changed)
 
     def point(self):
         return self._point

@@ -100,34 +100,38 @@ Item {
         var sprite = component.createObject(area, {railData: rail})
 
         sprite.railData.rotation = sibling ? sibling.railData.rotation : 0
-
-        if (sibling) {
-            const transformation = sibling.rotationData[index]
-            const up = (transformation.dir === Globals.dir.up)
-
-            let origin = sibling.mapToItem(area, transformation.point)
-
-            sprite.railData.rotation_x = sprite.rotationData[1 - index].point.x
-            sprite.railData.rotation_y = sprite.rotationData[1 - index].point.y
-
-            sprite.rotationData[1 - index].visible = false
-
-            sprite.x = origin.x
-            sprite.y = origin.y - (up ? sprite.height : 0)
-
-            let angle = sprite.rotationData[index].angle - transformation.angle
-            sprite.railData.rotation += angle * 22.5
-        }
-
         sprite["add"].connect (function (index) {
             createTrackPiece(sprite, index)
         })
+
+        if (!sibling) {
+            return;
+        }
+
+        const fromConfig = sibling.rotationData[index]
+        const start = (fromConfig.dir === Globals.dir.start)
+        const toConfig = sprite.rotationData[start ? 2 : 0]
+
+        console.log("from", fromConfig.dir, "index", index)
+        console.log("to", toConfig)
+
+        let origin = sibling.mapToItem(area, fromConfig.point)
+
+        sprite.railData.rotation_x = toConfig.point.x
+        sprite.railData.rotation_y = toConfig.point.y
+
+        toConfig.visible = false
+
+        sprite.x = origin.x - toConfig.point.x
+        sprite.y = origin.y - toConfig.point.y
+
+        let angle = start ? -fromConfig.angle : toConfig.angle
+        sprite.railData.rotation += angle * 22.5
     }
 
     Component.onCompleted: {
-        root.trackType = Rail.Straight
+        root.trackType = Rail.Curved
         root.createTrackPiece()
-        root.trackType = Rail.Switch
     }
 
     Item {
@@ -168,7 +172,6 @@ Item {
 
         Behavior on rotation {
             RotationAnimator {
-                id: rotationAninamtion
                 direction: RotationAnimation.Clockwise
                 duration : 200
             }
