@@ -96,7 +96,8 @@ Image {
 
             root.railData.to_index = root.rotationData[root.railData.to_index].flipped
             const toConfig = root.rotationData[root.railData.to_index]
-            const rotationOffset = 180
+            const sign = toConfig.angle > 0 ? -1 : 1
+            const rotationOffset = sign * (180 - 22.5)
 
             snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset)
         }

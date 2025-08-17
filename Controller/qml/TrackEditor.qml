@@ -103,7 +103,7 @@ Item {
     }
 
     Component.onCompleted: {
-        root.trackType = Rail.Straight
+        root.trackType = Rail.Curved
         root.createTrackPiece()
     }
 
