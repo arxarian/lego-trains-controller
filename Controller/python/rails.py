@@ -3,6 +3,7 @@ from __future__ import annotations
 from enum import IntEnum
 from PySide6.QtCore import QAbstractListModel, Slot, Property, Signal
 from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
+from PySide6.QtQuick import QQuickItem
 
 from rail import Rail
 from rail import RailType
@@ -32,12 +33,16 @@ class Rails(QAbstractListModel):
         roles[Rails.Role.ObjectRole] = QByteArray(b"object")
         return roles
 
-    @Slot(int, result=Rail)
-    def createRail(self, type) -> Rail:
+    @Slot(int, QQuickItem, result=Rail)
+    def createRail(self, type, sibling) -> Rail:
         # append a new one
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self._railways.append(Rail(type))
         self.endInsertRows()
+
+        if sibling:
+            self._railways[-1].append_connected_to(sibling)
+
         # return it
         return self._railways[-1]
 

@@ -14,18 +14,54 @@ Image {
     z: Globals.selectedTrack === root ? 10 : 0
 
     transform: Rotation {
+        id: transformation
         origin.x: root.railData ? root.railData.rotation_x : 0
         origin.y: root.railData ? root.railData.rotation_y : 0
         angle: root.railData ? root.railData.rotation : 0
     }
 
-    Component.onCompleted: Globals.selectedTrack = root
+    // SequentialAnimation {
+    //     id: animation
+    //     running: false
+    //     RotationAnimator {
+    //         target: transformation
+    //         property: "angle"
+    //         from: 0
+    //         to: 180
+    //         duration: 200
+    //     }
+    // }
 
-    Shortcut {
-        enabled: root.selected
-        sequences: ["F"]
-        onActivated: console.warn("flip not implemented")
+    // Behavior on transform.angle {
+    //     RotationAnimator {
+    //         direction: RotationAnimation.Clockwise
+    //         duration : 200
+    //     }
+    // }
+
+    // Behavior on rotation {
+    //     RotationAnimator {
+    //         direction: RotationAnimation.Clockwise
+    //         duration : 200
+    //     }
+    // }
+
+
+    function rotate() {
+        if (railData.connected_to.length === 0) {
+            root.railData.rotation_x = root.width / 2
+            root.railData.rotation_y = root.height / 2
+            root.railData.rotation = root.railData.rotation + 22.5
+        } else {
+            console.warn("reconnect not implemented")
+        }
     }
+
+    function flip() {
+        console.warn("flip not implemented")
+    }
+
+    Component.onCompleted: Globals.selectedTrack = root
 
     Repeater {
         model: root.rotationData.length

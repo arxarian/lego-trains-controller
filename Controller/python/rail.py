@@ -41,12 +41,13 @@ class Rail(QObject):
     # ½ position
     #   - x
     #   - y
-    # ½ rotation center
+    # ½ rotation center - is it even needed?
     #   - x
     #   - y
     #   ports
     #   - port
     #     - rotation center
+    #       - rotation?
     #       - x
     #       - y
     #     - sibling [id, None]
@@ -54,11 +55,11 @@ class Rail(QObject):
     #     - possible routes (e.g. the switch rail is limited)
     #   markers
     #   - color
-    #   - rotation
     #   - position
     #     - x
     #     - y
     #   - rotation center
+    #     - rotation
     #     - x
     #     - y
 
@@ -72,17 +73,19 @@ class Rail(QObject):
         self._y = 0                     # float
         self._rotation_x = 0            # float
         self._rotation_y = 0            # float
-        self._connected_to = {}         # dict
+        self._connected_to = [] #{}         # change it to dict later
 
-        if self._type == RailType.Straight or self._type == RailType.Curved:
-            self._ports = ["start", "end"]
-        elif self.type == RailType.Switch:
-            self._ports = ["start", "left", "right"]
-        else:
-            self._ports = []
+        # if self._type == RailType.Straight or self._type == RailType.Curved:
+        #     self._ports = ["start", "end"]
+        # elif self.type == RailType.Switch:
+        #     self._ports = ["start", "left", "right"]
+        # else:
+        #     self._ports = []
 
-        for port in self._ports:
-            self._connected_to[port] = None
+        # for port in self._ports:
+        #     self._connected_to[port] = None
+
+
 
     def id(self):
         return self._id
@@ -153,3 +156,13 @@ class Rail(QObject):
 
     rotation_y_changed = Signal()
     rotation_y = Property(float, rotation_y, set_rotation_y, notify=rotation_y_changed)
+
+    def connected_to(self):
+        return self._connected_to
+
+    def append_connected_to(self, value):
+        self._connected_to.append(value)
+        self.connected_to_changed.emit()
+
+    connected_to_changed = Signal()
+    connected_to = Property(list, connected_to, notify=connected_to_changed)

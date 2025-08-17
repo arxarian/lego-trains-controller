@@ -94,7 +94,7 @@ Item {
     }
 
     function createTrackPiece(sibling, index = 0) { // the index is for sibling, what's the index for the new?
-        let rail = rails.createRail(root.trackType)
+        let rail = rails.createRail(root.trackType, sibling)
 
         var component = Qt.createComponent(rail.source())
         var sprite = component.createObject(area, {railData: rail})
@@ -162,19 +162,20 @@ Item {
         }
 
         Shortcut {
+            enabled: Globals.selectedTrack
             sequences: ["R"]
-            onActivated: area.rotation = (area.rotation + 45) % 360
+            onActivated: Globals.selectedTrack.rotate() // area.rotation = (area.rotation + 45) % 360
         }
+
+        Shortcut {
+            enabled: Globals.selectedTrack
+            sequences: ["F"]
+            onActivated: Globals.selectedTrack.flip()
+        }
+
 
         Behavior on scale {
             NumberAnimation { duration: area.scale > 1.5 ? 150 : 250 }
-        }
-
-        Behavior on rotation {
-            RotationAnimator {
-                direction: RotationAnimation.Clockwise
-                duration : 200
-            }
         }
     }
 }
