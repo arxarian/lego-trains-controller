@@ -93,13 +93,13 @@ Item {
         }
     }
 
-    function createTrackPiece(sibling, index = 0) {
-        let rail = rails.createRail(root.trackType, sibling)
+    function createTrackPiece(sibling, fromIndex = 0) {
+        let rail = rails.createRail(root.trackType, sibling, fromIndex)
 
         var component = Qt.createComponent(rail.source())
         var sprite = component.createObject(area, {railData: rail})
 
-        sprite.connectTo(sibling, index)
+        sprite.connectToSibling()
     }
 
     Component.onCompleted: {

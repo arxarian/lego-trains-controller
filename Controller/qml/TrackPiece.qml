@@ -46,8 +46,7 @@ Image {
     //     }
     // }
 
-    function snapToRotationPoint(fromConfig, toConfig, sibling) {
-
+    function snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset = 0) {
         let origin = sibling.mapToItem(area, fromConfig.point)
 
         root.railData.rotation_x = toConfig.point.x
@@ -58,42 +57,48 @@ Image {
         root.x = origin.x - toConfig.point.x
         root.y = origin.y - toConfig.point.y
 
-        const start = (fromConfig.dir === Globals.dir.start)
-        let angle = start ? -fromConfig.angle : toConfig.angle
-        root.railData.rotation += angle * 22.5
-
+        root.railData.rotation += rotationOffset
     }
 
-    function connectTo(sibling, index = 0) {
+    function connectToSibling() {
+        const sibling = root.railData.connected_to[0]
+        const index = root.railData.from_index
+
         root.railData.rotation = sibling ? sibling.railData.rotation : 0
         root.add.connect (function (index) {
             createTrackPiece(root, index)
         })
 
         if (!sibling) {
-            return;
+            return
         }
 
         const fromConfig = sibling.rotationData[index]
         const start = (fromConfig.dir === Globals.dir.start)
-        const toConfig = root.rotationData[start ? 2 : 0]
+        root.railData.to_index = start ? 2 : 0
+        const toConfig = root.rotationData[root.railData.to_index]
+        const rotationOffset = (start ? -fromConfig.angle : toConfig.angle) * 22.5
 
-        console.log("from", fromConfig.dir, "index", index)
-        console.log("to", toConfig)
-
-        snapToRotationPoint(fromConfig, toConfig, sibling)
+        snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset)
     }
 
 
     function rotate() {
-        if (railData.connected_to.length === 0) {
+        if (root.railData.connected_to.length === 0) {
             root.railData.rotation_x = root.width / 2
             root.railData.rotation_y = root.height / 2
             root.railData.rotation = root.railData.rotation + 22.5
-        } else if (railData.connected_to.length === 1) {
-            console.warn("reconnect in progress")
+        } else if (root.railData.connected_to.length === 1) {
+            const sibling = root.railData.connected_to[0]
+            const index = root.railData.from_index
+            const fromConfig = sibling.rotationData[index]
+            const start = (fromConfig.dir === Globals.dir.start)
 
-            //
+            root.railData.to_index = root.rotationData[root.railData.to_index].flipped
+            const toConfig = root.rotationData[root.railData.to_index]
+            const rotationOffset = 180 - (start ? -fromConfig.angle : toConfig.angle) * 22.5
+
+            snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset)
         }
     }
 

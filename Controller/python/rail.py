@@ -74,6 +74,7 @@ class Rail(QObject):
         self._rotation_x = 0            # float
         self._rotation_y = 0            # float
         self._connected_to = [] #{}         # change it to dict later
+        self._from_index = 0
 
         # if self._type == RailType.Straight or self._type == RailType.Curved:
         #     self._ports = ["start", "end"]
@@ -157,12 +158,34 @@ class Rail(QObject):
     rotation_y_changed = Signal()
     rotation_y = Property(float, rotation_y, set_rotation_y, notify=rotation_y_changed)
 
+    def from_index(self):
+        return self._from_index
+
+    def set_from_index(self, value):
+        self._from_index = value
+        self.from_index_changed.emit()
+
+    from_index_changed = Signal()
+    from_index = Property(float, from_index, set_from_index, notify=from_index_changed)
+
+    def to_index(self):
+        return self._to_index
+
+    def set_to_index(self, value):
+        self._to_index = value
+        self.to_index_changed.emit()
+
+    to_index_changed = Signal()
+    to_index = Property(float, to_index, set_to_index, notify=to_index_changed)
+
     def connected_to(self):
         return self._connected_to
 
-    def append_connected_to(self, value):
-        self._connected_to.append(value)
+    def append_connected_to(self, from_rail, from_index):
+        self._connected_to.append(from_rail)
+        self._from_index = from_index
         self.connected_to_changed.emit()
+        self.from_index_changed.emit()
 
     connected_to_changed = Signal()
     connected_to = Property(list, connected_to, notify=connected_to_changed)

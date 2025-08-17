@@ -33,15 +33,15 @@ class Rails(QAbstractListModel):
         roles[Rails.Role.ObjectRole] = QByteArray(b"object")
         return roles
 
-    @Slot(int, QQuickItem, result=Rail)
-    def createRail(self, type, sibling) -> Rail:
+    @Slot(int, QQuickItem, int, result=Rail)
+    def createRail(self, type, sibling, fromIndex) -> Rail:
         # append a new one
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self._railways.append(Rail(type))
         self.endInsertRows()
 
         if sibling:
-            self._railways[-1].append_connected_to(sibling)
+            self._railways[-1].append_connected_to(sibling, fromIndex)
 
         # return it
         return self._railways[-1]
