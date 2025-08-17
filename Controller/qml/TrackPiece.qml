@@ -77,7 +77,7 @@ Image {
         const start = (fromConfig.dir === Globals.dir.start)
         root.railData.to_index = start ? 2 : 0
         const toConfig = root.rotationData[root.railData.to_index]
-        const rotationOffset = (start ? -fromConfig.angle : toConfig.angle) * 22.5
+        const rotationOffset = (toConfig.angle - fromConfig.angle) * 22.5
 
         snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset)
     }
@@ -96,7 +96,7 @@ Image {
 
             root.railData.to_index = root.rotationData[root.railData.to_index].flipped
             const toConfig = root.rotationData[root.railData.to_index]
-            const rotationOffset = 180 - (start ? -fromConfig.angle : toConfig.angle) * 22.5
+            const rotationOffset = 180
 
             snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset)
         }
