@@ -46,14 +46,54 @@ Image {
     //     }
     // }
 
+    function snapToRotationPoint(fromConfig, toConfig, sibling) {
+
+        let origin = sibling.mapToItem(area, fromConfig.point)
+
+        root.railData.rotation_x = toConfig.point.x
+        root.railData.rotation_y = toConfig.point.y
+
+        toConfig.visible = false
+
+        root.x = origin.x - toConfig.point.x
+        root.y = origin.y - toConfig.point.y
+
+        const start = (fromConfig.dir === Globals.dir.start)
+        let angle = start ? -fromConfig.angle : toConfig.angle
+        root.railData.rotation += angle * 22.5
+
+    }
+
+    function connectTo(sibling, index = 0) {
+        root.railData.rotation = sibling ? sibling.railData.rotation : 0
+        root.add.connect (function (index) {
+            createTrackPiece(root, index)
+        })
+
+        if (!sibling) {
+            return;
+        }
+
+        const fromConfig = sibling.rotationData[index]
+        const start = (fromConfig.dir === Globals.dir.start)
+        const toConfig = root.rotationData[start ? 2 : 0]
+
+        console.log("from", fromConfig.dir, "index", index)
+        console.log("to", toConfig)
+
+        snapToRotationPoint(fromConfig, toConfig, sibling)
+    }
+
 
     function rotate() {
         if (railData.connected_to.length === 0) {
             root.railData.rotation_x = root.width / 2
             root.railData.rotation_y = root.height / 2
             root.railData.rotation = root.railData.rotation + 22.5
-        } else {
-            console.warn("reconnect not implemented")
+        } else if (railData.connected_to.length === 1) {
+            console.warn("reconnect in progress")
+
+            //
         }
     }
 

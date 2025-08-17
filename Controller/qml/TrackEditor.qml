@@ -93,40 +93,13 @@ Item {
         }
     }
 
-    function createTrackPiece(sibling, index = 0) { // the index is for sibling, what's the index for the new?
+    function createTrackPiece(sibling, index = 0) {
         let rail = rails.createRail(root.trackType, sibling)
 
         var component = Qt.createComponent(rail.source())
         var sprite = component.createObject(area, {railData: rail})
 
-        sprite.railData.rotation = sibling ? sibling.railData.rotation : 0
-        sprite["add"].connect (function (index) {
-            createTrackPiece(sprite, index)
-        })
-
-        if (!sibling) {
-            return;
-        }
-
-        const fromConfig = sibling.rotationData[index]
-        const start = (fromConfig.dir === Globals.dir.start)
-        const toConfig = sprite.rotationData[start ? 2 : 0]
-
-        console.log("from", fromConfig.dir, "index", index)
-        console.log("to", toConfig)
-
-        let origin = sibling.mapToItem(area, fromConfig.point)
-
-        sprite.railData.rotation_x = toConfig.point.x
-        sprite.railData.rotation_y = toConfig.point.y
-
-        toConfig.visible = false
-
-        sprite.x = origin.x - toConfig.point.x
-        sprite.y = origin.y - toConfig.point.y
-
-        let angle = start ? -fromConfig.angle : toConfig.angle
-        sprite.railData.rotation += angle * 22.5
+        sprite.connectTo(sibling, index)
     }
 
     Component.onCompleted: {
