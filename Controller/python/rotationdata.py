@@ -15,7 +15,7 @@ class RotationData(QObject):
         self._angle = 0
         self._point = QPoint(0, 0)
         self._visible = True
-        self._flipped = 0
+        self._next = 0
 
     def angle(self):
         return self._angle
@@ -57,12 +57,12 @@ class RotationData(QObject):
     visible_changed = Signal()
     visible = Property(bool, visible, set_visible, notify=visible_changed)
 
-    def flipped(self):
-        return self._flipped
+    def next(self):
+        return self._next
 
-    def set_flipped(self, value):
-        self._flipped = value
-        self.flipped_changed.emit()
+    def set_next(self, value):
+        self._next = value
+        self.next_changed.emit()
 
-    flipped_changed = Signal()
-    flipped = Property(int, flipped, set_flipped, notify=flipped_changed)
+    next_changed = Signal()
+    next = Property(int, next, set_next, notify=next_changed)

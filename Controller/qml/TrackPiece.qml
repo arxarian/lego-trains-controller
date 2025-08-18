@@ -46,6 +46,11 @@ Image {
     //     }
     // }
 
+    function updateConnectors() {
+        let dir = root.rotationData[root.railData.to_index].dir
+        root.rotationData.forEach((element) => {element.visible = (dir !== element.dir)})
+    }
+
     function snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset = 0) {
         let origin = sibling.mapToItem(area, fromConfig.point)
 
@@ -58,11 +63,6 @@ Image {
         root.railData.rotation += rotationOffset
 
         updateConnectors()
-    }
-
-    function updateConnectors() {
-        let dir = root.rotationData[root.railData.to_index].dir
-        root.rotationData.forEach((element) => {element.visible = (dir !== element.dir)})
     }
 
     function connectToSibling() {
@@ -87,7 +87,6 @@ Image {
         snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset)
     }
 
-
     function rotate() {
         if (root.railData.connected_to.length === 0) {
             root.railData.rotation_x = root.width / 2
@@ -99,7 +98,7 @@ Image {
             const fromConfig = sibling.rotationData[index]
             const start = (fromConfig.dir === Globals.dir.start)
 
-            root.railData.to_index = root.rotationData[root.railData.to_index].flipped
+            root.railData.to_index = root.rotationData[root.railData.to_index].next
             const toConfig = root.rotationData[root.railData.to_index]
 
             let rotationOffset = 0
@@ -108,6 +107,9 @@ Image {
             } else if (root.railData.type === Rail.Curved) {
                 const sign = toConfig.angle > 0 ? -1 : 1
                 rotationOffset = sign * (180 - 22.5)
+            } else if (root.railData.type === Rail.Switch) {
+                let rotations = [180, 180, 202.5, 202.5, -22.5, -22.5]
+                rotationOffset = rotations[root.railData.to_index]
             }
 
             snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset)

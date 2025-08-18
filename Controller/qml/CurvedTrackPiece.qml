@@ -8,12 +8,12 @@ TrackPiece {
 
     rotationData: [
         RotationData { objectName: "start"; dir: Globals.dir.start;
-            angle: 1; point: Qt.point(0, 122); visible: true; flipped: 3 },
+            angle: 1; point: Qt.point(0, 122); visible: true; next: 3 },
         RotationData { objectName: "end_flipped"; dir: Globals.dir.start;
-            angle: 1; point: Qt.point(295, 0); visible: true; flipped: 2 },
+            angle: 1; point: Qt.point(295, 0); visible: true; next: 2 },
         RotationData { objectName: "end"; dir: Globals.dir.end;
-            angle: 0; point: Qt.point(107, 658); visible: true; flipped: 1 },
+            angle: 0; point: Qt.point(107, 658); visible: true; next: 1 },
         RotationData { objectName: "start_flipped"; dir: Globals.dir.end;
-            angle: 0; point: Qt.point(427, 658); visible: true; flipped: 0 }
+            angle: 0; point: Qt.point(427, 658); visible: true; next: 0 }
     ]
 }
