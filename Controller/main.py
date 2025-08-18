@@ -1,7 +1,13 @@
+import sys, os
+
+sys.path.insert(0,"python")
+
 from devices import Devices
+from rails import Rails
+from network import Network
 from rotationdata import RotationData
 
-import Railways.rails_rc
+import resources.rails_rc
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
@@ -9,7 +15,6 @@ from qasync import QEventLoop
 
 from pathlib import Path
 import asyncio
-import sys, os
 
 if __name__ == '__main__':
     app = QGuiApplication(sys.argv)
@@ -20,12 +25,16 @@ if __name__ == '__main__':
     asyncio.set_event_loop(loop)
 
     devices = Devices()
+    rails = Rails()
+    network = Network()
 
     engine.addImportPath(Path(__file__).parent)
-    engine.addImportPath(os.path.join(Path(__file__).parent, "TrainsView"))
-    engine.addImportPath(os.path.join(Path(__file__).parent, "Railsways"))
+    engine.addImportPath(os.path.join(Path(__file__).parent, "qml"))
+    engine.addImportPath(os.path.join(Path(__file__).parent, "resources"))
     engine.rootContext().setContextProperty("devices", devices)
-    engine.loadFromModule("TrainsView", "Main")
+    engine.rootContext().setContextProperty("rails", rails)
+    engine.rootContext().setContextProperty("network", network)
+    engine.loadFromModule("qml", "Main")
 
     if not engine.rootObjects():
         sys.exit(-1)

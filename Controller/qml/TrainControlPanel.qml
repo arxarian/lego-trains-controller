@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Controls
-import TrainsView
+import TrainView
 
 Rectangle {
     id: root

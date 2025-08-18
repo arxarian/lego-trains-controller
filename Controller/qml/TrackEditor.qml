@@ -8,7 +8,7 @@ Item {
     property real minimalScale: 0.1
     property real maximalScale: 3
 
-    property int trackType: Globals.rail.straight
+    property int trackType: Rail.Straight
 
     MouseArea {
         id: mouseArea
@@ -60,24 +60,24 @@ Item {
 
         Row {
             Button {
-                checked: root.trackType === Globals.rail.straight
+                checked: root.trackType === Rail.Straight
                 checkable: true
                 text: "Straight"
-                onClicked: root.trackType = Globals.rail.straight
+                onClicked: root.trackType = Rail.Straight
             }
 
             Button {
-                checked: root.trackType === Globals.rail.curved
+                checked: root.trackType === Rail.Curved
                 checkable: true
                 text: "Curved"
-                onClicked: root.trackType = Globals.rail.curved
+                onClicked: root.trackType = Rail.Curved
             }
 
             Button {
-                checked: root.trackType === Globals.rail.switchRail
+                checked: root.trackType === Rail.Switch
                 checkable: true
                 text: "Switch"
-                onClicked: root.trackType = Globals.rail.switchRail
+                onClicked: root.trackType = Rail.Switch
             }
         }
     }
@@ -93,48 +93,17 @@ Item {
         }
     }
 
-    function trackBySelection() {
-        if (root.trackType === Globals.rail.straight) {
-            return "StraightTrackPiece.qml"
-        } else if (root.trackType === Globals.rail.curved) {
-            return "CurvedTrackPiece.qml"
-        } else if (root.trackType === Globals.rail.switchRail) {
-            return "SwitchTrackPiece.qml"
-        }
-    }
+    function createTrackPiece(sibling, fromIndex = 0) {
+        let rail = rails.createRail(root.trackType, sibling, fromIndex)
 
-    function createTrackPiece(sibling, index = 0) { // the index is for sibling, what's the index for the new?
-        const track = trackBySelection()
-        var component = Qt.createComponent(track)
-        var sprite = component.createObject(area)
+        var component = Qt.createComponent(rail.source())
+        var sprite = component.createObject(area, {railData: rail})
 
-        sprite.angle = sibling ? sibling.angle : 0
-
-        if (sibling) {
-            const transformation = sibling.rotationData[1 - index]
-            const up = (transformation.dir === Globals.dir.up)
-
-            let origin = sibling.mapToItem(area, transformation.point)
-
-            sprite.originX = sprite.rotationData[index].point.x
-            sprite.originY = sprite.rotationData[index].point.y
-
-            sprite.rotationData[0].visible = false
-
-            sprite.x = origin.x - (up ? sprite.width : sprite.rotationData[1].point.x)
-            sprite.y = origin.y - (up ? sprite.height : 0)
-
-            let angle = sprite.rotationData[index].angle - transformation.angle
-            sprite.angle += angle * 22.5
-        }
-
-        sprite["add"].connect (function (transformation) {
-            createTrackPiece(sprite, transformation)
-        })
+        sprite.connectToSibling()
     }
 
     Component.onCompleted: {
-        root.trackType = Globals.rail.straight
+        root.trackType = Rail.Curved
         root.createTrackPiece()
     }
 
@@ -166,21 +135,20 @@ Item {
         }
 
         Shortcut {
-            enabled: root.selected
+            enabled: Globals.selectedTrack
             sequences: ["R"]
-            onActivated: area.rotation = (area.rotation + 45) % 360
+            onActivated: Globals.selectedTrack.rotate() // area.rotation = (area.rotation + 45) % 360
         }
+
+        Shortcut {
+            enabled: Globals.selectedTrack
+            sequences: ["F"]
+            onActivated: Globals.selectedTrack.flip()
+        }
+
 
         Behavior on scale {
             NumberAnimation { duration: area.scale > 1.5 ? 150 : 250 }
-        }
-
-        Behavior on rotation {
-            RotationAnimator {
-                id: rotationAninamtion
-                direction: RotationAnimation.Clockwise
-                duration : 200
-            }
         }
     }
 }

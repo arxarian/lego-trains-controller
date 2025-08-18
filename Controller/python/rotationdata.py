@@ -3,7 +3,7 @@ from __future__ import annotations
 from PySide6.QtCore import QObject, Slot, Property, Signal, QPoint
 from PySide6.QtQml import QmlElement
 
-QML_IMPORT_NAME = "TrainsView"
+QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
 @QmlElement
@@ -15,6 +15,7 @@ class RotationData(QObject):
         self._angle = 0
         self._point = QPoint(0, 0)
         self._visible = True
+        self._next = 0
 
     def angle(self):
         return self._angle
@@ -34,7 +35,7 @@ class RotationData(QObject):
         self.dir_changed.emit()
 
     dir_changed = Signal()
-    dir = Property(int, dir, set_dir, notify=dir_changed)
+    dir = Property(str, dir, set_dir, notify=dir_changed)
 
     def point(self):
         return self._point
@@ -56,3 +57,12 @@ class RotationData(QObject):
     visible_changed = Signal()
     visible = Property(bool, visible, set_visible, notify=visible_changed)
 
+    def next(self):
+        return self._next
+
+    def set_next(self, value):
+        self._next = value
+        self.next_changed.emit()
+
+    next_changed = Signal()
+    next = Property(int, next, set_next, notify=next_changed)

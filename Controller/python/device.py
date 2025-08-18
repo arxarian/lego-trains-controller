@@ -6,7 +6,7 @@ from PySide6.QtCore import QObject, Slot, Property, Signal
 from PySide6.QtGui import QColor
 from PySide6.QtQml import QmlElement
 
-QML_IMPORT_NAME = "TrainsView"
+QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
 PYBRICKS_COMMAND_EVENT_CHAR_UUID = "c5f50002-8280-46da-89f4-6d8051e4aeef"
