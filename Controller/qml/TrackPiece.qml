@@ -11,7 +11,7 @@ Image {
     required property list<RotationData> rotationData
     required property Rail railData
 
-    z: Globals.selectedTrack === root ? 10 : 0
+    z: root.selected === root ? 10 : 0
 
     transform: Rotation {
         id: transformation
@@ -52,12 +52,17 @@ Image {
         root.railData.rotation_x = toConfig.point.x
         root.railData.rotation_y = toConfig.point.y
 
-        toConfig.visible = false
-
         root.x = origin.x - toConfig.point.x
         root.y = origin.y - toConfig.point.y
 
         root.railData.rotation += rotationOffset
+
+        updateConnectors()
+    }
+
+    function updateConnectors() {
+        let dir = root.rotationData[root.railData.to_index].dir
+        root.rotationData.forEach((element) => {element.visible = (dir !== element.dir)})
     }
 
     function connectToSibling() {
@@ -156,7 +161,7 @@ Image {
 
             rotation: config ? (config.angle * -22.5) : 0
             transformOrigin: Item.TopLeft
-            visible: config ? (config.visible && !config.objectName.endsWith("_flipped") ) : false
+            visible: config ? (config.visible && !config.objectName.endsWith("_flipped")) : false
             x: config ? config.point.x : 0
             y: config ? config.point.y - (config.dir === Globals.dir.start ? 0 : height) : 0
             width: 320
