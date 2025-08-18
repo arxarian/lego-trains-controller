@@ -159,11 +159,13 @@ Image {
         delegate: Rectangle {
             property RotationData config: rotationData[index]
 
+            property bool reversed: config ? config.dir === Globals.dir.start : true
+
             rotation: config ? (config.angle * -22.5) : 0
-            transformOrigin: Item.TopLeft
+            transformOrigin: reversed ? Item.BottomLeft : Item.TopLeft  // TODO - not working
             visible: config ? (config.visible && !config.objectName.endsWith("_flipped")) : false
             x: config ? config.point.x : 0
-            y: config ? config.point.y - (config.dir === Globals.dir.start ? 0 : height) : 0
+            y: config ? (config.point.y - (reversed ? 0 : height)) : 0
             width: 320
             height: 50
 
