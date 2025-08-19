@@ -19,6 +19,7 @@
         "qml/SwitchTrackPiece.qml",
         "qml/TrackPiece.qml",
         "qml/Globals.qml",
-        "qml/RotationPointMarker.qml"
+        "qml/RotationPointMarker.qml",
+        "qml/ControlPanel.qml"
     ]
 }

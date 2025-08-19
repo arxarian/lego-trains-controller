@@ -8,8 +8,6 @@ Item {
     property real minimalScale: 0.1
     property real maximalScale: 3
 
-    property int trackType: Rail.Straight
-
     MouseArea {
         id: mouseArea
 
@@ -31,55 +29,14 @@ Item {
         }
     }
 
-    Column {
-        anchors.top: parent.top
-        anchors.topMargin: -24
+    ControlPanel {
+        id: controlPanel
+
         anchors.right: parent.right
         anchors.rightMargin: 20
+        anchors.top: parent.top
+        anchors.topMargin: -24
         z: 1
-
-        Row {
-            CheckBox {
-                text: "Grid"
-                checked: Globals.gridVisible
-                onClicked: Globals.gridVisible = checked
-            }
-
-            CheckBox {
-                text: "Track Frame"
-                checked: Globals.trackFrameVisible
-                onClicked: Globals.trackFrameVisible = checked
-            }
-
-            CheckBox {
-                text: "Rotation Points"
-                checked: Globals.rotationPointsVisible
-                onClicked: Globals.rotationPointsVisible = checked
-            }
-        }
-
-        Row {
-            Button {
-                checked: root.trackType === Rail.Straight
-                checkable: true
-                text: "Straight"
-                onClicked: root.trackType = Rail.Straight
-            }
-
-            Button {
-                checked: root.trackType === Rail.Curved
-                checkable: true
-                text: "Curved"
-                onClicked: root.trackType = Rail.Curved
-            }
-
-            Button {
-                checked: root.trackType === Rail.Switch
-                checkable: true
-                text: "Switch"
-                onClicked: root.trackType = Rail.Switch
-            }
-        }
     }
 
     WheelHandler {
@@ -94,7 +51,7 @@ Item {
     }
 
     function createTrackPiece(sibling, fromIndex = 0) {
-        let rail = rails.createRail(root.trackType, sibling, fromIndex)
+        let rail = rails.createRail(controlPanel.trackType, sibling, fromIndex)
 
         var component = Qt.createComponent(rail.source())
         var sprite = component.createObject(area, {railData: rail})
@@ -103,9 +60,9 @@ Item {
     }
 
     Component.onCompleted: {
-        root.trackType = Rail.Straight
+        controlPanel.trackType = Rail.Straight
         root.createTrackPiece()
-        root.trackType = Rail.Switch
+        controlPanel.trackType = Rail.Switch
     }
 
     Item {
