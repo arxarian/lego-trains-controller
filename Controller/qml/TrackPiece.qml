@@ -13,38 +13,34 @@ Image {
 
     z: root.selected === root ? 10 : 0
 
+    QtObject {
+        id: animation
+        property bool enabled: false
+        property real duration: 600
+        property int type: Easing.InOutQuad
+    }
+
     transform: Rotation {
         id: transformation
         origin.x: root.railData ? root.railData.rotation_x : 0
         origin.y: root.railData ? root.railData.rotation_y : 0
         angle: root.railData ? root.railData.rotation : 0
+
+        Behavior on angle {
+            enabled: animation.enabled
+            NumberAnimation { duration: animation.duration; easing.type: animation.type }
+        }
+
+        Behavior on origin.x {
+            enabled: animation.enabled
+            NumberAnimation { duration: animation.duration; easing.type: animation.type }
+        }
+
+        Behavior on origin.y {
+            enabled: animation.enabled
+            NumberAnimation { duration: animation.duration; easing.type: animation.type }
+        }
     }
-
-    // SequentialAnimation {
-    //     id: animation
-    //     running: false
-    //     RotationAnimator {
-    //         target: transformation
-    //         property: "angle"
-    //         from: 0
-    //         to: 180
-    //         duration: 200
-    //     }
-    // }
-
-    // Behavior on transform.angle {
-    //     RotationAnimator {
-    //         direction: RotationAnimation.Clockwise
-    //         duration : 200
-    //     }
-    // }
-
-    // Behavior on rotation {
-    //     RotationAnimator {
-    //         direction: RotationAnimation.Clockwise
-    //         duration : 200
-    //     }
-    // }
 
     function updateConnectors() {
         let dir = root.rotationData[root.railData.to_index].dir
@@ -54,11 +50,13 @@ Image {
     function snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset = 0) {
         let origin = sibling.mapToItem(area, fromConfig.point)
 
-        root.railData.rotation_x = toConfig.point.x
-        root.railData.rotation_y = toConfig.point.y
+        console.log(JSON.stringify(fromConfig), "\n", JSON.stringify(toConfig))
 
         root.x = origin.x - toConfig.point.x
         root.y = origin.y - toConfig.point.y
+
+        root.railData.rotation_x = toConfig.point.x
+        root.railData.rotation_y = toConfig.point.y
 
         root.railData.rotation += rotationOffset
 
@@ -84,7 +82,9 @@ Image {
         const toConfig = root.rotationData[root.railData.to_index]
         const rotationOffset = (toConfig.angle - fromConfig.angle) * 22.5
 
+        animation.enabled = false
         snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset)
+        animation.enabled = true
     }
 
     function rotate() {
@@ -106,9 +106,9 @@ Image {
                 rotationOffset = 180
             } else if (root.railData.type === Rail.Curved) {
                 const sign = toConfig.angle > 0 ? -1 : 1
-                rotationOffset = sign * (180 - 22.5)
+                rotationOffset = sign * (180 - 22.5)    // TODO - change to list as below
             } else if (root.railData.type === Rail.Switch) {
-                let rotations = [180, 180, 202.5, 202.5, -22.5, -22.5]
+                let rotations = [180, 180, -157.5, -157.5, -22.5, -22.5]    // one pass has to be 0 degrees in total
                 rotationOffset = rotations[root.railData.to_index]
             }
 
@@ -181,5 +181,15 @@ Image {
                 }
             }
         }
+    }
+
+    Behavior on x {
+        enabled: animation.enabled
+        NumberAnimation { duration: animation.duration; easing.type: animation.type }
+    }
+
+    Behavior on y {
+        enabled: animation.enabled
+        NumberAnimation { duration: animation.duration; easing.type: animation.type }
     }
 }

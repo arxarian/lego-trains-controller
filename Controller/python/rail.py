@@ -9,7 +9,6 @@ QML_IMPORT_MAJOR_VERSION = 1
 
 @QEnum
 class RailType(IntEnum):
-    Unknown = -1
     Straight = 0
     Curved = 1
     Switch = 2

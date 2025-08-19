@@ -103,8 +103,9 @@ Item {
     }
 
     Component.onCompleted: {
-        root.trackType = Rail.Curved
+        root.trackType = Rail.Straight
         root.createTrackPiece()
+        root.trackType = Rail.Switch
     }
 
     Item {
@@ -137,7 +138,7 @@ Item {
         Shortcut {
             enabled: Globals.selectedTrack
             sequences: ["R"]
-            onActivated: Globals.selectedTrack.rotate() // area.rotation = (area.rotation + 45) % 360
+            onActivated: Globals.selectedTrack.rotate()
         }
 
         Shortcut {
