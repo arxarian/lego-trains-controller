@@ -1,0 +1,11 @@
+{
+    "source": "qrc:/switch left.png",
+    "connectors":[
+        { "name": "start", "dir": "start", "angle": 0, "point": {"x": 0, "y": 0}, "next": 3 },
+        { "name": "start_flipped", "dir": "start", "angle": 0, "point": {"x": 319, "y": 0}, "next": 2 },
+        { "name": "end_curved", "dir": "end", "angle": 1, "point": {"x": 533, "y": 1384}, "next": 4 },
+        { "name": "end_curved_flipped", "dir": "end", "angle": 1, "point": {"x": 829, "y": 1261}, "next": 5 },
+        { "name": "end_straight", "dir": "end", "angle": 0, "point": {"x": 0, "y": 1279}, "next": 1 },
+        { "name": "end_straight_flipped", "dir": "end", "angle": 0, "point": {"x": 319, "y": 1279}, "next": 0 }
+    ]
+}

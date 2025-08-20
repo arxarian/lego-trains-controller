@@ -5,7 +5,7 @@ sys.path.insert(0,"python")
 from devices import Devices
 from rails import Rails
 from network import Network
-from rotationdata import RotationData
+from connector import Connector
 
 import resources.rails_rc
 

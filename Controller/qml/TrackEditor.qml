@@ -53,7 +53,7 @@ Item {
     function createTrackPiece(sibling, fromIndex = 0) {
         let rail = rails.createRail(controlPanel.trackType, sibling, fromIndex)
 
-        var component = Qt.createComponent(rail.source())
+        var component = Qt.createComponent("TrackPiece.qml")
         var sprite = component.createObject(area, {railData: rail})
 
         sprite.connectToSibling()

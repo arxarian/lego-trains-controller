@@ -1,0 +1,9 @@
+{
+    "source": "qrc:/straight.png",
+    "connectors":[
+        { "name": "start", "dir": "start", "angle": 0, "point": {"x": 0, "y": 0}, "next": 3 },
+        { "name": "end_flipped", "dir": "start", "angle": 0, "point": {"x": 320, "y": 0}, "next": 2 },
+        { "name": "end", "dir": "end", "angle": 0, "point": {"x": 0, "y": 640}, "next": 1 },
+        { "name": "start_flipped", "dir": "end", "angle": 0, "point": {"x": 320, "y": 640}, "next": 0 }
+    ]
+}

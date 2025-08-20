@@ -6,12 +6,12 @@ Image {
 
     signal add(int index)
 
+    required property Rail railData
     readonly property bool selected: Globals.selectedTrack === root
 
-    required property list<RotationData> rotationData
-    required property Rail railData
-
     z: root.selected === root ? 10 : 0
+
+    source: root.railData ? root.railData.source : ""
 
     QtObject {
         id: animation
@@ -43,14 +43,15 @@ Image {
     }
 
     function updateConnectors() {
-        let dir = root.rotationData[root.railData.to_index].dir
-        root.rotationData.forEach((element) => {element.visible = (dir !== element.dir)})
+        let dir = root.railData.connectors.get(root.railData.to_index).dir
+        for (let i = 0; i < root.railData.connectors.rowCount(); ++i) {
+            let connector = root.railData.connectors.get(i)
+            connector.visible = (dir !== connector.dir)
+        }
     }
 
     function snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset = 0) {
         let origin = sibling.mapToItem(area, fromConfig.point)
-
-        console.log(JSON.stringify(fromConfig), "\n", JSON.stringify(toConfig))
 
         root.x = origin.x - toConfig.point.x
         root.y = origin.y - toConfig.point.y
@@ -76,10 +77,10 @@ Image {
             return
         }
 
-        const fromConfig = sibling.rotationData[index]
+        const fromConfig = sibling.railData.connectors.get(index)
         const start = (fromConfig.dir === Globals.dir.start)
         root.railData.to_index = start ? 2 : 0
-        const toConfig = root.rotationData[root.railData.to_index]
+        const toConfig = root.railData.connectors.get(root.railData.to_index)
         const rotationOffset = (toConfig.angle - fromConfig.angle) * 22.5
 
         animation.enabled = false
@@ -88,25 +89,30 @@ Image {
     }
 
     function rotate() {
+        if (!root.railData.rotatable) {
+            return
+        }
+
         if (root.railData.connected_to.length === 0) {
             root.railData.rotation_x = root.width / 2
             root.railData.rotation_y = root.height / 2
             root.railData.rotation = root.railData.rotation + 22.5
         } else if (root.railData.connected_to.length === 1) {
-            const sibling = root.railData.connected_to[0]
             const index = root.railData.from_index
-            const fromConfig = sibling.rotationData[index]
+            const sibling = root.railData.connected_to[0]
+            const fromConfig = sibling.railData.connectors.get(index)
             const start = (fromConfig.dir === Globals.dir.start)
 
-            root.railData.to_index = root.rotationData[root.railData.to_index].next
-            const toConfig = root.rotationData[root.railData.to_index]
+            root.railData.to_index = root.railData.connectors.get(root.railData.to_index).next
+            const toConfig = root.railData.connectors.get(root.railData.to_index)
 
             let rotationOffset = 0
             if (root.railData.type === Rail.Straight) {
-                rotationOffset = 180
+                let rotations = [180, 180, -180, -180]
+                rotationOffset = rotations[root.railData.to_index]
             } else if (root.railData.type === Rail.Curved) {
-                const sign = toConfig.angle > 0 ? -1 : 1
-                rotationOffset = sign * (180 - 22.5)    // TODO - change to list as below
+                let rotations = [202.5, 202.5, -202.5, -202.5]
+                rotationOffset = rotations[root.railData.to_index]
             } else if (root.railData.type === Rail.Switch) {
                 let rotations = [180, 180, -157.5, -157.5, -22.5, -22.5]    // one pass has to be 0 degrees in total
                 rotationOffset = rotations[root.railData.to_index]
@@ -117,16 +123,20 @@ Image {
     }
 
     function flip() {
-        console.warn("flip not implemented")
+        if (!root.railData.flippable) {
+            return
+        }
     }
 
     Component.onCompleted: Globals.selectedTrack = root
 
     Repeater {
-        model: root.rotationData.length
+        model: root.railData.connectors
         delegate: RotationPointMarker {
-            x: rotationData[index].point.x - width / 2
-            y: rotationData[index].point.y - height / 2
+            property Connector connector: model.object
+
+            x: connector.point.x - width / 2
+            y: connector.point.y - height / 2
         }
     }
 
@@ -157,17 +167,16 @@ Image {
     }
 
     Repeater {
-        model: root.rotationData.length
+        model: root.railData.connectors
         delegate: Rectangle {
-            property RotationData config: rotationData[index]
+            property Connector connector: model.object
+            property bool reversed: connector.dir === Globals.dir.start
 
-            property bool reversed: config ? config.dir === Globals.dir.start : true
-
-            rotation: config ? (config.angle * -22.5) : 0
+            rotation: connector.angle * -22.5
             transformOrigin: reversed ? Item.BottomLeft : Item.TopLeft  // TODO - not working
-            visible: config ? (config.visible && !config.objectName.endsWith("_flipped")) : false
-            x: config ? config.point.x : 0
-            y: config ? (config.point.y - (reversed ? 0 : height)) : 0
+            visible: connector.visible && !connector.name.endsWith("_flipped")
+            x: connector.point.x
+            y: connector.point.y - (reversed ? 0 : height)
             width: 320
             height: 50
 
@@ -177,7 +186,7 @@ Image {
                 anchors.fill: parent
                 onClicked: {
                     root.add(index)
-                    config.visible = false
+                    connector.visible = false
                 }
             }
         }

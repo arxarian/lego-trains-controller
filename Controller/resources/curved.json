@@ -1,0 +1,9 @@
+{
+    "source": "qrc:/curved.png",
+    "connectors":[
+        { "name": "start", "dir": "start", "angle": 1, "point": {"x": 0, "y": 122}, "next": 3 },
+        { "name": "end_flipped", "dir": "start", "angle": 1, "point": {"x": 295, "y": 0}, "next": 2 },
+        { "name": "end", "dir": "end", "angle": 0, "point": {"x": 107, "y": 658}, "next": 1 },
+        { "name": "start_flipped", "dir": "end", "angle": 0, "point": {"x": 427, "y": 658}, "next": 0 }
+    ]
+}
