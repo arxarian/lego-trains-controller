@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from enum import IntEnum
 from PySide6.QtCore import QObject, Slot, Property, Signal, QEnum
 from PySide6.QtQml import QmlElement
@@ -14,20 +15,15 @@ class RailType(IntEnum):
     Switch = 2
 
 RailSource = {
-  RailType.Straight: "StraightTrackPiece.qml",
-  RailType.Curved: "CurvedTrackPiece.qml",
-  RailType.Switch: "SwitchTrackPiece.qml"
+    RailType.Straight: "straight.json",
+    RailType.Curved: "curved.json",
+    RailType.Switch: "switch left.json"
 }
 
 @QmlElement
 class Rail(QObject):
     last_id = 0  # static variable
     QEnum(RailType)
-
-    @Slot(result=str)
-    def source(self) -> str:
-        return RailSource[self._type]
-
 
     def generateId():   # static method
         Rail.last_id += 1
@@ -36,6 +32,8 @@ class Rail(QObject):
     # ✓ id
     # ✓ type
     #   length
+    # ✓ flippable
+    # ✓ rotatable
     # ✓ rotation (move together with rotation center?)
     # ½ position
     #   - x
@@ -66,7 +64,7 @@ class Rail(QObject):
         super().__init__(parent)
         self._id = Rail.generateId()    # int
         self._type = type               # RailType
-
+        self._flippable = False         # bool
         self._rotation = 0              # float
         self._x = 0                     # float
         self._y = 0                     # float
@@ -74,6 +72,9 @@ class Rail(QObject):
         self._rotation_y = 0            # float
         self._connected_to = [] #{}         # change it to dict later
         self._from_index = 0
+        self._source = ""
+
+        self.loadMetadataFromJson()
 
         # if self._type == RailType.Straight or self._type == RailType.Curved:
         #     self._ports = ["start", "end"]
@@ -85,7 +86,12 @@ class Rail(QObject):
         # for port in self._ports:
         #     self._connected_to[port] = None
 
-
+    def loadMetadataFromJson(self):
+        with open("resources/" + RailSource[self._type]) as json_data:
+            data = json.load(json_data)
+            for key, value in data.items():
+                if hasattr(self, key):
+                    setattr(self, key, value)
 
     def id(self):
         return self._id
@@ -96,6 +102,36 @@ class Rail(QObject):
 
     id_changed = Signal()
     id = Property(int, id, set_id, notify=id_changed)
+
+    def source(self):
+        return self._source
+
+    def set_source(self, value):
+        self._source = value
+        self.source_changed.emit()
+
+    source_changed = Signal()
+    source = Property(str, source, set_source, notify=source_changed)
+
+    def flippable(self):
+        return self._flippable
+
+    def set_flippable(self, value):
+        self._flippable = value
+        self.flippable_changed.emit()
+
+    flippable_changed = Signal()
+    flippable = Property(bool, flippable, set_flippable, notify=flippable_changed)
+
+    def rotatable(self):
+        return self._rotatable
+
+    def set_rotatable(self, value):
+        self._rotatable = value
+        self.rotatable_changed.emit()
+
+    rotatable_changed = Signal()
+    rotatable = Property(bool, rotatable, set_rotatable, notify=rotatable_changed)
 
     def type(self):
         return self._type

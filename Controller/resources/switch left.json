@@ -1,0 +1,11 @@
+{
+    "source": "qrc:/switch left.png",
+    "rotations":[
+        { "objectName": "start", "dir": "start", "angle": 0, "point": "Qt.point(0, 0)", "next": 3 },
+        { "objectName": "start_flipped", "dir": "start", "angle": 0, "point": "Qt.point(319, 0)", "next": 2 },
+        { "objectName": "end_curved", "dir": "end", "angle": 1, "point": "Qt.point(533, 1384)", "next": 4 },
+        { "objectName": "end_curved_flipped", "dir": "end", "angle": 1, "point": "Qt.point(829, 1261)", "next": 5 },
+        { "objectName": "end_straight", "dir": "end", "angle": 0, "point": "Qt.point(0, 1279)", "next": 1 },
+        { "objectName": "end_straight_flipped", "dir": "end", "angle": 0, "point": "Qt.point(319, 1279)", "next": 0 }
+    ]
+}

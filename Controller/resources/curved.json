@@ -1,0 +1,9 @@
+{
+    "source": "qrc:/curved.png",
+    "rotations":[
+        { "objectName": "start", "dir": "start", "angle": 1, "point": "Qt.point(0, 122)", "next": 3 },
+        { "objectName": "end_flipped", "dir": "start", "angle": 1, "point": "Qt.point(295, 0)", "next": 2 },
+        { "objectName": "end", "dir": "end", "angle": 0, "point": "Qt.point(107, 658)", "next": 1 },
+        { "objectName": "start_flipped", "dir": "end", "angle": 0, "point": "Qt.point(427, 658)", "next": 0 }
+    ]
+}
