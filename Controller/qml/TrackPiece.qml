@@ -50,14 +50,16 @@ Image {
         }
     }
 
-    function snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset = 0) {
-        let origin = sibling.mapToItem(area, fromConfig.point)
+    function snapToRotationPoint(fromConnector, toConnector, sibling, rotationOffset = 0) {
+        let origin = sibling.mapToItem(area, fromConnector.point)
 
-        root.x = origin.x - toConfig.point.x
-        root.y = origin.y - toConfig.point.y
+        console.log(JSON.stringify(fromConnector), "\n", JSON.stringify(toConnector))
 
-        root.railData.rotation_x = toConfig.point.x
-        root.railData.rotation_y = toConfig.point.y
+        root.x = origin.x - toConnector.point.x
+        root.y = origin.y - toConnector.point.y
+
+        root.railData.rotation_x = toConnector.point.x
+        root.railData.rotation_y = toConnector.point.y
 
         root.railData.rotation += rotationOffset
 
@@ -77,14 +79,14 @@ Image {
             return
         }
 
-        const fromConfig = sibling.railData.connectors.get(index)
-        const start = (fromConfig.dir === Globals.dir.start)
+        const fromtoConnector = sibling.railData.connectors.get(index)
+        const start = (fromtoConnector.dir === Globals.dir.start)
         root.railData.to_index = start ? 2 : 0
-        const toConfig = root.railData.connectors.get(root.railData.to_index)
-        const rotationOffset = (toConfig.angle - fromConfig.angle) * 22.5
+        const totoConnector = root.railData.connectors.get(root.railData.to_index)
+        const rotationOffset = (totoConnector.angle - fromtoConnector.angle) * 22.5
 
         animation.enabled = false
-        snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset)
+        snapToRotationPoint(fromtoConnector, totoConnector, sibling, rotationOffset)
         animation.enabled = true
     }
 
@@ -98,15 +100,13 @@ Image {
             root.railData.rotation_y = root.height / 2
             root.railData.rotation = root.railData.rotation + 22.5
         } else if (root.railData.connected_to.length === 1) {
-            const index = root.railData.from_index
             const sibling = root.railData.connected_to[0]
-            const fromConfig = sibling.railData.connectors.get(index)
-            const start = (fromConfig.dir === Globals.dir.start)
+            const fromConnector = sibling.railData.connectors.get(root.railData.from_index)
 
             root.railData.to_index = root.railData.connectors.get(root.railData.to_index).next
-            const toConfig = root.railData.connectors.get(root.railData.to_index)
+            const toConnector = root.railData.connectors.get(root.railData.to_index)
 
-            snapToRotationPoint(fromConfig, toConfig, sibling, toConfig.rotation)
+            snapToRotationPoint(fromConnector, toConnector, sibling, toConnector.rotation)
         }
     }
 
