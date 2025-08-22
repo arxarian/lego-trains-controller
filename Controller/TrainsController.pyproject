@@ -20,7 +20,9 @@
         "qml/TrackEditor.qml",
         "qml/TrackPiece.qml",
         "qml/Globals.qml",
-        "qml/RotationPointMarker.qml",
-        "qml/ControlPanel.qml"
+        "qml/RotationPoints.qml",
+        "qml/ControlPanel.qml",
+        "qml/Connectors.qml",
+        "qml/SelectedMarker.qml"
     ]
 }

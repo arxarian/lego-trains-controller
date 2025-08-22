@@ -4,8 +4,6 @@ import TrainView
 Image {
     id: root
 
-    signal add(int index)
-
     required property Rail railData
     readonly property bool selected: Globals.selectedTrack === root
 
@@ -71,8 +69,8 @@ Image {
         const index = root.railData.from_index
 
         root.railData.rotation = sibling ? sibling.railData.rotation : 0
-        root.add.connect (function (index) {
-            createTrackPiece(root, index)
+        connectors.add.connect (function (index) {
+            createTrackPiece(root, index)   // TODO - calling a function from TrackEditor, that's a bit wierd
         })
 
         if (!sibling) {
@@ -118,14 +116,9 @@ Image {
 
     Component.onCompleted: Globals.selectedTrack = root
 
-    Repeater {
+    RotationPoints {
+        anchors.fill: parent
         model: root.railData.connectors
-        delegate: RotationPointMarker {
-            property Connector connector: model.object
-
-            x: connector.point.x - width / 2
-            y: connector.point.y - height / 2
-        }
     }
 
     Rectangle {
@@ -135,18 +128,11 @@ Image {
         border.width: 4
     }
 
-    Rectangle {
-        id: selectedMarker
-
+    SelectedMarker {
         anchors.fill: parent
         anchors.margins: -radius / 2
-        radius: 40
         z: 10
         visible: root.selected
-        color: "transparent"
-        opacity: 0.5
-        border.width: 20
-        border.color: "gold"
     }
 
     MouseArea {
@@ -154,30 +140,10 @@ Image {
         onClicked: Globals.selectedTrack = (root.selected ? null : root)
     }
 
-    Repeater {
+    Connectors {
+        id: connectors
+        anchors.fill: parent
         model: root.railData.connectors
-        delegate: Rectangle {
-            property Connector connector: model.object
-            property bool reversed: connector.dir === Globals.dir.start
-
-            rotation: connector.angle * -22.5
-            transformOrigin: reversed ? Item.BottomLeft : Item.TopLeft  // TODO - not working
-            visible: connector.visible && !connector.name.endsWith("_flipped")
-            x: connector.point.x
-            y: connector.point.y - (reversed ? 0 : height)
-            width: 320
-            height: 50
-
-            color: "#55FF00FF"
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    root.add(index)
-                    connector.visible = false
-                }
-            }
-        }
     }
 
     Behavior on x {
