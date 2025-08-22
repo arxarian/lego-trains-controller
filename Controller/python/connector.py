@@ -16,6 +16,7 @@ class Connector(QObject):
         self._angle = 0
         self._point = QPoint(0, 0)
         self._next = 0
+        self.rotation = 0
         self._visible = True       # not defined in json
 
         self.loadMetadataFromJson(data)
@@ -77,6 +78,16 @@ class Connector(QObject):
 
     next_changed = Signal()
     next = Property(int, next, set_next, notify=next_changed)
+
+    def rotation(self):
+        return self._rotation
+
+    def set_rotation(self, value):
+        self._rotation = value
+        self.rotation_changed.emit()
+
+    rotation_changed = Signal()
+    rotation = Property(float, rotation, set_rotation, notify=rotation_changed)
 
     def visible(self):
         return self._visible

@@ -106,19 +106,7 @@ Image {
             root.railData.to_index = root.railData.connectors.get(root.railData.to_index).next
             const toConfig = root.railData.connectors.get(root.railData.to_index)
 
-            let rotationOffset = 0
-            if (root.railData.type === Rail.Straight) {
-                let rotations = [180, 180, -180, -180]
-                rotationOffset = rotations[root.railData.to_index]
-            } else if (root.railData.type === Rail.Curved) {
-                let rotations = [202.5, 202.5, -202.5, -202.5]
-                rotationOffset = rotations[root.railData.to_index]
-            } else if (root.railData.type === Rail.Switch) {
-                let rotations = [180, 180, -157.5, -157.5, -22.5, -22.5]    // one pass has to be 0 degrees in total
-                rotationOffset = rotations[root.railData.to_index]
-            }
-
-            snapToRotationPoint(fromConfig, toConfig, sibling, rotationOffset)
+            snapToRotationPoint(fromConfig, toConfig, sibling, toConfig.rotation)
         }
     }
 
