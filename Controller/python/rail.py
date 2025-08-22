@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import json
 from enum import IntEnum
-from PySide6.QtCore import QObject, Slot, Property, Signal, QEnum
+from PySide6.QtCore import QObject, Slot, Property, Signal, QEnum, QAbstractListModel
 from PySide6.QtQml import QmlElement
+
+from connectors import Connectors
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -63,16 +65,21 @@ class Rail(QObject):
     def __init__(self, type: RailType, parent=None):
         super().__init__(parent)
         self._id = Rail.generateId()    # int
+        self._source = ""               # str
         self._type = type               # RailType
-        self._flippable = False         # bool
+        self._flippable = True          # bool
+        self._rotatable = True          # bool  // TODO - delete? Everything can rotate
+
         self._rotation = 0              # float
         self._x = 0                     # float
         self._y = 0                     # float
         self._rotation_x = 0            # float
         self._rotation_y = 0            # float
-        self._connected_to = [] #{}         # change it to dict later
         self._from_index = 0
-        self._source = ""
+
+        self._connectors = Connectors()  # QAbstractListModel
+        self._connected_to = [] #{}         # change it to dict later   // TODO - move to connectors?
+        self._to_index = 0              # int                           // TODO - move to connectors?
 
         self.loadMetadataFromJson()
 
@@ -91,6 +98,9 @@ class Rail(QObject):
             data = json.load(json_data)
             for key, value in data.items():
                 if hasattr(self, key):
+                    if key == "connectors":
+                        self._connectors.setModel(value)
+                        continue
                     setattr(self, key, value)
 
     def id(self):
@@ -112,6 +122,11 @@ class Rail(QObject):
 
     source_changed = Signal()
     source = Property(str, source, set_source, notify=source_changed)
+
+    def connectors(self):
+        return self._connectors
+
+    connectors = Property(QObject, connectors, constant=True)
 
     def flippable(self):
         return self._flippable
@@ -211,7 +226,7 @@ class Rail(QObject):
         self.to_index_changed.emit()
 
     to_index_changed = Signal()
-    to_index = Property(float, to_index, set_to_index, notify=to_index_changed)
+    to_index = Property(int, to_index, set_to_index, notify=to_index_changed)
 
     def connected_to(self):
         return self._connected_to
