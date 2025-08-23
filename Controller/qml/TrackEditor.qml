@@ -62,7 +62,7 @@ Item {
     Component.onCompleted: {
         controlPanel.trackType = Rail.Straight
         root.createTrackPiece()
-        controlPanel.trackType = Rail.Switch
+        controlPanel.trackType = Rail.SwitchLeft
     }
 
     Item {

@@ -5,6 +5,7 @@
         "resources/straight.json",
         "resources/curved.json",
         "resources/switch left.json",
+        "resources/switch right.json",
         "python/communication_example.py",
         "python/devices.py",
         "python/device.py",

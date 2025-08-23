@@ -41,10 +41,17 @@ Column {
         }
 
         Button {
-            checked: root.trackType === Rail.Switch
+            checked: root.trackType === Rail.SwitchLeft
             checkable: true
-            text: "Switch"
-            onClicked: root.trackType = Rail.Switch
+            text: "Switch Left"
+            onClicked: root.trackType = Rail.SwitchLeft
+        }
+
+        Button {
+            checked: root.trackType === Rail.SwitchRight
+            checkable: true
+            text: "Switch Right"
+            onClicked: root.trackType = Rail.SwitchRight
         }
     }
 }

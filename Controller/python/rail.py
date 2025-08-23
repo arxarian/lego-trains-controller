@@ -14,12 +14,14 @@ QML_IMPORT_MAJOR_VERSION = 1
 class RailType(IntEnum):
     Straight = 0
     Curved = 1
-    Switch = 2
+    SwitchLeft = 2
+    SwitchRight = 3
 
 RailSource = {
     RailType.Straight: "straight.json",
     RailType.Curved: "curved.json",
-    RailType.Switch: "switch left.json"
+    RailType.SwitchLeft: "switch left.json",
+    RailType.SwitchRight: "switch right.json"
 }
 
 @QmlElement
@@ -85,7 +87,7 @@ class Rail(QObject):
 
         # if self._type == RailType.Straight or self._type == RailType.Curved:
         #     self._ports = ["start", "end"]
-        # elif self.type == RailType.Switch:
+        # elif self.type == RailType.SwitchLeft:
         #     self._ports = ["start", "left", "right"]
         # else:
         #     self._ports = []
