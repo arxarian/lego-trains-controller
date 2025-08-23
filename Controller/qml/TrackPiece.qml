@@ -62,6 +62,8 @@ Image {
         root.railData.rotation += rotationOffset
 
         updateConnectors()
+        railData.x = root.x
+        railData.y = root.y
     }
 
     function connectToSibling() {

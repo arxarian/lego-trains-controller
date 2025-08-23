@@ -6,6 +6,11 @@ Column {
     property int trackType: Rail.Straight
 
     Row {
+        Button {
+            text: "Save"
+            onClicked: rails.save()
+        }
+
         CheckBox {
             text: "Grid"
             checked: Globals.gridVisible

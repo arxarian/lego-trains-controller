@@ -105,6 +105,11 @@ class Rail(QObject):
                         continue
                     setattr(self, key, value)
 
+    def to_dict(self):  # TODO - missing connected to!
+        return {"id": self._id, "type": self._type, "rotation": self._rotation,
+            "from_index": self._from_index, "to_index": self._to_index, "x": self._x,
+            "y": self._y, "rotation_x": self._rotation_x, "rotation_y": self._rotation_y}
+
     def id(self):
         return self._id
 

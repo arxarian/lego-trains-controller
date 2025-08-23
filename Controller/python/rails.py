@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from enum import IntEnum
 from PySide6.QtCore import QAbstractListModel, Slot, Property, Signal
 from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
@@ -32,6 +33,13 @@ class Rails(QAbstractListModel):
         roles = super().roleNames()
         roles[Rails.Role.ObjectRole] = QByteArray(b"object")
         return roles
+
+    @Slot()
+    def save(self):
+        data = [rail.to_dict() for rail in self._railways]
+        with open("rails.json", "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        print("saved")
 
     @Slot(int, QQuickItem, int, result=Rail)
     def createRail(self, type, sibling, fromIndex) -> Rail:
