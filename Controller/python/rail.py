@@ -83,7 +83,7 @@ class Rail(QObject):
         self._connected_to = [] #{}         # change it to dict later   // TODO - move to connectors?
         self._to_index = 0              # int                           // TODO - move to connectors?
 
-        self.loadMetadataFromJson()
+        self.load_metadata_from_Json()
 
         # if self._type == RailType.Straight or self._type == RailType.Curved:
         #     self._ports = ["start", "end"]
@@ -95,7 +95,7 @@ class Rail(QObject):
         # for port in self._ports:
         #     self._connected_to[port] = None
 
-    def loadMetadataFromJson(self):
+    def load_metadata_from_Json(self):
         with open("resources/" + RailSource[self._type]) as json_data:
             data = json.load(json_data)
             for key, value in data.items():
