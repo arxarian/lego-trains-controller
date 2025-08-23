@@ -12,6 +12,7 @@ QML_IMPORT_MAJOR_VERSION = 1
 
 @QEnum
 class RailType(IntEnum):
+    Undefined = -1
     Straight = 0
     Curved = 1
     SwitchLeft = 2
@@ -29,9 +30,12 @@ class Rail(QObject):
     last_id = 0  # static variable
     QEnum(RailType)
 
-    def generateId():   # static method
-        Rail.last_id += 1
-        return Rail.last_id
+    def generateId(id):   # static method
+        if id == 0:
+            Rail.last_id += 1
+            return Rail.last_id
+        else:
+            return id
 
     # ✓ id
     # ✓ type
@@ -64,24 +68,26 @@ class Rail(QObject):
     #     - x
     #     - y
 
-    def __init__(self, type: RailType, parent=None):
+    def __init__(self, type=RailType.Undefined, id=0, rotation=0, x=0, y=0,
+        rotation_x=0, rotation_y=0, parent=None):
+
         super().__init__(parent)
-        self._id = Rail.generateId()    # int
+        self._id = Rail.generateId(id)  # int
         self._source = ""               # str
         self._type = type               # RailType
         self._flippable = True          # bool
         self._rotatable = True          # bool  // TODO - delete? Everything can rotate
 
-        self._rotation = 0              # float
-        self._x = 0                     # float
-        self._y = 0                     # float
-        self._rotation_x = 0            # float
-        self._rotation_y = 0            # float
-        self._from_index = 0
+        self._rotation = rotation       # float
+        self._x = x                     # float
+        self._y = y                     # float
+        self._rotation_x = rotation_x   # float
+        self._rotation_y = rotation_y   # float
 
         self._connectors = Connectors()  # QAbstractListModel
         self._connected_to = [] #{}         # change it to dict later   // TODO - move to connectors?
         self._to_index = 0              # int                           // TODO - move to connectors?
+        self._from_index = 0
 
         self.load_metadata_from_Json()
 
@@ -96,6 +102,10 @@ class Rail(QObject):
         #     self._connected_to[port] = None
 
     def load_metadata_from_Json(self):
+        if self._type == RailType.Undefined:
+            print("undefined rail type")
+            return
+
         with open("resources/" + RailSource[self._type]) as json_data:
             data = json.load(json_data)
             for key, value in data.items():
@@ -109,6 +119,11 @@ class Rail(QObject):
         return {"id": self._id, "type": self._type, "rotation": self._rotation,
             "from_index": self._from_index, "to_index": self._to_index, "x": self._x,
             "y": self._y, "rotation_x": self._rotation_x, "rotation_y": self._rotation_y}
+
+    def from_dict(data):
+        return Rail(type=data.get("type", ""), id=data.get("id", ""), rotation=data.get("rotation", 0),
+            x=data.get("x", 0), y=data.get("y", 0), rotation_x=data.get("rotation_x", 0),
+            rotation_y=data.get("rotation_y", 0))
 
     def id(self):
         return self._id

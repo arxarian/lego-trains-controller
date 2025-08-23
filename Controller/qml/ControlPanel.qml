@@ -11,6 +11,11 @@ Column {
             onClicked: rails.save()
         }
 
+        Button {
+            text: "Load"
+            onClicked: rails.load()
+        }
+
         CheckBox {
             text: "Grid"
             checked: Globals.gridVisible

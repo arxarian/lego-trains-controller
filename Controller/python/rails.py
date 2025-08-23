@@ -41,6 +41,15 @@ class Rails(QAbstractListModel):
             json.dump(data, f, ensure_ascii=False, indent=2)
         print("saved")
 
+    @Slot()
+    def load(self):
+        with open("rails.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+        self.beginResetModel()
+        self._railways = [Rail.from_dict(d) for d in data]
+        self.endResetModel()
+        print("loaded")
+
     @Slot(int, QQuickItem, int, result=Rail)
     def createRail(self, type, sibling, fromIndex) -> Rail:
         # append a new one
