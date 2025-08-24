@@ -44,6 +44,7 @@ class Rails(QAbstractListModel):
 
     @Slot()
     def load(self):
+        # TODO - delete the previous rails before
         with open("rails.json", "r", encoding="utf-8") as f:
             data = json.load(f)
         self.beginResetModel()

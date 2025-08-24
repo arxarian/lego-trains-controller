@@ -27,6 +27,12 @@ Item {
             area.x = mouse.x - mouseArea.offsetX + mouseArea.startX
             area.y = mouse.y - mouseArea.offsetY + mouseArea.startY
         }
+
+        onClicked: {
+            if (rails.rowCount() === 0) {
+                rails.append(Globals.selectedType)
+            }
+        }
     }
 
     ControlPanel {
@@ -48,8 +54,6 @@ Item {
         }
     }
 
-    Component.onCompleted: rails.append(Globals.selectedType) // DEBUG
-
     Item {
         id: area
         height: parent.height
@@ -63,7 +67,7 @@ Item {
                 railData: model.object
                 Component.onCompleted: {
                     rails.registerRail(rail, rail.railData.id)
-                    rail.connectToSibling()
+                    // rail.connectToSibling() - TODO - it's need for connection of rails!
                 }
             }
         }
