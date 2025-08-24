@@ -253,8 +253,8 @@ class Rail(QObject):
     def connected_to(self):
         return self._connected_to
 
-    def append_connected_to(self, from_rail, from_index):
-        self._connected_to.append(from_rail)
+    def append_connected_to(self, from_rail_id, from_index):
+        self._connected_to.append(from_rail_id)
         self._from_index = from_index
         self.connected_to_changed.emit()
         self.from_index_changed.emit()

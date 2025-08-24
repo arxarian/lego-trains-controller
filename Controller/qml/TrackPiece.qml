@@ -4,9 +4,11 @@ import TrainView
 Image {
     id: root
 
-    required property Rail railData
+    /*required*/ property Rail railData // TODO - required is not working for some reason
     readonly property bool selected: Globals.selectedTrack === root
 
+    x: root.railData ? root.railData.x : 0
+    y: root.railData ? root.railData.y : 0
     z: root.selected === root ? 10 : 0
 
     source: root.railData ? root.railData.source : ""
@@ -62,31 +64,32 @@ Image {
         root.railData.rotation += rotationOffset
 
         updateConnectors()
-        railData.x = root.x
-        railData.y = root.y
+        // TODO - need to update coordinates for loading
+        // railData.x = root.x
+        // railData.y = root.y
     }
 
     function connectToSibling() {
-        const sibling = root.railData.connected_to[0]
+        const sibling = rails.findRail(root.railData.connected_to[0])
         const index = root.railData.from_index
 
         root.railData.rotation = sibling ? sibling.railData.rotation : 0
         connectors.add.connect (function (index) {
-            createTrackPiece(root, index)   // TODO - calling a function from TrackEditor, that's a bit wierd
+            rails.append(Globals.selectedType, root.railData.id, index)
         })
 
         if (!sibling) {
             return
         }
 
-        const fromtoConnector = sibling.railData.connectors.get(index)
-        const start = (fromtoConnector.dir === Globals.dir.start)
+        const fromConnector = sibling.railData.connectors.get(index)
+        const start = (fromConnector.dir === Globals.dir.start)
         root.railData.to_index = start ? 2 : 0
-        const totoConnector = root.railData.connectors.get(root.railData.to_index)
-        const rotationOffset = (totoConnector.angle - fromtoConnector.angle) * 22.5
+        const toConnector = root.railData.connectors.get(root.railData.to_index)
+        const rotationOffset = (toConnector.angle - fromConnector.angle) * 22.5
 
         animation.enabled = false
-        snapToRotationPoint(fromtoConnector, totoConnector, sibling, rotationOffset)
+        snapToRotationPoint(fromConnector, toConnector, sibling, rotationOffset)
         animation.enabled = true
     }
 
@@ -100,7 +103,8 @@ Image {
             root.railData.rotation_y = root.height / 2
             root.railData.rotation = root.railData.rotation + 22.5
         } else if (root.railData.connected_to.length === 1) {
-            const sibling = root.railData.connected_to[0]
+            // TODO - no need to have a real sibling here
+            const sibling = rails.findRail(root.railData.connected_to[0])
             const fromConnector = sibling.railData.connectors.get(root.railData.from_index)
 
             root.railData.to_index = root.railData.connectors.get(root.railData.to_index).next

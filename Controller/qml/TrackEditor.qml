@@ -30,8 +30,6 @@ Item {
     }
 
     ControlPanel {
-        id: controlPanel
-
         anchors.right: parent.right
         anchors.rightMargin: 20
         anchors.top: parent.top
@@ -50,26 +48,25 @@ Item {
         }
     }
 
-    function createTrackPiece(sibling, fromIndex = 0) {
-        let rail = rails.createRail(controlPanel.trackType, sibling, fromIndex)
-
-        var component = Qt.createComponent("TrackPiece.qml")
-        var sprite = component.createObject(area, {railData: rail})
-
-        sprite.connectToSibling()
-    }
-
-    Component.onCompleted: {
-        controlPanel.trackType = Rail.Straight
-        root.createTrackPiece()
-        controlPanel.trackType = Rail.SwitchLeft
-    }
+    Component.onCompleted: rails.append(Globals.selectedType) // DEBUG
 
     Item {
         id: area
         height: parent.height
         width: parent.width
         scale: 0.3
+
+        Repeater {
+            model: rails
+            delegate: TrackPiece {
+                id: rail
+                railData: model.object
+                Component.onCompleted: {
+                    rails.registerRail(rail, rail.railData.id)
+                    rail.connectToSibling()
+                }
+            }
+        }
 
         GridView {
             id: grid

@@ -3,7 +3,6 @@ import QtQuick.Controls
 
 Column {
     id: root
-    property int trackType: Rail.Straight
 
     Row {
         Button {
@@ -37,31 +36,31 @@ Column {
 
     Row {
         Button {
-            checked: root.trackType === Rail.Straight
+            checked: Globals.selectedType === Rail.Straight
             checkable: true
             text: "Straight"
-            onClicked: root.trackType = Rail.Straight
+            onClicked: Globals.selectedType = Rail.Straight
         }
 
         Button {
-            checked: root.trackType === Rail.Curved
+            checked: Globals.selectedType === Rail.Curved
             checkable: true
             text: "Curved"
-            onClicked: root.trackType = Rail.Curved
+            onClicked: Globals.selectedType = Rail.Curved
         }
 
         Button {
-            checked: root.trackType === Rail.SwitchLeft
+            checked: Globals.selectedType === Rail.SwitchLeft
             checkable: true
             text: "Switch Left"
-            onClicked: root.trackType = Rail.SwitchLeft
+            onClicked: Globals.selectedType = Rail.SwitchLeft
         }
 
         Button {
-            checked: root.trackType === Rail.SwitchRight
+            checked: Globals.selectedType === Rail.SwitchRight
             checkable: true
             text: "Switch Right"
-            onClicked: root.trackType = Rail.SwitchRight
+            onClicked: Globals.selectedType = Rail.SwitchRight
         }
     }
 }
