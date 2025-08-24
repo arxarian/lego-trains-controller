@@ -65,8 +65,8 @@ Image {
 
         updateConnectors()
         // TODO - need to update coordinates for loading
-        // railData.x = root.x
-        // railData.y = root.y
+        railData.x = root.x
+        railData.y = root.y
     }
 
     function connectToSibling() {
@@ -88,9 +88,9 @@ Image {
         const toConnector = root.railData.connectors.get(root.railData.to_index)
         const rotationOffset = (toConnector.angle - fromConnector.angle) * 22.5
 
-        animation.enabled = false
+        // animation.enabled = false
         snapToRotationPoint(fromConnector, toConnector, sibling, rotationOffset)
-        animation.enabled = true
+        // animation.enabled = true
     }
 
     function rotate() {
