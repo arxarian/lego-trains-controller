@@ -44,7 +44,8 @@ class Rails(QAbstractListModel):
 
     @Slot()
     def load(self):
-        # TODO - delete the previous rails before
+        self.resetModel()
+
         with open("rails.json", "r", encoding="utf-8") as f:
             data = json.load(f)
         self.beginResetModel()
@@ -76,6 +77,16 @@ class Rails(QAbstractListModel):
             self._railways[-1].append_connected_to(id, fromIndex)
 
         self.endInsertRows()
+
+    def resetModel(self):
+        if (self.rowCount() == 0):
+            return
+
+        self.beginRemoveRows(QModelIndex(), 0, self.rowCount() - 1)
+        for rail in self._railways:
+            rail.deleteLater()
+        self._railways.clear()
+        self.endRemoveRows()
 
     def remove(self, rail):
         index = self._railways.index(rail)
