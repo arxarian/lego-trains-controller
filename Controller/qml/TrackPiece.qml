@@ -94,10 +94,6 @@ Image {
     }
 
     function rotate() {
-        if (!root.railData.rotatable) {
-            return
-        }
-
         if (root.railData.connected_to.length === 0) {
             root.railData.rotation_x = root.width / 2
             root.railData.rotation_y = root.height / 2
@@ -111,12 +107,6 @@ Image {
             const toConnector = root.railData.connectors.get(root.railData.to_index)
 
             snapToRotationPoint(fromConnector, toConnector, sibling, toConnector.rotation)
-        }
-    }
-
-    function flip() {
-        if (!root.railData.flippable) {
-            return
         }
     }
 

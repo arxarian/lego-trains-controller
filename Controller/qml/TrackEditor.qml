@@ -67,7 +67,7 @@ Item {
                 railData: model.object
                 Component.onCompleted: {
                     rails.registerRail(rail, rail.railData.id)
-                    // rail.connectToSibling() - TODO - it's need for connection of rails!
+                    // rail.connectToSibling() - TODO - it's need for repositioning!
                 }
             }
         }
@@ -98,13 +98,6 @@ Item {
             sequences: ["R"]
             onActivated: Globals.selectedTrack.rotate()
         }
-
-        Shortcut {
-            enabled: Globals.selectedTrack
-            sequences: ["F"]
-            onActivated: Globals.selectedTrack.flip()
-        }
-
 
         Behavior on scale {
             NumberAnimation { duration: area.scale > 1.5 ? 150 : 250 }

@@ -40,8 +40,6 @@ class Rail(QObject):
     # ✓ id
     # ✓ type
     #   length
-    # ✓ flippable
-    # ✓ rotatable
     # ✓ rotation (move together with rotation center?)
     # ½ position
     #   - x
@@ -75,8 +73,6 @@ class Rail(QObject):
         self._id = Rail.generateId(id)  # int
         self._source = ""               # str
         self._type = type               # RailType
-        self._flippable = True          # bool
-        self._rotatable = True          # bool  // TODO - delete? Everything can rotate
 
         self._rotation = rotation       # float
         self._x = x                     # float
@@ -149,26 +145,6 @@ class Rail(QObject):
         return self._connectors
 
     connectors = Property(QObject, connectors, constant=True)
-
-    def flippable(self):
-        return self._flippable
-
-    def set_flippable(self, value):
-        self._flippable = value
-        self.flippable_changed.emit()
-
-    flippable_changed = Signal()
-    flippable = Property(bool, flippable, set_flippable, notify=flippable_changed)
-
-    def rotatable(self):
-        return self._rotatable
-
-    def set_rotatable(self, value):
-        self._rotatable = value
-        self.rotatable_changed.emit()
-
-    rotatable_changed = Signal()
-    rotatable = Property(bool, rotatable, set_rotatable, notify=rotatable_changed)
 
     def type(self):
         return self._type
