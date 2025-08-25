@@ -66,7 +66,7 @@ class Rail(QObject):
     #     - x
     #     - y
 
-    def __init__(self, type=RailType.Undefined, id=0, rotation=0, x=0, y=0,
+    def __init__(self, type=RailType.Undefined, id=0, angle=0, x=0, y=0,
         rotation_x=0, rotation_y=0, parent=None):
 
         super().__init__(parent)
@@ -74,7 +74,7 @@ class Rail(QObject):
         self._source = ""               # str
         self._type = type               # RailType
 
-        self._rotation = rotation       # float
+        self._angle = angle       # float
         self._x = x                     # float
         self._y = y                     # float
         self._rotation_x = rotation_x   # float
@@ -112,12 +112,12 @@ class Rail(QObject):
                     setattr(self, key, value)
 
     def to_dict(self):  # TODO - missing connected to!
-        return {"id": self._id, "type": self._type, "rotation": self._rotation,
+        return {"id": self._id, "type": self._type, "angle": self._angle,
             "from_index": self._from_index, "to_index": self._to_index, "x": self._x,
             "y": self._y, "rotation_x": self._rotation_x, "rotation_y": self._rotation_y}
 
     def from_dict(data):
-        return Rail(type=data.get("type", ""), id=data.get("id", ""), rotation=data.get("rotation", 0),
+        return Rail(type=data.get("type", ""), id=data.get("id", ""), angle=data.get("angle", 0),
             x=data.get("x", 0), y=data.get("y", 0), rotation_x=data.get("rotation_x", 0),
             rotation_y=data.get("rotation_y", 0))
 
@@ -156,15 +156,15 @@ class Rail(QObject):
     type_changed = Signal()
     type = Property(int, type, set_type, notify=type_changed)
 
-    def rotation(self):
-        return self._rotation
+    def angle(self):
+        return self._angle
 
-    def set_rotation(self, value):
-        self._rotation = value
-        self.rotation_changed.emit()
+    def set_angle(self, value):
+        self._angle = value
+        self.angle_changed.emit()
 
-    rotation_changed = Signal()
-    rotation = Property(float, rotation, set_rotation, notify=rotation_changed)
+    angle_changed = Signal()
+    angle = Property(float, angle, set_angle, notify=angle_changed)
 
     def x(self):
         return self._x

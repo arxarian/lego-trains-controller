@@ -24,7 +24,7 @@ Image {
         id: transformation
         origin.x: root.railData ? root.railData.rotation_x : 0
         origin.y: root.railData ? root.railData.rotation_y : 0
-        angle: root.railData ? root.railData.rotation : 0
+        angle: root.railData ? root.railData.angle : 0
 
         Behavior on angle {
             enabled: animation.enabled
@@ -61,7 +61,7 @@ Image {
         root.railData.rotation_x = toConnector.point.x
         root.railData.rotation_y = toConnector.point.y
 
-        root.railData.rotation += rotationOffset
+        root.railData.angle += rotationOffset
 
         updateConnectors()
         // TODO - need to update coordinates for loading
@@ -73,7 +73,7 @@ Image {
         const sibling = rails.findRail(root.railData.connected_to[0])
         const index = root.railData.from_index
 
-        root.railData.rotation = sibling ? sibling.railData.rotation : 0
+        root.railData.angle = sibling ? sibling.railData.angle : 0
         connectors.add.connect (function (index) {
             rails.append(Globals.selectedType, root.railData.id, index)
         })
@@ -97,7 +97,7 @@ Image {
         if (root.railData.connected_to.length === 0) {
             root.railData.rotation_x = root.width / 2
             root.railData.rotation_y = root.height / 2
-            root.railData.rotation = root.railData.rotation + 22.5
+            root.railData.angle = root.railData.angle+ 22.5
         } else if (root.railData.connected_to.length === 1) {
             // TODO - no need to have a real sibling here
             const sibling = rails.findRail(root.railData.connected_to[0])
