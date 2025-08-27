@@ -24,6 +24,8 @@
         "qml/RotationPoints.qml",
         "qml/ControlPanel.qml",
         "qml/Connectors.qml",
-        "qml/SelectedMarker.qml"
+        "qml/SelectedMarker.qml",
+        "rails.json",
+        "python/rotator.py"
     ]
 }

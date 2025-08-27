@@ -37,7 +37,7 @@ class Rails(QAbstractListModel):
 
     @Slot()
     def save(self):
-        data = [rail.to_dict() for rail in self._railways]
+        data = [rail.save_data() for rail in self._railways]
         with open("rails.json", "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         print("saved")
@@ -49,7 +49,7 @@ class Rails(QAbstractListModel):
         with open("rails.json", "r", encoding="utf-8") as f:
             data = json.load(f)
         self.beginResetModel()
-        self._railways = [Rail.from_dict(d) for d in data]
+        self._railways = [Rail.load_data(d, self) for d in data]
         self.endResetModel()
         print("loaded, size", len(self._railways))
 
