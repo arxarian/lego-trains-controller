@@ -2,34 +2,40 @@
   {
     "id": 1,
     "type": 0,
-    "angle": 0.0,
+    "rotator": {
+      "x": 0,
+      "y": 0,
+      "angle": 0.0
+    },
     "from_index": 0,
     "to_index": 0,
     "x": 0,
-    "y": 0,
-    "rotation_x": 0,
-    "rotation_y": 0
+    "y": 0
   },
   {
     "id": 2,
     "type": 1,
-    "angle": 202.5,
+    "rotator": {
+      "x": 295.0,
+      "y": 0.0,
+      "angle": 202.5
+    },
     "from_index": 0,
     "to_index": 1,
     "x": -295.0,
-    "y": -2.0345052007542108e-05,
-    "rotation_x": 295.0,
-    "rotation_y": 0.0
+    "y": -2.0345052007542108e-05
   },
   {
     "id": 3,
     "type": 1,
-    "angle": 22.5,
+    "rotator": {
+      "x": 0.0,
+      "y": 122.0,
+      "angle": 22.5
+    },
     "from_index": 2,
     "to_index": 0,
     "x": 0.0,
-    "y": 518.0000050862632,
-    "rotation_x": 0.0,
-    "rotation_y": 122.0
+    "y": 518.0000050862632
   }
 ]
