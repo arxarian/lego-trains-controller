@@ -67,8 +67,14 @@ Item {
                 railData: model.object
                 Component.onCompleted: {
                     rails.registerRail(rail, rail.railData.id)
-                    // rail.connectToSibling() // TODO - it's need for repositioning!
-                }
+
+                    rail.connectors.clicked.connect(function (index) {
+                        rails.append(Globals.selectedType, rail.railData.id, index)
+                    })
+
+                    if (rails.loaded) {
+                        rail.positionTrackToSibling()
+                    }}
             }
         }
 

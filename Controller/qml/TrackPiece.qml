@@ -6,6 +6,7 @@ Image {
 
     /*required*/ property Rail railData // TODO - required is not working for some reason
     readonly property bool selected: Globals.selectedTrack === root
+    property alias connectors: connectors
 
     x: root.railData ? root.railData.x : 0
     y: root.railData ? root.railData.y : 0
@@ -60,13 +61,9 @@ Image {
         root.railData.y = root.y
     }
 
-    function connectToSibling() {
-
-        connectors.clicked.connect(function (index) {
-            rails.append(Globals.selectedType, root.railData.id, index)
-        })
-
+    function positionTrackToSibling() {
         const sibling = rails.findRail(root.railData.connected_to[0])
+
         if (!sibling) {
             return
         }

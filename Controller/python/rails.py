@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from enum import IntEnum
-from PySide6.QtCore import QAbstractListModel, Slot
+from PySide6.QtCore import QAbstractListModel, Slot, Signal, Property
 from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
 from PySide6.QtQuick import QQuickItem
 
@@ -19,6 +19,7 @@ class Rails(QAbstractListModel):
         super().__init__(parent)
         self._railways = []
         self._registeredRails = {}
+        self._loaded = True
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._railways)
@@ -35,6 +36,16 @@ class Rails(QAbstractListModel):
         roles[Rails.Role.ObjectRole] = QByteArray(b"object")
         return roles
 
+    def loaded(self):
+        return self._loaded
+
+    def set_loaded(self, value):
+        self._loaded = value
+        self.loaded_changed.emit()
+
+    loaded_changed = Signal()
+    loaded = Property(bool, loaded, set_loaded, notify=loaded_changed)
+
     @Slot()
     def save(self):
         data = [rail.save_data() for rail in self._railways]
@@ -44,6 +55,7 @@ class Rails(QAbstractListModel):
 
     @Slot()
     def load(self):
+        self.set_loaded(False)
         self.resetModel()
 
         with open("rails.json", "r", encoding="utf-8") as f:
@@ -59,6 +71,8 @@ class Rails(QAbstractListModel):
             print("Cannot register, not a QQuickItem")
             return
         self._registeredRails[id] = item
+        if len(self._registeredRails) == self.rowCount():
+            self.set_loaded(True)
         return
 
     @Slot(int, result=QQuickItem)
@@ -81,6 +95,8 @@ class Rails(QAbstractListModel):
     def resetModel(self):
         if (self.rowCount() == 0):
             return
+
+        self._registeredRails.clear()
 
         self.beginRemoveRows(QModelIndex(), 0, self.rowCount() - 1)
         for rail in self._railways:
