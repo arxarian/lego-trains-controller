@@ -43,14 +43,6 @@ Image {
         }
     }
 
-    function updateConnectors() {
-        let dir = root.railData.connectors.get(root.railData.to_index).dir
-        for (let i = 0; i < root.railData.connectors.rowCount(); ++i) {
-            let connector = root.railData.connectors.get(i)
-            connector.visible = (dir !== connector.dir)
-        }
-    }
-
     function snapToRotationPoint(fromConnector, toConnector, sibling, rotationOffset = 0) {
         let origin = sibling.mapToItem(area, fromConnector.point)
 
@@ -64,24 +56,23 @@ Image {
 
         root.railData.rotator.angle += rotationOffset
 
-        updateConnectors()
-        // TODO - need to update coordinates for loading
         root.railData.x = root.x
         root.railData.y = root.y
     }
 
     function connectToSibling() {
-        const sibling = rails.findRail(root.railData.connected_to[0])
-        const index = root.railData.from_index
 
-        root.railData.rotator.angle = sibling ? sibling.railData.rotator.angle : 0
-        connectors.add.connect (function (index) {
+        connectors.clicked.connect(function (index) {
             rails.append(Globals.selectedType, root.railData.id, index)
         })
 
+        const sibling = rails.findRail(root.railData.connected_to[0])
         if (!sibling) {
             return
         }
+
+        const index = root.railData.from_index
+        root.railData.rotator.angle = sibling.railData.rotator.angle
 
         const fromConnector = sibling.railData.connectors.get(index)
         const start = (fromConnector.dir === Globals.dir.start)
