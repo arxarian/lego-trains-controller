@@ -99,12 +99,6 @@ Item {
             }
         }
 
-        Shortcut {
-            enabled: Globals.selectedTrack
-            sequences: ["R"]
-            onActivated: Globals.selectedTrack.rotate()
-        }
-
         Behavior on scale {
             NumberAnimation { duration: area.scale > 1.5 ? 150 : 250 }
         }

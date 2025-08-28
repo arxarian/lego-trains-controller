@@ -13,6 +13,5 @@ QtObject {
     property bool trackFrameVisible: false
     property bool rotationPointsVisible: false
 
-    property Item selectedTrack: null
     property int selectedType: Rail.Straight   // TODO - fix RailType registration
 }

@@ -5,13 +5,14 @@ Image {
     id: root
 
     /*required*/ property Rail railData // TODO - required is not working for some reason
-    readonly property bool selected: Globals.selectedTrack === root
+    readonly property bool selected: root.activeFocus
     property alias connectors: connectors
 
     x: root.railData ? root.railData.x : 0
     y: root.railData ? root.railData.y : 0
     z: root.selected === root ? 10 : 0
 
+    focus: true
     source: root.railData ? root.railData.source : ""
 
     QtObject {
@@ -99,7 +100,17 @@ Image {
         }
     }
 
-    Component.onCompleted: Globals.selectedTrack = root
+    Component.onCompleted: root.forceActiveFocus()
+
+    Keys.onPressed: (event)=> {
+                        if (event.key === Qt.Key_Delete) {
+                            rails.remove(root.railData)
+                            event.accepted = true
+                        } else if (event.key === Qt.Key_R) {
+                            root.rotate()
+                            event.accepted = true
+                        }
+                    }
 
     RotationPoints {
         anchors.fill: parent
@@ -122,7 +133,7 @@ Image {
 
     MouseArea {
         anchors.fill: parent
-        onClicked: Globals.selectedTrack = (root.selected ? null : root)
+        onClicked: root.forceActiveFocus()
     }
 
     Connectors {

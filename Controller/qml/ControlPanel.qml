@@ -15,12 +15,6 @@ Column {
             onClicked: rails.load()
         }
 
-        Button {
-            text: "Delete"
-            enabled: Globals.selectedTrack
-            onClicked: rails.remove(Globals.selectedTrack.railData)
-        }
-
         CheckBox {
             text: "Grid"
             checked: Globals.gridVisible
