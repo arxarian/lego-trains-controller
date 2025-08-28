@@ -19,9 +19,9 @@ class Connector(QObject):
         self.rotation = 0
         self._visible = True       # not defined in json
 
-        self.loadMetadataFromJson(data)
+        self.load_metadata(data)
 
-    def loadMetadataFromJson(self, data):
+    def load_metadata(self, data):
         for key, value in data.items():
             if hasattr(self, key):
                 if key == "point":

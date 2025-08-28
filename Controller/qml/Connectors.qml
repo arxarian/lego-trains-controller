@@ -6,19 +6,20 @@ Item
     id: root
 
     property var model  // TODO - why var and not Connectors?
-    signal add(int index)
+    signal clicked(int index)
 
     Repeater {
         model: root.model
         delegate: Rectangle {
+            id: item
             property Connector connector: model.object
             property bool reversed: connector.dir === Globals.dir.start
 
-            rotation: connector.angle * -22.5
-            transformOrigin: reversed ? Item.BottomLeft : Item.TopLeft  // TODO - not working
-            visible: connector.visible && !connector.name.endsWith("_flipped")
-            x: connector.point.x
-            y: connector.point.y - (reversed ? 0 : height)
+            rotation: item.connector.angle * -22.5
+            transformOrigin: item.reversed ? Item.BottomLeft : Item.TopLeft  // TODO - not working
+            visible: item.connector.visible && !item.connector.name.endsWith("_flipped")
+            x: item.connector.point.x
+            y: item.connector.point.y - (item.reversed ? 0 : height)
             width: 320
             height: 50
 
@@ -26,10 +27,7 @@ Item
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: {
-                    root.add(index)
-                    connector.visible = false
-                }
+                onClicked: root.clicked(index)
             }
         }
     }

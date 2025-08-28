@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import json
 from enum import IntEnum
-from PySide6.QtCore import QAbstractListModel, Slot, Property, Signal
+from PySide6.QtCore import QAbstractListModel, Slot, Signal, Property
 from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
 from PySide6.QtQuick import QQuickItem
 
@@ -17,6 +18,8 @@ class Rails(QAbstractListModel):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self._railways = []
+        self._registeredRails = {}
+        self._loaded = True
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._railways)
@@ -33,18 +36,73 @@ class Rails(QAbstractListModel):
         roles[Rails.Role.ObjectRole] = QByteArray(b"object")
         return roles
 
-    @Slot(int, QQuickItem, int, result=Rail)
-    def createRail(self, type, sibling, fromIndex) -> Rail:
-        # append a new one
+    def loaded(self):
+        return self._loaded
+
+    def set_loaded(self, value):
+        self._loaded = value
+        self.loaded_changed.emit()
+
+    loaded_changed = Signal()
+    loaded = Property(bool, loaded, set_loaded, notify=loaded_changed)
+
+    @Slot()
+    def save(self):
+        data = [rail.save_data() for rail in self._railways]
+        with open("rails.json", "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        print("saved")
+
+    @Slot()
+    def load(self):
+        self.set_loaded(False)
+        self.resetModel()
+
+        with open("rails.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+        self.beginResetModel()
+        self._railways = [Rail.load_data(d, self) for d in data]
+        self.endResetModel()
+        print("loaded, size", len(self._railways))
+
+    @Slot(QQuickItem, int)
+    def registerRail(self, item, id):
+        if not isinstance(item, QQuickItem):
+            print("Cannot register, not a QQuickItem")
+            return
+        self._registeredRails[id] = item
+        if len(self._registeredRails) == self.rowCount():
+            self.set_loaded(True)
+        return
+
+    @Slot(int, result=QQuickItem)
+    def findRail(self, id) -> QQuickItem:
+        if id in self._registeredRails:
+            return self._registeredRails[id]
+        return None
+
+    @Slot(int)
+    @Slot(int, int, int)
+    def append(self, type, id=0, fromIndex=0):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self._railways.append(Rail(type))
+
+        if id > 0:
+            self._railways[-1].append_connected_to(id, fromIndex)
+
         self.endInsertRows()
 
-        if sibling:
-            self._railways[-1].append_connected_to(sibling, fromIndex)
+    def resetModel(self):
+        if (self.rowCount() == 0):
+            return
 
-        # return it
-        return self._railways[-1]
+        self._registeredRails.clear()
+
+        self.beginRemoveRows(QModelIndex(), 0, self.rowCount() - 1)
+        for rail in self._railways:
+            rail.deleteLater()
+        self._railways.clear()
+        self.endRemoveRows()
 
     def remove(self, rail):
         index = self._railways.index(rail)

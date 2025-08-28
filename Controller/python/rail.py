@@ -6,12 +6,14 @@ from PySide6.QtCore import QObject, Slot, Property, Signal, QEnum, QAbstractList
 from PySide6.QtQml import QmlElement
 
 from connectors import Connectors
+from rotator import Rotator
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
 @QEnum
 class RailType(IntEnum):
+    Undefined = -1
     Straight = 0
     Curved = 1
     SwitchLeft = 2
@@ -29,20 +31,21 @@ class Rail(QObject):
     last_id = 0  # static variable
     QEnum(RailType)
 
-    def generateId():   # static method
-        Rail.last_id += 1
-        return Rail.last_id
+    def generate_id(id):   # static method
+        if id == 0:
+            Rail.last_id += 1
+            return Rail.last_id
+        else:
+            return id
 
     # ✓ id
     # ✓ type
     #   length
-    # ✓ flippable
-    # ✓ rotatable
-    # ✓ rotation (move together with rotation center?)
     # ½ position
     #   - x
     #   - y
-    # ½ rotation center - is it even needed?
+    # ✓ rotator
+    #   - angle
     #   - x
     #   - y
     #   ports
@@ -64,26 +67,27 @@ class Rail(QObject):
     #     - x
     #     - y
 
-    def __init__(self, type: RailType, parent=None):
+    def __init__(self, type=RailType.Undefined, id=0, x=0, y=0, rotator=None, parent=None):
+
         super().__init__(parent)
-        self._id = Rail.generateId()    # int
-        self._source = ""               # str
-        self._type = type               # RailType
-        self._flippable = True          # bool
-        self._rotatable = True          # bool  // TODO - delete? Everything can rotate
+        self._id = Rail.generate_id(id)             # int
+        self._source = ""                           # str
+        self._type = type                           # RailType
 
-        self._rotation = 0              # float
-        self._x = 0                     # float
-        self._y = 0                     # float
-        self._rotation_x = 0            # float
-        self._rotation_y = 0            # float
-        self._from_index = 0
+        self._x = x                                 # float
+        self._y = y                                 # float
 
-        self._connectors = Connectors()  # QAbstractListModel
-        self._connected_to = [] #{}         # change it to dict later   // TODO - move to connectors?
-        self._to_index = 0              # int                           // TODO - move to connectors?
+        if rotator == None:
+            self._rotator = Rotator(parent=self)    # Rotator
+        else:
+            self._rotator = rotator
 
-        self.loadMetadataFromJson()
+        self._connectors = Connectors(parent=self)  # QAbstractListModel
+        self._connected_to = [] #{}                 # change it to dict later   // TODO - move to connectors?
+        self._to_index = 0                          # int                       // TODO - move to connectors?
+        self._from_index = 0                        # int
+
+        self.load_metadata()
 
         # if self._type == RailType.Straight or self._type == RailType.Curved:
         #     self._ports = ["start", "end"]
@@ -95,7 +99,11 @@ class Rail(QObject):
         # for port in self._ports:
         #     self._connected_to[port] = None
 
-    def loadMetadataFromJson(self):
+    def load_metadata(self):
+        if self._type == RailType.Undefined:
+            print("undefined rail type")
+            return
+
         with open("resources/" + RailSource[self._type]) as json_data:
             data = json.load(json_data)
             for key, value in data.items():
@@ -104,6 +112,15 @@ class Rail(QObject):
                         self._connectors.setModel(value)
                         continue
                     setattr(self, key, value)
+
+    def save_data(self):  # TODO - missing connected to!
+        return {"id": self._id, "type": self._type, "rotator": self._rotator.save_data(),
+            "from_index": self._from_index, "to_index": self._to_index, "x": self._x, "y": self._y}
+
+    def load_data(data, parent):
+        return Rail(type=data.get("type", ""), id=data.get("id", ""),
+            rotator=Rotator.load_data(data.get("rotator", {}), parent),
+            x=data.get("x", 0), y=data.get("y", 0), parent=parent)
 
     def id(self):
         return self._id
@@ -130,26 +147,6 @@ class Rail(QObject):
 
     connectors = Property(QObject, connectors, constant=True)
 
-    def flippable(self):
-        return self._flippable
-
-    def set_flippable(self, value):
-        self._flippable = value
-        self.flippable_changed.emit()
-
-    flippable_changed = Signal()
-    flippable = Property(bool, flippable, set_flippable, notify=flippable_changed)
-
-    def rotatable(self):
-        return self._rotatable
-
-    def set_rotatable(self, value):
-        self._rotatable = value
-        self.rotatable_changed.emit()
-
-    rotatable_changed = Signal()
-    rotatable = Property(bool, rotatable, set_rotatable, notify=rotatable_changed)
-
     def type(self):
         return self._type
 
@@ -160,15 +157,15 @@ class Rail(QObject):
     type_changed = Signal()
     type = Property(int, type, set_type, notify=type_changed)
 
-    def rotation(self):
-        return self._rotation
+    def rotator(self):
+        return self._rotator
 
-    def set_rotation(self, value):
-        self._rotation = value
-        self.rotation_changed.emit()
+    def set_rotator(self, value):
+        self._rotator = value
+        self.rotator_changed.emit()
 
-    rotation_changed = Signal()
-    rotation = Property(float, rotation, set_rotation, notify=rotation_changed)
+    rotator_changed = Signal()
+    rotator = Property(Rotator, rotator, set_rotator, notify=rotator_changed)
 
     def x(self):
         return self._x
@@ -189,26 +186,6 @@ class Rail(QObject):
 
     y_changed = Signal()
     y = Property(float, y, set_y, notify=y_changed)
-
-    def rotation_x(self):
-        return self._rotation_x
-
-    def set_rotation_x(self, value):
-        self._rotation_x = value
-        self.rotation_x_changed.emit()
-
-    rotation_x_changed = Signal()
-    rotation_x = Property(float, rotation_x, set_rotation_x, notify=rotation_x_changed)
-
-    def rotation_y(self):
-        return self._rotation_y
-
-    def set_rotation_y(self, value):
-        self._rotation_y = value
-        self.rotation_y_changed.emit()
-
-    rotation_y_changed = Signal()
-    rotation_y = Property(float, rotation_y, set_rotation_y, notify=rotation_y_changed)
 
     def from_index(self):
         return self._from_index
@@ -233,8 +210,8 @@ class Rail(QObject):
     def connected_to(self):
         return self._connected_to
 
-    def append_connected_to(self, from_rail, from_index):
-        self._connected_to.append(from_rail)
+    def append_connected_to(self, from_rail_id, from_index):
+        self._connected_to.append(from_rail_id)
         self._from_index = from_index
         self.connected_to_changed.emit()
         self.from_index_changed.emit()

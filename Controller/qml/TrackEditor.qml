@@ -27,11 +27,15 @@ Item {
             area.x = mouse.x - mouseArea.offsetX + mouseArea.startX
             area.y = mouse.y - mouseArea.offsetY + mouseArea.startY
         }
+
+        onClicked: {
+            if (rails.rowCount() === 0) {
+                rails.append(Globals.selectedType)
+            }
+        }
     }
 
     ControlPanel {
-        id: controlPanel
-
         anchors.right: parent.right
         anchors.rightMargin: 20
         anchors.top: parent.top
@@ -50,26 +54,29 @@ Item {
         }
     }
 
-    function createTrackPiece(sibling, fromIndex = 0) {
-        let rail = rails.createRail(controlPanel.trackType, sibling, fromIndex)
-
-        var component = Qt.createComponent("TrackPiece.qml")
-        var sprite = component.createObject(area, {railData: rail})
-
-        sprite.connectToSibling()
-    }
-
-    Component.onCompleted: {
-        controlPanel.trackType = Rail.Straight
-        root.createTrackPiece()
-        controlPanel.trackType = Rail.SwitchLeft
-    }
-
     Item {
         id: area
         height: parent.height
         width: parent.width
         scale: 0.3
+
+        Repeater {
+            model: rails
+            delegate: TrackPiece {
+                id: rail
+                railData: model.object
+                Component.onCompleted: {
+                    rails.registerRail(rail, rail.railData.id)
+
+                    rail.connectors.clicked.connect(function (index) {
+                        rails.append(Globals.selectedType, rail.railData.id, index)
+                    })
+
+                    if (rails.loaded) {
+                        rail.positionTrackToSibling()
+                    }}
+            }
+        }
 
         GridView {
             id: grid
@@ -97,13 +104,6 @@ Item {
             sequences: ["R"]
             onActivated: Globals.selectedTrack.rotate()
         }
-
-        Shortcut {
-            enabled: Globals.selectedTrack
-            sequences: ["F"]
-            onActivated: Globals.selectedTrack.flip()
-        }
-
 
         Behavior on scale {
             NumberAnimation { duration: area.scale > 1.5 ? 150 : 250 }

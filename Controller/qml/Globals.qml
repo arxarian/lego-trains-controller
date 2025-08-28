@@ -1,6 +1,7 @@
 pragma Singleton
 
 import QtQuick
+import TrainView
 
 QtObject {
     readonly property QtObject dir: QtObject {
@@ -13,4 +14,5 @@ QtObject {
     property bool rotationPointsVisible: false
 
     property Item selectedTrack: null
+    property int selectedType: Rail.Straight   // TODO - fix RailType registration
 }
