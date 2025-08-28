@@ -104,6 +104,7 @@ class Rails(QAbstractListModel):
         self._railways.clear()
         self.endRemoveRows()
 
+    @Slot(Rail)
     def remove(self, rail):
         index = self._railways.index(rail)
         if index > -1:
