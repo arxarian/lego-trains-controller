@@ -31,7 +31,7 @@ class Rail(QObject):
     last_id = 0  # static variable
     QEnum(RailType)
 
-    def generateId(id):   # static method
+    def generate_id(id):   # static method
         if id == 0:
             Rail.last_id += 1
             return Rail.last_id
@@ -70,7 +70,7 @@ class Rail(QObject):
     def __init__(self, type=RailType.Undefined, id=0, x=0, y=0, rotator=None, parent=None):
 
         super().__init__(parent)
-        self._id = Rail.generateId(id)              # int
+        self._id = Rail.generate_id(id)             # int
         self._source = ""                           # str
         self._type = type                           # RailType
 
