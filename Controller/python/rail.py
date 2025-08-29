@@ -41,7 +41,7 @@ class Rail(QObject):
     # ✓ id
     # ✓ type
     # ✓ length
-    # ½ position
+    # ✓ position - not in a container
     #   - x
     #   - y
     # ✓ rotator
@@ -50,8 +50,8 @@ class Rail(QObject):
     #   - y
     #   ports
     #   - port
-    #     - rotation center
-    #       - rotation?
+    #     - rotator
+    #       - angle
     #       - x
     #       - y
     #     - sibling [id, None]
@@ -62,8 +62,8 @@ class Rail(QObject):
     #   - position
     #     - x
     #     - y
-    #   - rotation center
-    #     - rotation
+    #   - rotator
+    #     - angle
     #     - x
     #     - y
 
