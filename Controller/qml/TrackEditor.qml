@@ -74,7 +74,8 @@ Item {
 
                     if (rails.loaded) {
                         rail.positionTrackToSibling()
-                    }}
+                    }
+                }
             }
         }
 

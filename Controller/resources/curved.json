@@ -1,5 +1,6 @@
 {
     "source": "qrc:/curved.png",
+    "length": 16,
     "connectors":[
         { "name": "start", "dir": "start", "angle": 1, "point": {"x": 0, "y": 122},
             "next": 3, "rotation": 202.5 },

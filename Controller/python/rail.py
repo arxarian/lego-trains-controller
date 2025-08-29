@@ -40,7 +40,7 @@ class Rail(QObject):
 
     # ✓ id
     # ✓ type
-    #   length
+    # ✓ length
     # ½ position
     #   - x
     #   - y
@@ -67,22 +67,23 @@ class Rail(QObject):
     #     - x
     #     - y
 
-    def __init__(self, type=RailType.Undefined, id=0, x=0, y=0, rotator=None, parent=None):
+    def __init__(self, type=RailType.Undefined, id=0, length=0, x=0, y=0, rotator=None, parent=None):
 
         super().__init__(parent)
         self._id = Rail.generate_id(id)             # int
-        self._source = ""                           # str
+        self._source = str()                        # str
         self._type = type                           # RailType
+        self._length = length                       # int   // TODO - for switch, there can be different lenghts
 
         self._x = x                                 # float
         self._y = y                                 # float
 
+        self._rotator = rotator                     # Rotator
         if rotator == None:
-            self._rotator = Rotator(parent=self)    # Rotator
-        else:
-            self._rotator = rotator
+            self._rotator = Rotator(parent=self)
 
         self._connectors = Connectors(parent=self)  # QAbstractListModel
+
         self._connected_to = [] #{}                 # change it to dict later   // TODO - move to connectors?
         self._to_index = 0                          # int                       // TODO - move to connectors?
         self._from_index = 0                        # int
@@ -141,6 +142,16 @@ class Rail(QObject):
 
     source_changed = Signal()
     source = Property(str, source, set_source, notify=source_changed)
+
+    def length(self):
+        return self._length
+
+    def set_length(self, value):
+        self._length = value
+        self.length_changed.emit()
+
+    length_changed = Signal()
+    length = Property(int, length, set_length, notify=length_changed)
 
     def connectors(self):
         return self._connectors
