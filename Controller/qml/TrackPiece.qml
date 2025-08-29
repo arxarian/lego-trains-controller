@@ -48,18 +48,11 @@ Image {
     function snapToRotationPoint(fromConnector, toConnector, sibling, rotationOffset = 0) {
         let origin = sibling.mapToItem(area, fromConnector.point)
 
-        console.log(JSON.stringify(fromConnector), "\n", JSON.stringify(toConnector))
-
-        root.x = origin.x - toConnector.point.x
-        root.y = origin.y - toConnector.point.y
-
+        root.railData.x = origin.x - toConnector.point.x
+        root.railData.y = origin.y - toConnector.point.y
         root.railData.rotator.x = toConnector.point.x
         root.railData.rotator.y = toConnector.point.y
-
         root.railData.rotator.angle += rotationOffset
-
-        root.railData.x = root.x
-        root.railData.y = root.y
     }
 
     function positionTrackToSibling() {
@@ -78,9 +71,9 @@ Image {
         const toConnector = root.railData.connectors.get(root.railData.to_index)
         const rotationOffset = (toConnector.angle - fromConnector.angle) * 22.5
 
-        // animation.enabled = false
+        animation.enabled = false
         snapToRotationPoint(fromConnector, toConnector, sibling, rotationOffset)
-        // animation.enabled = true
+        animation.enabled = true
     }
 
     function rotate() {
