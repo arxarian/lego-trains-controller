@@ -63,19 +63,7 @@ Item {
         Repeater {
             model: rails
             delegate: TrackPiece {
-                id: rail
                 railData: model.object
-                Component.onCompleted: {
-                    rails.registerRail(rail, rail.railData.id)
-
-                    rail.connectors.clicked.connect(function (index) {
-                        rails.append(Globals.selectedType, rail.railData.id, index)
-                    })
-
-                    if (rails.loaded) {
-                        rail.positionTrackToSibling()
-                    }
-                }
             }
         }
 

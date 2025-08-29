@@ -92,7 +92,19 @@ Image {
         }
     }
 
-    Component.onCompleted: root.forceActiveFocus()
+    Component.onCompleted: {
+        rails.registerRail(root, root.railData.id)
+
+        root.connectors.clicked.connect(function (fromRailId, index) {
+            rails.append(Globals.selectedType, root.railData.id, fromRailId, index)
+        })
+
+        if (rails.loaded) {
+            root.positionTrackToSibling()
+        }
+
+        root.forceActiveFocus()
+    }
 
     Keys.onPressed: (event)=> {
                         if (event.key === Qt.Key_Delete) {
@@ -132,6 +144,7 @@ Image {
         id: connectors
         anchors.fill: parent
         model: root.railData.connectors
+        railId: root.railData ? root.railData.id : -1
     }
 
     Behavior on x {

@@ -86,13 +86,13 @@ class Rails(QAbstractListModel):
         return None
 
     @Slot(int)
-    @Slot(int, int, int)
-    def append(self, type, id=0, fromIndex=0):
+    @Slot(int, int, int, int)
+    def append(self, type, toRailId=0, fromRailId=-1, fromIndex=0):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self._railways.append(Rail(type))
 
-        if id > 0:
-            self._railways[-1].append_connected_to(id, fromIndex)
+        if toRailId > 0:
+            self._railways[-1].connectTo(toRailId, fromRailId, fromIndex)
 
         # self.connectRails()
         self.endInsertRows()
