@@ -46,12 +46,12 @@ Image {
     }
 
     function snapToRotationPoint(fromConnector, toConnector, sibling, rotationOffset = 0) {
-        let origin = sibling.mapToItem(area, fromConnector.point)
+        let origin = sibling.mapToItem(area, Qt.point(fromConnector.rotator.x, fromConnector.rotator.y))
 
-        root.railData.x = origin.x - toConnector.point.x
-        root.railData.y = origin.y - toConnector.point.y
-        root.railData.rotator.x = toConnector.point.x
-        root.railData.rotator.y = toConnector.point.y
+        root.railData.x = origin.x - toConnector.rotator.x
+        root.railData.y = origin.y - toConnector.rotator.y
+        root.railData.rotator.x = toConnector.rotator.x
+        root.railData.rotator.y = toConnector.rotator.y
         root.railData.rotator.angle += rotationOffset
     }
 
@@ -89,7 +89,7 @@ Image {
             root.railData.to_index = root.railData.connectors.get(root.railData.to_index).next
             const toConnector = root.railData.connectors.get(root.railData.to_index)
 
-            snapToRotationPoint(fromConnector, toConnector, sibling, toConnector.rotation)
+            snapToRotationPoint(fromConnector, toConnector, sibling, toConnector.rotator.angle)
         }
     }
 

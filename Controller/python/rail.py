@@ -41,16 +41,16 @@ class Rail(QObject):
     # ✓ id
     # ✓ type
     # ✓ length
-    # ✓ position - not in a container
+    # ½ position - not in a container
     #   - x
     #   - y
     # ✓ rotator
     #   - angle
     #   - x
     #   - y
-    #   ports
-    #   - port
-    #     - rotator
+    #   connectors
+    #   - connector
+    # ½   - rotator - TODO: rotator is not used
     #       - angle
     #       - x
     #       - y

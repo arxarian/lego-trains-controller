@@ -1,17 +1,17 @@
 {
     "source": "qrc:/switch right.png",
     "connectors":[
-        { "name": "start", "dir": "start", "angle": 0, "point": {"x": 510, "y": 0},
-            "next": 3, "rotation": 180 },
-        { "name": "start_flipped", "dir": "start", "angle": 0, "point": {"x": 829, "y": 0},
-            "next": 2, "rotation": 180 },
-        { "name": "end_curved", "dir": "end", "angle": -1, "point": {"x": 0, "y": 1261},
-            "next": 4, "rotation": -202.5 },
-        { "name": "end_curved_flipped", "dir": "end", "angle": -1, "point": {"x": 296, "y": 1384},
-            "next": 5, "rotation": -202.5 },
-        { "name": "end_straight", "dir": "end", "angle": 0, "point": {"x": 510, "y": 1279},
-            "next": 1, "rotation": 22.5 },
-        { "name": "end_straight_flipped", "dir": "end", "angle": 0, "point": {"x": 829, "y": 1279},
-            "next": 0, "rotation": 22.5 }
+        { "name": "start", "dir": "start", "angle": 0, "rotator": {"x": 510, "y": 0, "angle": 180 },
+            "next": 3 },
+        { "name": "start_flipped", "dir": "start", "angle": 0, "rotator": {"x": 829, "y": 0, "angle": 180 },
+            "next": 2 },
+        { "name": "end_curved", "dir": "end", "angle": -1, "rotator": {"x": 0, "y": 1261, "angle": -202.5 },
+            "next": 4 },
+        { "name": "end_curved_flipped", "dir": "end", "angle": -1, "rotator": {"x": 296, "y": 1384, "angle": -202.5 },
+            "next": 5 },
+        { "name": "end_straight", "dir": "end", "angle": 0, "rotator": {"x": 510, "y": 1279, "angle": 22.5 },
+            "next": 1 },
+        { "name": "end_straight_flipped", "dir": "end", "angle": 0, "rotator": {"x": 829, "y": 1279, "angle": 22.5 },
+            "next": 0 }
     ]
 }

@@ -18,8 +18,8 @@ Item
             rotation: item.connector.angle * -22.5
             transformOrigin: item.reversed ? Item.BottomLeft : Item.TopLeft  // TODO - not working
             visible: item.connector.visible && !item.connector.name.endsWith("_flipped")
-            x: item.connector.point.x
-            y: item.connector.point.y - (item.reversed ? 0 : height)
+            x: item.connector.rotator.x
+            y: item.connector.rotator.y - (item.reversed ? 0 : height)
             width: 320
             height: 50
 

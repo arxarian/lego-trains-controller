@@ -11,8 +11,8 @@ Item {
         delegate: Rectangle {
             property Connector connector: model.object
 
-            x: connector.point.x - width / 2
-            y: connector.point.y - height / 2
+            x: connector.rotator.x - width / 2
+            y: connector.rotator.y - height / 2
             z: 1
 
             visible: Globals.rotationPointsVisible
