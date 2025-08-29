@@ -1,18 +1,23 @@
 {
     "source": "qrc:/switch left.png",
-    "length": 32,
-    "connectors":[
-        { "name": "start", "dir": "start", "angle": 0, "rotator": {"x": 0, "y": 0, "angle": 180 },
+    "paths": [
+        { "from": 0, "to": 2, "length": 35 }, { "from": 0, "to": 4, "length": 32 },
+        { "from": 2, "to": 0, "length": 35 }, { "from": 4, "to": 0, "length": 32 },
+        { "from": 1, "to": 3, "length": 35 }, { "from": 1, "to": 5, "length": 32 },
+        { "from": 3, "to": 1, "length": 35 }, { "from": 5, "to": 1, "length": 32 }
+    ],
+    "connectors": [
+        { "name": "start", "dir": "start", "angle": 0, "rotator": { "x": 0, "y": 0, "angle": 180 },
             "next": 3 },
-        { "name": "start_flipped", "dir": "start", "angle": 0, "rotator": {"x": 319, "y": 0, "angle": 180 },
+        { "name": "start_flipped", "dir": "start", "angle": 0, "rotator": { "x": 319, "y": 0, "angle": 180 },
             "next": 2 },
-        { "name": "end_curved", "dir": "end", "angle": 1, "rotator": {"x": 533, "y": 1384, "angle": -157.5 },
+        { "name": "end_curved", "dir": "end", "angle": 1, "rotator": { "x": 533, "y": 1384, "angle": -157.5 },
             "next": 4 },
-        { "name": "end_curved_flipped", "dir": "end", "angle": 1, "rotator": {"x": 829, "y": 1261, "angle": -157.5 },
+        { "name": "end_curved_flipped", "dir": "end", "angle": 1, "rotator": { "x": 829, "y": 1261, "angle": -157.5 },
             "next": 5 },
-        { "name": "end_straight", "dir": "end", "angle": 0, "rotator": {"x": 0, "y": 1279, "angle": -22.5 },
+        { "name": "end_straight", "dir": "end", "angle": 0, "rotator": { "x": 0, "y": 1279, "angle": -22.5 },
             "next": 1 },
-        { "name": "end_straight_flipped", "dir": "end", "angle": 0, "rotator": {"x": 319, "y": 1279, "angle": -22.5 },
+        { "name": "end_straight_flipped", "dir": "end", "angle": 0, "rotator": { "x": 319, "y": 1279, "angle": -22.5 },
             "next": 0 }
     ]
 }

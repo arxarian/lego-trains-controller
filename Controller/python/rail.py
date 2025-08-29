@@ -42,20 +42,20 @@ class Rail(QObject):
     # ✓ type
     # ✓ length
     # ½ position - not in a container
-    #   - x
-    #   - y
+    # ✓ - x
+    # ✓ - y
     # ✓ rotator
-    #   - angle
-    #   - x
-    #   - y
-    #   connectors
-    #   - connector
-    # ½   - rotator - TODO: rotator is not used
-    #       - angle
-    #       - x
-    #       - y
+    # ✓ - angle
+    # ✓ - x
+    # ✓ - y
+    # ✓ connectors
+    # ½ - connector
+    # ✓   - rotator
+    # ✓     - angle
+    # v     - x
+    # ✓     - y
     #     - sibling [id, None]
-    #     - dir (straight, left, right)
+    #     - paths
     #     - possible routes (e.g. the switch rail is limited)
     #   markers
     #   - color
@@ -77,28 +77,15 @@ class Rail(QObject):
 
         self._x = x                                 # float
         self._y = y                                 # float
-
-        self._rotator = rotator                     # Rotator
-        if rotator == None:
-            self._rotator = Rotator(parent=self)
+        self._rotator = rotator if rotator is not None else Rotator(parent=self) # Rotator
 
         self._connectors = Connectors(parent=self)  # QAbstractListModel
 
         self._connected_to = [] #{}                 # change it to dict later   // TODO - move to connectors?
         self._to_index = 0                          # int                       // TODO - move to connectors?
-        self._from_index = 0                        # int
+        self._from_index = 0                        # int                       // TODO - move to connectors?
 
         self.load_metadata()
-
-        # if self._type == RailType.Straight or self._type == RailType.Curved:
-        #     self._ports = ["start", "end"]
-        # elif self.type == RailType.SwitchLeft:
-        #     self._ports = ["start", "left", "right"]
-        # else:
-        #     self._ports = []
-
-        # for port in self._ports:
-        #     self._connected_to[port] = None
 
     def load_metadata(self):
         if self._type == RailType.Undefined:
