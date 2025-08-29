@@ -62,12 +62,11 @@ Image {
             return
         }
 
-        const index = root.railData.from_index
         root.railData.rotator.angle = sibling.railData.rotator.angle
 
-        const fromConnector = sibling.railData.connectors.get(index)
+        const fromConnector = sibling.railData.connectors.get(root.railData.from_index)
         const start = (fromConnector.dir === Globals.dir.start)
-        root.railData.to_index = start ? 2 : 0
+        root.railData.to_index = start ? 2 : 0  // TODO - it assumes that the 3rd element is an end connector
         const toConnector = root.railData.connectors.get(root.railData.to_index)
         const rotationOffset = (toConnector.angle - fromConnector.angle) * 22.5
 

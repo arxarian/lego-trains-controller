@@ -46,6 +46,9 @@ class Rails(QAbstractListModel):
     loaded_changed = Signal()
     loaded = Property(bool, loaded, set_loaded, notify=loaded_changed)
 
+    def connectRails(self):
+        return
+
     @Slot()
     def save(self):
         data = [rail.save_data() for rail in self._railways]
@@ -64,6 +67,7 @@ class Rails(QAbstractListModel):
         self._railways = [Rail.load_data(d, self) for d in data]
         self.endResetModel()
         print("loaded, size", len(self._railways))
+        self.connectRails()
 
     @Slot(QQuickItem, int)
     def registerRail(self, item, id):
@@ -90,6 +94,7 @@ class Rails(QAbstractListModel):
         if id > 0:
             self._railways[-1].append_connected_to(id, fromIndex)
 
+        # self.connectRails()
         self.endInsertRows()
 
     def resetModel(self):
