@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
-from PySide6.QtCore import QAbstractListModel, QObject, Slot
+from PySide6.QtCore import QAbstractListModel, Slot
 from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
 
 from port import Port
@@ -39,16 +39,31 @@ class Ports(QAbstractListModel):
             self._ports.append(Port(i, self))
         self.endInsertRows()
 
+    @Slot(int, result=int)
+    def findFromConnectorIndex(self, siblingRailId):
+        for port in self._ports:
+            if port.connectedRailId == siblingRailId:
+                return port.connectorIndex
+        return -1
+
+    @Slot(result=bool)
+    def isConnected(self):
+        for port in self._ports:
+            if port.connected():
+                return True
+        return False
+
     def portByIndex(self, index):
         for port in self._ports:
             if index in port.connectors:
                 return port
-            return None
+        return None
 
-    def connectTo(self, connectorIndex, toRailId):
+    def connectTo(self, toRailId, connectorIndex):
         port = self.portByIndex(connectorIndex)
         if port:
             port.set_connectedRailId(toRailId)
+            port.set_connectorIndex(connectorIndex)
             for index in port.connectors:
                 # make connectors invisible
                 self._connectors.get(index).set_visible(False)

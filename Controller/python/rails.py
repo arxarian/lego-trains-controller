@@ -6,6 +6,7 @@ from PySide6.QtCore import QAbstractListModel, Slot, Signal, Property
 from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
 from PySide6.QtQuick import QQuickItem
 
+from ports import Ports
 from rail import Rail
 from rail import RailType
 
@@ -99,14 +100,24 @@ class Rails(QAbstractListModel):
         self._railways.append(Rail(type))
 
         if fromRailId > 0:
-            #self._railways[-1].connectTo(fromRailId, fromIndex)
-            # and connect to the previous one! Find by fromRailId
+            # connect the new rail to the previous one
+            self._railways[-1].connectTo(fromRailId, 0)
+            # and the previous one to the new one
             rail = self.findRailData(fromRailId)
             if rail:
-                rail.connectTo(fromIndex, self._railways[-1].id)
+                rail.connectTo(self._railways[-1].id, fromIndex)
 
-        # self.connectRails()
         self.endInsertRows()
+
+    @Slot(int, result=int)
+    def siblingOf(self, railId):
+        for rail in self._railways:
+            for row in range(rail.ports.rowCount()):
+                index = rail.ports.index(row, 0)
+                port = rail.ports.data(index, Ports.Role.ObjectRole)
+                if port.connectedRailId == railId:
+                    return rail.id
+        return -1
 
     def resetModel(self):
         if (self.rowCount() == 0):

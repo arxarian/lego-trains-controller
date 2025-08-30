@@ -56,23 +56,27 @@ Image {
     }
 
     function positionTrackToSibling() {
-        // connected_to is removed
-        const sibling = undefined//rails.findRailItem(root.railData.connected_to[0])
+        const siblingId = rails.siblingOf(root.railData.id)
 
-        if (!sibling) {
+        if (siblingId === -1) {
             return
         }
 
-        root.railData.rotator.angle = sibling.railData.rotator.angle
+        const siblingData = rails.findRailData(siblingId)
+        const fromConnectorIndex = siblingData.ports.findFromConnectorIndex(root.railData.id)
+        const fromConnector = siblingData.connectors.get(fromConnectorIndex)
 
-        const fromConnector = sibling.railData.connectors.get(root.railData.from_index)
         const start = (fromConnector.dir === Globals.dir.start)
-        root.railData.to_index = start ? 2 : 0  // TODO - it assumes that the 3rd element is an end connector
-        const toConnector = root.railData.connectors.get(root.railData.to_index)
+        const toConnector = root.railData.connectors.get(0)
         const rotationOffset = (toConnector.angle - fromConnector.angle) * 22.5
+        console.log("toConnector", toConnector, start)
+
+        root.railData.rotator.angle = siblingData.rotator.angle + (start ? 180 : 0)
+
+        const siblingItem = rails.findRailItem(siblingId)
 
         animation.enabled = false
-        snapToRotationPoint(fromConnector, toConnector, sibling, rotationOffset)
+        snapToRotationPoint(fromConnector, toConnector, siblingItem, rotationOffset)
         animation.enabled = true
     }
 
