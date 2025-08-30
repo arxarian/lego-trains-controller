@@ -38,8 +38,16 @@ class Ports(QAbstractListModel):
             self._ports.append(Port(i, self))
         self.endInsertRows()
 
-    # def connectTo(self, fromRailId, fromIndex):
-    #     return
+    def portByIndex(self, index):
+        for port in enumerate(self._ports):
+            if index in port.connectors:
+                return port
+            return None
+
+    def connectTo(self, connectorIndex, toRailId):
+        port = self.portByIndex(connectorIndex)
+        if port:
+            port.set_connectedRailId(toRailId)
 
     # @Slot(int, result=QObject)
     # def get(self, index):

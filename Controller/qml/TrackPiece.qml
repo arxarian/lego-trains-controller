@@ -57,7 +57,7 @@ Image {
 
     function positionTrackToSibling() {
         // connected_to is removed
-        const sibling = undefined//rails.findRail(root.railData.connected_to[0])
+        const sibling = undefined//rails.findRailItem(root.railData.connected_to[0])
 
         if (!sibling) {
             return
@@ -83,7 +83,7 @@ Image {
             root.railData.rotator.angle = root.railData.rotator.angle + 22.5
         } else if (root.railData.connected_to.length === 1) {
             // TODO - no need to have a real sibling here
-            const sibling = rails.findRail(root.railData.connected_to[0])
+            const sibling = rails.findRailItem(root.railData.connected_to[0])
             const fromConnector = sibling.railData.connectors.get(root.railData.from_index)
 
             root.railData.to_index = root.railData.connectors.get(root.railData.to_index).next

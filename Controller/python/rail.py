@@ -196,4 +196,4 @@ class Rail(QObject):
     paths = Property(list, paths, set_paths, notify=paths_changed)
 
     def connectTo(self, fromRailId, fromIndex):
-        self._connectors.connectTo(fromRailId, fromIndex)
+        self._ports.connectTo(fromRailId, fromIndex)

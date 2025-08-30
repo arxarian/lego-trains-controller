@@ -16,7 +16,7 @@ class Port(QObject):
         self._connectors = []
 
         self._connectedRailId = -1  # not defined in json
-        self._connected = False     # not defined in json
+        self._connected = False     # not defined in json // TODO - use the one in connectors
 
         self.load_metadata(data)
 
@@ -44,3 +44,23 @@ class Port(QObject):
 
     connectors_changed = Signal()
     connectors = Property(list, connectors, set_connectors, notify=connectors_changed)
+
+    def connectedRailId(self):
+        return self._connectedRailId
+
+    def set_connectedRailId(self, value):
+        self._connectedRailId = value
+        self.connectedRailId_changed.emit()
+
+    connectedRailId_changed = Signal()
+    connectedRailId = Property(int, connectedRailId, set_connectedRailId, notify=connectedRailId_changed)
+
+    def connected(self):
+        return self._connected
+
+    def set_connected(self, value):
+        self._connected = value
+        self.connected_changed.emit()
+
+    connected_changed = Signal()
+    connected = Property(bool, connected, set_connected, notify=connected_changed)

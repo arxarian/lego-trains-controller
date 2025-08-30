@@ -38,9 +38,6 @@ class Connectors(QAbstractListModel):
             self._connectors.append(Connector(i, self))
         self.endInsertRows()
 
-    def connectTo(self, fromRailId, fromIndex):
-        return
-
     @Slot(int, result=QObject)
     def get(self, index):
         if 0 <= index < len(self._connectors):

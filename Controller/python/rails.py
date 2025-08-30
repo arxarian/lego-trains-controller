@@ -80,10 +80,17 @@ class Rails(QAbstractListModel):
         return
 
     @Slot(int, result=QQuickItem)
-    def findRail(self, id) -> QQuickItem:
+    def findRailItem(self, id) -> QQuickItem:
         if id in self._registeredRails:
             return self._registeredRails[id]
         return None
+
+    @Slot(int, result=Rail)
+    def findRailData(self, id) -> Rail:
+        for rail in self._railways:
+            if rail.id == id:
+                return rail
+            return None
 
     @Slot(int)
     @Slot(int, int, int)
@@ -92,7 +99,11 @@ class Rails(QAbstractListModel):
         self._railways.append(Rail(type))
 
         if fromRailId > 0:
-            self._railways[-1].connectTo(fromRailId, fromIndex)
+            #self._railways[-1].connectTo(fromRailId, fromIndex)
+            # and connect to the previous one! Find by fromRailId
+            rail = self.findRailData(fromRailId)
+            if rail:
+                rail.connectTo(fromIndex, self._railways[-1].id)
 
         # self.connectRails()
         self.endInsertRows()
