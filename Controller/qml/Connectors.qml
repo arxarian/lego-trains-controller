@@ -5,9 +5,8 @@ Item
 {
     id: root
 
-    property int railId: -1
     property var model  // TODO - why var and not Connectors?
-    signal clicked(int railId, int index)
+    signal clicked(int index)
 
     Repeater {
         model: root.model
@@ -28,7 +27,7 @@ Item
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: root.clicked(root.railId, index)
+                onClicked: root.clicked(index)
             }
         }
     }

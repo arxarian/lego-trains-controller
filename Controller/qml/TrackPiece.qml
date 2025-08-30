@@ -56,7 +56,8 @@ Image {
     }
 
     function positionTrackToSibling() {
-        const sibling = rails.findRail(root.railData.connected_to[0])
+        // connected_to is removed
+        const sibling = undefined//rails.findRail(root.railData.connected_to[0])
 
         if (!sibling) {
             return
@@ -95,8 +96,8 @@ Image {
     Component.onCompleted: {
         rails.registerRail(root, root.railData.id)
 
-        root.connectors.clicked.connect(function (fromRailId, index) {
-            rails.append(Globals.selectedType, root.railData.id, fromRailId, index)
+        root.connectors.clicked.connect(function (index) {
+            rails.append(Globals.selectedType, root.railData.id, index)
         })
 
         if (rails.loaded) {
@@ -144,7 +145,6 @@ Image {
         id: connectors
         anchors.fill: parent
         model: root.railData.connectors
-        railId: root.railData ? root.railData.id : -1
     }
 
     Behavior on x {

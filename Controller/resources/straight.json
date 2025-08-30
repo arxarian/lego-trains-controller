@@ -1,8 +1,12 @@
 {
     "source": "qrc:/straight.png",
     "paths": [
-        { "from": 0, "to": 2, "length": 16 }, { "from": 2, "to": 0, "length": 16 },
-        { "from": 1, "to": 3, "length": 16 }, { "from": 3, "to": 1, "length": 16 }
+        { "from": "start", "to": "end", "length": 16 },
+        { "from": "end", "to": "start", "length": 16 }
+    ],
+    "ports": [
+        { "port": "start", "connectors": [0, 3] },
+        { "port": "end", "connectors": [1, 2] }
     ],
     "connectors":[
         { "name": "start", "dir": "start", "angle": 0, "rotator": { "x": 0, "y": 0, "angle": 180 },

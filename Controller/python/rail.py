@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import json
 from enum import IntEnum
-from PySide6.QtCore import QObject, Slot, Property, Signal, QEnum, QAbstractListModel
+from PySide6.QtCore import QObject, Property, Signal, QEnum
 from PySide6.QtQml import QmlElement
 
 from connectors import Connectors
+from ports import Ports
 from rotator import Rotator
 
 QML_IMPORT_NAME = "TrainView"
@@ -55,8 +56,7 @@ class Rail(QObject):
     # v     - x
     # ✓     - y
     #     - sibling [id, None]
-    #     - paths
-    #     - possible routes (e.g. the switch rail is limited)
+    #     - possible routes/paths (e.g. the switch rail is limited)
     #   markers
     #   - color
     #   - position
@@ -72,18 +72,15 @@ class Rail(QObject):
         super().__init__(parent)
         self._id = Rail.generate_id(id)             # int
         self._source = str()                        # str
-        self._type = type                           # RailType
-        self._length = length                       # int   // TODO - for switch, there can be different lenghts
+        self._type = type                           # RailType/Enum
 
         self._x = x                                 # float
         self._y = y                                 # float
-        self._rotator = rotator if rotator is not None else Rotator(parent=self) # Rotator
+        self._rotator = rotator if rotator is not None else Rotator(parent=self) # Rotator/QObject
 
         self._connectors = Connectors(parent=self)  # QAbstractListModel
-
-        self._connected_to = [] #{}                 # change it to dict later   // TODO - move to connectors?
-        self._to_index = 0                          # int                       // TODO - move to connectors?
-        self._from_index = 0                        # int                       // TODO - move to connectors?
+        self._ports = Ports(parent=self)            # QAbstractListModel
+        self._paths = {}                            # dictionary
 
         self.load_metadata()
 
@@ -98,6 +95,9 @@ class Rail(QObject):
                 if hasattr(self, key):
                     if key == "connectors":
                         self._connectors.setModel(value)
+                        continue
+                    if key == "ports":
+                        self._ports.setModel(value)
                         continue
                     setattr(self, key, value)
 
@@ -129,16 +129,6 @@ class Rail(QObject):
 
     source_changed = Signal()
     source = Property(str, source, set_source, notify=source_changed)
-
-    def length(self):
-        return self._length
-
-    def set_length(self, value):
-        self._length = value
-        self.length_changed.emit()
-
-    length_changed = Signal()
-    length = Property(int, length, set_length, notify=length_changed)
 
     def connectors(self):
         return self._connectors
@@ -185,34 +175,25 @@ class Rail(QObject):
     y_changed = Signal()
     y = Property(float, y, set_y, notify=y_changed)
 
-    def from_index(self):
-        return self._from_index
+    def ports(self):
+        return self._ports
 
-    def set_from_index(self, value):
-        self._from_index = value
-        self.from_index_changed.emit()
+    def set_ports(self, value):
+        self._ports = value
+        self.ports_changed.emit()
 
-    from_index_changed = Signal()
-    from_index = Property(float, from_index, set_from_index, notify=from_index_changed)
+    ports_changed = Signal()
+    ports = Property(QObject, ports, set_ports, notify=ports_changed)
 
-    def to_index(self):
-        return self._to_index
+    def paths(self):
+        return self._paths
 
-    def set_to_index(self, value):
-        self._to_index = value
-        self.to_index_changed.emit()
+    def set_paths(self, value):
+        self._paths = value
+        self.paths_changed.emit()
 
-    to_index_changed = Signal()
-    to_index = Property(int, to_index, set_to_index, notify=to_index_changed)
+    paths_changed = Signal()
+    paths = Property(list, paths, set_paths, notify=paths_changed)
 
-    def connected_to(self):
-        return self._connected_to
-
-    def connectTo(self, toRailId, fromRailId, fromIndex):
-        self._connected_to.append(fromRailId)
-        self._from_index = fromIndex
-        self.connected_to_changed.emit()
-        self.from_index_changed.emit()
-
-    connected_to_changed = Signal()
-    connected_to = Property(list, connected_to, notify=connected_to_changed)
+    def connectTo(self, fromRailId, fromIndex):
+        self._connectors.connectTo(fromRailId, fromIndex)
