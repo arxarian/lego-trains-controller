@@ -12,9 +12,10 @@ class Ports(QAbstractListModel):
     class Role(IntEnum):
         ObjectRole = Qt.ItemDataRole.UserRole
 
-    def __init__(self, parent=None) -> None:
+    def __init__(self, connectors, parent=None) -> None:
         super().__init__(parent)
         self._ports = []
+        self._connectors = connectors
 
     @Slot(QModelIndex, result=int)
     def rowCount(self, parent=QModelIndex()):
@@ -39,7 +40,7 @@ class Ports(QAbstractListModel):
         self.endInsertRows()
 
     def portByIndex(self, index):
-        for port in enumerate(self._ports):
+        for port in self._ports:
             if index in port.connectors:
                 return port
             return None
@@ -48,9 +49,6 @@ class Ports(QAbstractListModel):
         port = self.portByIndex(connectorIndex)
         if port:
             port.set_connectedRailId(toRailId)
-
-    # @Slot(int, result=QObject)
-    # def get(self, index):
-    #     if 0 <= index < len(self._ports):
-    #         return self._ports[index]
-    #     return None
+            for index in port.connectors:
+                # make connectors invisible
+                self._connectors.get(index).set_visible(False)

@@ -76,10 +76,10 @@ class Rail(QObject):
 
         self._x = x                                 # float
         self._y = y                                 # float
-        self._rotator = rotator if rotator is not None else Rotator(parent=self) # Rotator/QObject
+        self._rotator = rotator if rotator is not None else Rotator(parent=self)    # Rotator/QObject
 
         self._connectors = Connectors(parent=self)  # QAbstractListModel
-        self._ports = Ports(parent=self)            # QAbstractListModel
+        self._ports = Ports(self._connectors, parent=self)                          # QAbstractListModel
         self._paths = {}                            # dictionary
 
         self.load_metadata()
