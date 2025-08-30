@@ -81,11 +81,11 @@ Image {
     }
 
     function rotate() {
-        if (root.railData.connected_to.length === 0) {
+        if (!root.railData.ports.isConnected()) {
             root.railData.rotator.x = root.width / 2
             root.railData.rotator.y = root.height / 2
             root.railData.rotator.angle = root.railData.rotator.angle + 22.5
-        } else if (root.railData.connected_to.length === 1) {
+        } else if (root.railData.ports.isConnected()) {
             // TODO - no need to have a real sibling here
             const sibling = rails.findRailItem(root.railData.connected_to[0])
             const fromConnector = sibling.railData.connectors.get(root.railData.from_index)
@@ -95,6 +95,7 @@ Image {
 
             snapToRotationPoint(fromConnector, toConnector, sibling, toConnector.rotator.angle)
         }
+        // TODO - missing for fully connected
     }
 
     Component.onCompleted: {
