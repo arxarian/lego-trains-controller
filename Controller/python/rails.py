@@ -8,6 +8,7 @@ from PySide6.QtQuick import QQuickItem
 
 from rail import Rail
 from rail import RailType
+from connectors import Connectors
 
 class Rails(QAbstractListModel):
 
@@ -46,6 +47,10 @@ class Rails(QAbstractListModel):
     loaded_changed = Signal()
     loaded = Property(bool, loaded, set_loaded, notify=loaded_changed)
 
+    def connectRails(self):
+        print("TODO - connecting not implemented")
+        return
+
     @Slot()
     def save(self):
         data = [rail.save_data() for rail in self._railways]
@@ -64,6 +69,7 @@ class Rails(QAbstractListModel):
         self._railways = [Rail.load_data(d, self) for d in data]
         self.endResetModel()
         print("loaded, size", len(self._railways))
+        self.connectRails()
 
     @Slot(QQuickItem, int)
     def registerRail(self, item, id):
@@ -76,21 +82,43 @@ class Rails(QAbstractListModel):
         return
 
     @Slot(int, result=QQuickItem)
-    def findRail(self, id) -> QQuickItem:
+    def findRailItem(self, id) -> QQuickItem:
         if id in self._registeredRails:
             return self._registeredRails[id]
         return None
 
+    @Slot(int, result=Rail)
+    def findRailData(self, id) -> Rail:
+        for rail in self._railways:
+            if rail.id == id:
+                return rail
+        return None
+
     @Slot(int)
     @Slot(int, int, int)
-    def append(self, type, id=0, fromIndex=0):
+    def append(self, type, fromRailId=-1, fromIndex=0):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self._railways.append(Rail(type))
 
-        if id > 0:
-            self._railways[-1].append_connected_to(id, fromIndex)
+        if fromRailId > 0:
+            # connect the new rail to the previous one
+            self._railways[-1].connectTo(fromRailId, 0)
+            # and the previous one to the new one
+            rail = self.findRailData(fromRailId)
+            if rail:
+                rail.connectTo(self._railways[-1].id, fromIndex)
 
         self.endInsertRows()
+
+    @Slot(int, result=int)
+    def siblingOf(self, railId):
+        for rail in self._railways:
+            for row in range(rail.connectors.rowCount()):
+                index = rail.connectors.index(row, 0)
+                connector = rail.connectors.data(index, Connectors.Role.ObjectRole)
+                if connector.connectedRailId == railId:
+                    return rail.id
+        return -1
 
     def resetModel(self):
         if (self.rowCount() == 0):

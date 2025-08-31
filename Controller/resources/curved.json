@@ -1,14 +1,17 @@
 {
     "source": "qrc:/curved.png",
-    "length": 16,
+    "paths": [
+        { "from": "start", "to": "end", "length": 16 },
+        { "from": "end", "to": "start", "length": 16 }
+    ],
+    "ports": [
+        { "port": "start", "connectors": [0] },
+        { "port": "end", "connectors": [1] }
+    ],
     "connectors":[
-        { "name": "start", "dir": "start", "angle": 1, "point": {"x": 0, "y": 122},
-            "next": 3, "rotation": 202.5 },
-        { "name": "end_flipped", "dir": "start", "angle": 1, "point": {"x": 295, "y": 0},
-            "next": 2, "rotation": 202.5 },
-        { "name": "end", "dir": "end", "angle": 0, "point": {"x": 107, "y": 658},
-            "next": 1, "rotation": -202.5 },
-        { "name": "start_flipped", "dir": "end", "angle": 0, "point": {"x": 427, "y": 658},
-            "next": 0, "rotation": -202.5 }
+        { "name": "start", "dir": "start", "angle": 1, "rotator": { "x": 147.5, "y": 61, "angle": 202.5 },
+            "next": 1 },
+        { "name": "end", "dir": "end", "angle": 0, "rotator": { "x": 267, "y": 658, "angle": -202.5 },
+            "next": 0 }
     ]
 }

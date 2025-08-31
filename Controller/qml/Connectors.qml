@@ -13,17 +13,23 @@ Item
         delegate: Rectangle {
             id: item
             property Connector connector: model.object
-            property bool reversed: connector.dir === Globals.dir.start
+            property real size: 100
 
             rotation: item.connector.angle * -22.5
-            transformOrigin: item.reversed ? Item.BottomLeft : Item.TopLeft  // TODO - not working
-            visible: item.connector.visible && !item.connector.name.endsWith("_flipped")
-            x: item.connector.point.x
-            y: item.connector.point.y - (item.reversed ? 0 : height)
-            width: 320
-            height: 50
+            visible: item.connector.visible
+            x: item.connector.rotator.x - item.size / 2
+            y: item.connector.rotator.y - item.size / 2
+            radius: item.size
+            width: item.size
+            height: item.size
 
-            color: "#55FF00FF"
+            color: "#88FF00FF"
+
+            SequentialAnimation on color {
+                loops: Animation.Infinite
+                ColorAnimation { from: "#88FF00FF"; to: "#55FF00FF"; duration: 1000; easing.type: Easing.InQuad }
+                ColorAnimation { from: "#55FF00FF"; to: "#88FF00FF"; duration: 1000; easing.type: Easing.OutQuad }
+            }
 
             MouseArea {
                 anchors.fill: parent

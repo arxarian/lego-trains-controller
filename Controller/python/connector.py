@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QObject, Slot, Property, Signal, QPoint
+from PySide6.QtCore import QObject, Slot, Property, Signal
 from PySide6.QtQml import QmlElement
+from rotator import Rotator
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -14,20 +15,24 @@ class Connector(QObject):
         self._name = str()
         self._dir = str()
         self._angle = 0
-        self._point = QPoint(0, 0)
+        self._rotator = None
         self._next = 0
-        self.rotation = 0
-        self._visible = True       # not defined in json
+
+        self._visible = True        # not defined in json
+        self._connectedRailId = -1  # not defined in json
 
         self.load_metadata(data)
 
     def load_metadata(self, data):
         for key, value in data.items():
             if hasattr(self, key):
-                if key == "point":
-                    self._point = QPoint(value["x"], value["y"])
+                if key == "rotator":
+                    self._rotator = Rotator.load_data(value, self)
                     continue
                 setattr(self, key, value)
+
+    def connected(self):
+        return self._connectedRailId != -1
 
     def angle(self):
         return self._angle
@@ -59,15 +64,15 @@ class Connector(QObject):
     dir_changed = Signal()
     dir = Property(str, dir, set_dir, notify=dir_changed)
 
-    def point(self):
-        return self._point
+    def rotator(self):
+        return self._rotator
 
-    def set_point(self, value):
-        self._point = value
-        self.point_changed.emit()
+    def set_rotator(self, value):
+        self._rotator = value
+        self.rotator_changed.emit()
 
-    point_changed = Signal()
-    point = Property(QPoint, point, set_point, notify=point_changed)
+    rotator_changed = Signal()
+    rotator = Property(Rotator, rotator, set_rotator, notify=rotator_changed)
 
     def next(self):
         return self._next
@@ -79,16 +84,6 @@ class Connector(QObject):
     next_changed = Signal()
     next = Property(int, next, set_next, notify=next_changed)
 
-    def rotation(self):
-        return self._rotation
-
-    def set_rotation(self, value):
-        self._rotation = value
-        self.rotation_changed.emit()
-
-    rotation_changed = Signal()
-    rotation = Property(float, rotation, set_rotation, notify=rotation_changed)
-
     def visible(self):
         return self._visible
 
@@ -98,3 +93,14 @@ class Connector(QObject):
 
     visible_changed = Signal()
     visible = Property(bool, visible, set_visible, notify=visible_changed)
+
+    def connectedRailId(self):
+        return self._connectedRailId
+
+    def set_connectedRailId(self, value):
+        self._connectedRailId = value
+        self.connectedRailId_changed.emit()
+        self.set_visible(value == -1)
+
+    connectedRailId_changed = Signal()
+    connectedRailId = Property(int, connectedRailId, set_connectedRailId, notify=connectedRailId_changed)

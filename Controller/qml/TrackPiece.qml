@@ -46,54 +46,69 @@ Image {
     }
 
     function snapToRotationPoint(fromConnector, toConnector, sibling, rotationOffset = 0) {
-        let origin = sibling.mapToItem(area, fromConnector.point)
+        let origin = sibling.mapToItem(area, Qt.point(fromConnector.rotator.x, fromConnector.rotator.y))
 
-        root.railData.x = origin.x - toConnector.point.x
-        root.railData.y = origin.y - toConnector.point.y
-        root.railData.rotator.x = toConnector.point.x
-        root.railData.rotator.y = toConnector.point.y
+        root.railData.x = origin.x - toConnector.rotator.x
+        root.railData.y = origin.y - toConnector.rotator.y
+        root.railData.rotator.x = toConnector.rotator.x
+        root.railData.rotator.y = toConnector.rotator.y
         root.railData.rotator.angle += rotationOffset
     }
 
     function positionTrackToSibling() {
-        const sibling = rails.findRail(root.railData.connected_to[0])
+        const siblingId = rails.siblingOf(root.railData.id)
 
-        if (!sibling) {
+        if (siblingId === -1) {
             return
         }
 
-        const index = root.railData.from_index
-        root.railData.rotator.angle = sibling.railData.rotator.angle
+        const siblingData = rails.findRailData(siblingId)
+        const fromConnector = siblingData.connectors.findFromConnector(root.railData.id)
 
-        const fromConnector = sibling.railData.connectors.get(index)
         const start = (fromConnector.dir === Globals.dir.start)
-        root.railData.to_index = start ? 2 : 0
-        const toConnector = root.railData.connectors.get(root.railData.to_index)
+        const toConnector = root.railData.connectors.get(0)
         const rotationOffset = (toConnector.angle - fromConnector.angle) * 22.5
 
+        root.railData.rotator.angle = siblingData.rotator.angle + (start ? 180 : 0)
+
+        const siblingItem = rails.findRailItem(siblingId)
+
         animation.enabled = false
-        snapToRotationPoint(fromConnector, toConnector, sibling, rotationOffset)
+        snapToRotationPoint(fromConnector, toConnector, siblingItem, rotationOffset)
         animation.enabled = true
     }
 
     function rotate() {
-        if (root.railData.connected_to.length === 0) {
+        if (root.railData.connectors.connections() === 0) {
             root.railData.rotator.x = root.width / 2
             root.railData.rotator.y = root.height / 2
             root.railData.rotator.angle = root.railData.rotator.angle + 22.5
-        } else if (root.railData.connected_to.length === 1) {
+        } else if (root.railData.connectors.connections() === 1) {
             // TODO - no need to have a real sibling here
-            const sibling = rails.findRail(root.railData.connected_to[0])
-            const fromConnector = sibling.railData.connectors.get(root.railData.from_index)
+            const siblingId = rails.siblingOf(root.railData.id)
+            const siblingData = rails.findRailData(siblingId)
+            const fromConnector = siblingData.connectors.findFromConnector(root.railData.id)
+            const toConnector = root.railData.connectors.setNextConnector()
 
-            root.railData.to_index = root.railData.connectors.get(root.railData.to_index).next
-            const toConnector = root.railData.connectors.get(root.railData.to_index)
-
-            snapToRotationPoint(fromConnector, toConnector, sibling, toConnector.rotation)
+            const siblingItem = rails.findRailItem(siblingId)
+            snapToRotationPoint(fromConnector, toConnector, siblingItem, toConnector.rotator.angle)
         }
+        // cannot rotate more connected
     }
 
-    Component.onCompleted: root.forceActiveFocus()
+    Component.onCompleted: {
+        rails.registerRail(root, root.railData.id)
+
+        root.connectors.clicked.connect(function (index) {
+            rails.append(Globals.selectedType, root.railData.id, index)
+        })
+
+        if (rails.loaded) {
+            root.positionTrackToSibling()
+        }
+
+        root.forceActiveFocus()
+    }
 
     Keys.onPressed: (event)=> {
                         if (event.key === Qt.Key_Delete) {
