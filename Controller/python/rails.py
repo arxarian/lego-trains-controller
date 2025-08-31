@@ -48,6 +48,7 @@ class Rails(QAbstractListModel):
     loaded = Property(bool, loaded, set_loaded, notify=loaded_changed)
 
     def connectRails(self):
+        print("TODO - connecting not implemented")
         return
 
     @Slot()
