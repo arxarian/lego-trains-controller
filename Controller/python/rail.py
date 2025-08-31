@@ -40,7 +40,6 @@ class Rail(QObject):
 
     # ✓ id
     # ✓ type
-    # ✓ length
     # ½ position - not in a container
     # ✓ - x
     # ✓ - y
@@ -49,13 +48,15 @@ class Rail(QObject):
     # ✓ - x
     # ✓ - y
     # ✓ connectors
-    # ½ - connector
+    # ✓ - connector
+    # ✓   - sibling [id, -1]
     # ✓   - rotator
     # ✓     - angle
     # v     - x
     # ✓     - y
-    #     - sibling [id, None]
-    #     - possible routes/paths (e.g. the switch rail is limited)
+    # ½ possible paths (e.g. the switch rail is limited)
+    # ✓ - lenghts
+    # ✓ - paths
     #   markers
     #   - color
     #   - position
