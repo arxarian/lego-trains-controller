@@ -91,7 +91,7 @@ class Rails(QAbstractListModel):
         for rail in self._railways:
             if rail.id == id:
                 return rail
-            return None
+        return None
 
     @Slot(int)
     @Slot(int, int, int)
@@ -115,6 +115,7 @@ class Rails(QAbstractListModel):
             for row in range(rail.ports.rowCount()):
                 index = rail.ports.index(row, 0)
                 port = rail.ports.data(index, Ports.Role.ObjectRole)
+                print("port", port.port, port.connectedRailId, "searching for", railId)
                 if port.connectedRailId == railId:
                     return rail.id
         return -1
