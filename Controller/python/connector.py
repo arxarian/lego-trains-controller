@@ -32,7 +32,7 @@ class Connector(QObject):
                 setattr(self, key, value)
 
     def connected(self):
-        return self._connectedRailId > 0
+        return self._connectedRailId != -1
 
     def angle(self):
         return self._angle

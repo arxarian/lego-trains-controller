@@ -45,7 +45,7 @@ class Connectors(QAbstractListModel):
     def connections(self):
         count = 0
         for connector in self._connectors:
-            if connector.connectedRailId != -1:
+            if connector.connected():
                 count += 1
         return count
 
@@ -59,7 +59,7 @@ class Connectors(QAbstractListModel):
     @Slot(result=QObject)
     def setNextConnector(self):
         for connector in self._connectors:
-            if connector.connectedRailId != -1:
+            if connector.connected():
                 nextConnector = self._connectors[connector.next]
                 nextConnector.set_connectedRailId(connector.connectedRailId)
                 connector.set_connectedRailId(-1)
