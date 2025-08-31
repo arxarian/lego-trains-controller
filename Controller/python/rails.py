@@ -6,9 +6,9 @@ from PySide6.QtCore import QAbstractListModel, Slot, Signal, Property
 from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
 from PySide6.QtQuick import QQuickItem
 
-from ports import Ports
 from rail import Rail
 from rail import RailType
+from connectors import Connectors
 
 class Rails(QAbstractListModel):
 
@@ -112,11 +112,10 @@ class Rails(QAbstractListModel):
     @Slot(int, result=int)
     def siblingOf(self, railId):
         for rail in self._railways:
-            for row in range(rail.ports.rowCount()):
-                index = rail.ports.index(row, 0)
-                port = rail.ports.data(index, Ports.Role.ObjectRole)
-                print("port", port.port, port.connectedRailId, "searching for", railId)
-                if port.connectedRailId == railId:
+            for row in range(rail.connectors.rowCount()):
+                index = rail.connectors.index(row, 0)
+                connector = rail.connectors.data(index, Connectors.Role.ObjectRole)
+                if connector.connectedRailId == railId:
                     return rail.id
         return -1
 

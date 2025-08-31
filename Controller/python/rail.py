@@ -6,7 +6,6 @@ from PySide6.QtCore import QObject, Property, Signal, QEnum
 from PySide6.QtQml import QmlElement
 
 from connectors import Connectors
-from ports import Ports
 from rotator import Rotator
 
 QML_IMPORT_NAME = "TrainView"
@@ -79,7 +78,6 @@ class Rail(QObject):
         self._rotator = rotator if rotator is not None else Rotator(parent=self)    # Rotator/QObject
 
         self._connectors = Connectors(parent=self)  # QAbstractListModel
-        self._ports = Ports(self._connectors, parent=self)                          # QAbstractListModel
         self._paths = {}                            # dictionary
 
         self.load_metadata()
@@ -95,9 +93,6 @@ class Rail(QObject):
                 if hasattr(self, key):
                     if key == "connectors":
                         self._connectors.setModel(value)
-                        continue
-                    if key == "ports":
-                        self._ports.setModel(value)
                         continue
                     setattr(self, key, value)
 
@@ -175,16 +170,6 @@ class Rail(QObject):
     y_changed = Signal()
     y = Property(float, y, set_y, notify=y_changed)
 
-    def ports(self):
-        return self._ports
-
-    def set_ports(self, value):
-        self._ports = value
-        self.ports_changed.emit()
-
-    ports_changed = Signal()
-    ports = Property(QObject, ports, set_ports, notify=ports_changed)
-
     def paths(self):
         return self._paths
 
@@ -196,4 +181,4 @@ class Rail(QObject):
     paths = Property(list, paths, set_paths, notify=paths_changed)
 
     def connectTo(self, fromRailId, fromIndex):
-        self._ports.connectTo(fromRailId, fromIndex)
+        self._connectors.connectTo(fromRailId, fromIndex)

@@ -4,14 +4,10 @@
         { "from": "start", "to": "end", "length": 16 },
         { "from": "end", "to": "start", "length": 16 }
     ],
-    "ports": [
-        { "port": "start", "connectors": [0] },
-        { "port": "end", "connectors": [1] }
-    ],
     "connectors":[
-        { "name": "start", "dir": "start", "angle": 0, "rotator": { "x": 160, "y": 0, "angle": 0 },
+        { "name": "start", "dir": "start", "angle": 0, "rotator": { "x": 160, "y": 0, "angle": 180 },
             "next": 1 },
-        { "name": "end", "dir": "end", "angle": 0, "rotator": { "x": 160, "y": 640, "angle": 0 },
+        { "name": "end", "dir": "end", "angle": 0, "rotator": { "x": 160, "y": 640, "angle": -180 },
             "next": 0 }
     ]
 }

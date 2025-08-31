@@ -14,8 +14,6 @@
         "python/network.py",
         "python/connectors.py",
         "python/connector.py",
-        "python/ports.py",
-        "python/port.py",
         "qml/Main.qml",
         "qml/qmldir",
         "qml/DiscoverDevices.qml",

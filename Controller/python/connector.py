@@ -18,7 +18,8 @@ class Connector(QObject):
         self._rotator = None
         self._next = 0
 
-        self._visible = True       # not defined in json
+        self._visible = True        # not defined in json
+        self._connectedRailId = -1  # not defined in json
 
         self.load_metadata(data)
 
@@ -29,6 +30,9 @@ class Connector(QObject):
                     self._rotator = Rotator.load_data(value, self)
                     continue
                 setattr(self, key, value)
+
+    def connected(self):
+        return self._connectedRailId > 0
 
     def angle(self):
         return self._angle
@@ -89,3 +93,14 @@ class Connector(QObject):
 
     visible_changed = Signal()
     visible = Property(bool, visible, set_visible, notify=visible_changed)
+
+    def connectedRailId(self):
+        return self._connectedRailId
+
+    def set_connectedRailId(self, value):
+        self._connectedRailId = value
+        self.connectedRailId_changed.emit()
+        self.set_visible(value == -1)
+
+    connectedRailId_changed = Signal()
+    connectedRailId = Property(int, connectedRailId, set_connectedRailId, notify=connectedRailId_changed)

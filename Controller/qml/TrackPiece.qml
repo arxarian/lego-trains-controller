@@ -63,8 +63,7 @@ Image {
         }
 
         const siblingData = rails.findRailData(siblingId)
-        const fromConnectorIndex = siblingData.ports.findFromConnectorIndex(root.railData.id)
-        const fromConnector = siblingData.connectors.get(fromConnectorIndex)
+        const fromConnector = siblingData.connectors.findFromConnector(root.railData.id)
 
         const start = (fromConnector.dir === Globals.dir.start)
         const toConnector = root.railData.connectors.get(0)
@@ -80,21 +79,21 @@ Image {
     }
 
     function rotate() {
-        if (!root.railData.ports.isConnected()) {
+        if (root.railData.connectors.connections() === 0) {
             root.railData.rotator.x = root.width / 2
             root.railData.rotator.y = root.height / 2
             root.railData.rotator.angle = root.railData.rotator.angle + 22.5
-        } else if (root.railData.ports.isConnected()) {
+        } else if (root.railData.connectors.connections() === 1) {
             // TODO - no need to have a real sibling here
-            const sibling = rails.findRailItem(root.railData.connected_to[0])
-            const fromConnector = sibling.railData.connectors.get(root.railData.from_index)
+            const siblingId = rails.siblingOf(root.railData.id)
+            const siblingData = rails.findRailData(siblingId)
+            const fromConnector = siblingData.connectors.findFromConnector(root.railData.id)
+            const toConnector = root.railData.connectors.setNextConnector()
 
-            root.railData.to_index = root.railData.connectors.get(root.railData.to_index).next
-            const toConnector = root.railData.connectors.get(root.railData.to_index)
-
-            snapToRotationPoint(fromConnector, toConnector, sibling, toConnector.rotator.angle)
+            const siblingItem = rails.findRailItem(siblingId)
+            snapToRotationPoint(fromConnector, toConnector, siblingItem, toConnector.rotator.angle)
         }
-        // TODO - missing for fully connected
+        // cannot rotate more connected
     }
 
     Component.onCompleted: {

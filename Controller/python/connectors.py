@@ -38,6 +38,34 @@ class Connectors(QAbstractListModel):
             self._connectors.append(Connector(i, self))
         self.endInsertRows()
 
+    def connectTo(self, toRailId, connectorIndex):
+        self._connectors[connectorIndex].set_connectedRailId(toRailId)
+
+    @Slot(result=int)
+    def connections(self):
+        count = 0
+        for connector in self._connectors:
+            if connector.connectedRailId != -1:
+                count += 1
+        return count
+
+    @Slot(int, result=QObject)
+    def findFromConnector(self, siblingRailId):
+        for connector in self._connectors:
+            if connector.connectedRailId == siblingRailId:
+                return connector
+        return None
+
+    @Slot(result=QObject)
+    def setNextConnector(self):
+        for connector in self._connectors:
+            if connector.connectedRailId != -1:
+                nextConnector = self._connectors[connector.next]
+                nextConnector.set_connectedRailId(connector.connectedRailId)
+                connector.set_connectedRailId(-1)
+                return nextConnector
+        return None
+
     @Slot(int, result=QObject)
     def get(self, index):
         if 0 <= index < len(self._connectors):
