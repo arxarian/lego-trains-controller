@@ -69,7 +69,6 @@ Image {
         const start = (fromConnector.dir === Globals.dir.start)
         const toConnector = root.railData.connectors.get(0)
         const rotationOffset = (toConnector.angle - fromConnector.angle) * 22.5
-        console.log("toConnector", toConnector, start)
 
         root.railData.rotator.angle = siblingData.rotator.angle + (start ? 180 : 0)
 

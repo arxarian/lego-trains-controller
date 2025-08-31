@@ -1,23 +1,22 @@
 {
     "source": "qrc:/switch right.png",
     "paths": [
-        { "from": 0, "to": 2, "length": 35 }, { "from": 0, "to": 4, "length": 32  },
-        { "from": 2, "to": 0, "length": 35 }, { "from": 4, "to": 0, "length": 32  },
-        { "from": 1, "to": 3, "length": 35 }, { "from": 1, "to": 5, "length": 32  },
-        { "from": 3, "to": 1, "length": 35 }, { "from": 5, "to": 1, "length": 32  }
+        { "from": "start", "to": "end_straight", "length": 32 },
+        { "from": "end_straight", "to": "start", "length": 32 },
+        { "from": "start", "to": "end_curved", "length": 35 },
+        { "from": "end_curved", "to": "start", "length": 35 }
+    ],
+    "ports": [
+        { "port": "start", "connectors": [0] },
+        { "port": "end_straight", "connectors": [1] },
+        { "port": "end_curved", "connectors": [2] }
     ],
     "connectors":[
-        { "name": "start", "dir": "start", "angle": 0, "rotator": { "x": 510, "y": 0, "angle": 180 },
-            "next": 3 },
-        { "name": "start_flipped", "dir": "start", "angle": 0, "rotator": { "x": 829, "y": 0, "angle": 180 },
-            "next": 2 },
-        { "name": "end_curved", "dir": "end", "angle": -1, "rotator": { "x": 0, "y": 1261, "angle": -202.5 },
-            "next": 4 },
-        { "name": "end_curved_flipped", "dir": "end", "angle": -1, "rotator": { "x": 296, "y": 1384, "angle": -202.5 },
-            "next": 5 },
-        { "name": "end_straight", "dir": "end", "angle": 0, "rotator": { "x": 510, "y": 1279, "angle": 22.5 },
+        { "name": "start", "dir": "start", "angle": 0, "rotator": { "x": 669.5, "y": 0, "angle": 180 },
             "next": 1 },
-        { "name": "end_straight_flipped", "dir": "end", "angle": 0, "rotator": { "x": 829, "y": 1279, "angle": 22.5 },
+        { "name": "end_curved", "dir": "end", "angle": -1, "rotator": { "x": 148, "y": 1322.5, "angle": -202.5 },
+            "next": 2 },
+        { "name": "end_straight", "dir": "end", "angle": 0, "rotator": { "x": 669.5, "y": 1279, "angle": 22.5 },
             "next": 0 }
     ]
 }
