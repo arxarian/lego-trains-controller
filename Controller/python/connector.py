@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QObject, Slot, Property, Signal
+from PySide6.QtCore import QObject, Property, Signal
 from PySide6.QtQml import QmlElement
 from rotator import Rotator
 
@@ -30,6 +30,13 @@ class Connector(QObject):
                     self._rotator = Rotator.load_data(value, self)
                     continue
                 setattr(self, key, value)
+
+    def save_data(self):
+        return {"name": self._name, "connectedRailId": self._connectedRailId}
+
+    def load_data(data, parent):
+        return Connector(name=data.get("name", ""),
+            connectedRailId=data.get("connectedRailId", -1), parent=parent)
 
     def connected(self):
         return self._connectedRailId != -1

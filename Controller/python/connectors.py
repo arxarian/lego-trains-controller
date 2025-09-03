@@ -41,6 +41,13 @@ class Connectors(QAbstractListModel):
     def connectTo(self, toRailId, connectorIndex):
         self._connectors[connectorIndex].set_connectedRailId(toRailId)
 
+    def save_data(self):
+        data = [connector.save_data() for connector in self._connectors]
+        return data
+
+    def load_data(data, parent):
+        return Connectors(parent=parent)
+
     @Slot(result=int)
     def connections(self):
         count = 0

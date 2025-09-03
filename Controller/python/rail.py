@@ -67,7 +67,8 @@ class Rail(QObject):
     #     - x
     #     - y
 
-    def __init__(self, type=RailType.Undefined, id=0, length=0, x=0, y=0, rotator=None, parent=None):
+    def __init__(self, type=RailType.Undefined, id=0, length=0, x=0, y=0, rotator=None,
+        connectors=None, parent=None):
 
         super().__init__(parent)
         self._id = Rail.generate_id(id)             # int
@@ -78,7 +79,7 @@ class Rail(QObject):
         self._y = y                                 # float
         self._rotator = rotator if rotator is not None else Rotator(parent=self)    # Rotator/QObject
 
-        self._connectors = Connectors(parent=self)  # QAbstractListModel
+        self._connectors = connectors if connectors is not None else Connectors(parent=self)    # QAbstractListModel
         self._paths = {}                            # dictionary
 
         self.load_metadata()
@@ -99,7 +100,7 @@ class Rail(QObject):
 
     def save_data(self):  # TODO - missing connected to!
         return {"id": self._id, "type": self._type, "rotator": self._rotator.save_data(),
-            "from_index": self._from_index, "to_index": self._to_index, "x": self._x, "y": self._y}
+            "x": self._x, "y": self._y, "connectors": self._connectors.save_data() }
 
     def load_data(data, parent):
         return Rail(type=data.get("type", ""), id=data.get("id", ""),
