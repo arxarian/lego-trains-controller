@@ -100,7 +100,7 @@ class Rail(QObject):
 
     def save_data(self):  # TODO - missing connected to!
         return {"id": self._id, "type": self._type, "rotator": self._rotator.save_data(),
-            "x": self._x, "y": self._y, "connectors": self._connectors.save_data() }
+            "x": round(self._x, 1), "y": round(self._y, 1), "connectors": self._connectors.save_data() }
 
     def load_data(data, parent):
         return Rail(type=data.get("type", ""), id=data.get("id", ""),
