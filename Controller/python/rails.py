@@ -52,14 +52,14 @@ class Rails(QAbstractListModel):
         return
 
     @Slot()
-    def save(self):
+    def save_data(self):
         data = [rail.save_data() for rail in self._railways]
         with open("rails.json", "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         print("saved")
 
     @Slot()
-    def load(self):
+    def load_data(self):
         self.set_loaded(False)
         self.resetModel()
 

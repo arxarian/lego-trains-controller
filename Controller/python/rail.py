@@ -67,8 +67,8 @@ class Rail(QObject):
     #     - x
     #     - y
 
-    def __init__(self, type=RailType.Undefined, id=0, length=0, x=0, y=0, rotator=None,
-        connectors=None, parent=None):
+    def __init__(self, type=RailType.Undefined, id=0, length=0, x=0, y=0,
+        rotator=None, connectors=None, parent=None):
 
         super().__init__(parent)
         self._id = Rail.generate_id(id)             # int
@@ -98,14 +98,14 @@ class Rail(QObject):
                         continue
                     setattr(self, key, value)
 
-    def save_data(self):  # TODO - missing connected to!
+    def save_data(self):  # TODO - why to save rotator? Is it needed?
         return {"id": self._id, "type": self._type, "rotator": self._rotator.save_data(),
             "x": round(self._x, 1), "y": round(self._y, 1), "connectors": self._connectors.save_data() }
 
     def load_data(data, parent):
-        return Rail(type=data.get("type", ""), id=data.get("id", ""),
-            rotator=Rotator.load_data(data.get("rotator", {}), parent),
-            x=data.get("x", 0), y=data.get("y", 0), parent=parent)
+        return Rail(type=data.get("type", 0), id=data.get("id", 0),
+            rotator=Rotator.load_data(data.get("rotator", {}), parent), x=data.get("x", 0), y=data.get("y", 0),
+            connectors=Connectors.load_data(data.get("connectors", []), parent), parent=parent)
 
     def id(self):
         return self._id

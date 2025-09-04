@@ -12,9 +12,9 @@ class Connectors(QAbstractListModel):
     class Role(IntEnum):
         ObjectRole = Qt.ItemDataRole.UserRole
 
-    def __init__(self, parent=None) -> None:
+    def __init__(self, data=[], parent=None) -> None:
         super().__init__(parent)
-        self._connectors = []
+        self._connectors = [Connector.load_data(d, self) for d in data]
 
     @Slot(QModelIndex, result=int)
     def rowCount(self, parent=QModelIndex()):
@@ -33,10 +33,16 @@ class Connectors(QAbstractListModel):
         return roles
 
     def setModel(self, data):
-        self.beginInsertRows(QModelIndex(), 0, len(data))
-        for i in data:
-            self._connectors.append(Connector(i, self))
-        self.endInsertRows()
+        if len(self._connectors) > 0:
+            # just update the model
+            for i, d in enumerate(data):
+                self._connectors[i].load_metadata(d)
+        else:
+            # create a new model
+            self.beginInsertRows(QModelIndex(), 0, len(data))
+            for i in data:
+                self._connectors.append(Connector(i, self))
+            self.endInsertRows()
 
     def connectTo(self, toRailId, connectorIndex):
         self._connectors[connectorIndex].set_connectedRailId(toRailId)
@@ -46,7 +52,7 @@ class Connectors(QAbstractListModel):
         return data
 
     def load_data(data, parent):
-        return Connectors(parent=parent)
+        return Connectors(data=data, parent=parent)
 
     @Slot(result=int)
     def connections(self):

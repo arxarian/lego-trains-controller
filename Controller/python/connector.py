@@ -10,16 +10,16 @@ QML_IMPORT_MAJOR_VERSION = 1
 @QmlElement
 class Connector(QObject):
 
-    def __init__(self, data, parent=None):
+    def __init__(self, data={}, name=str(), connectedRailId=-1, parent=None):
         super().__init__(parent)
-        self._name = str()
+        self._name = name
         self._dir = str()
         self._angle = 0
         self._rotator = None
         self._next = 0
 
-        self._visible = True        # not defined in json
-        self._connectedRailId = -1  # not defined in json
+        self._visible = connectedRailId == -1   # not defined in json
+        self._connectedRailId = connectedRailId # not defined in json
 
         self.load_metadata(data)
 
@@ -35,7 +35,7 @@ class Connector(QObject):
         return {"name": self._name, "connectedRailId": self._connectedRailId}
 
     def load_data(data, parent):
-        return Connector(name=data.get("name", ""),
+        return Connector(name=data.get("name", str()),
             connectedRailId=data.get("connectedRailId", -1), parent=parent)
 
     def connected(self):
