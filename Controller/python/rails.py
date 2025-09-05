@@ -77,8 +77,6 @@ class Rails(QAbstractListModel):
             print("Cannot register, not a QQuickItem")
             return
         self._registeredRails[id] = item
-        if len(self._registeredRails) == self.rowCount():
-            self.set_loaded(True)
         return
 
     @Slot(int, result=QQuickItem)
@@ -86,6 +84,11 @@ class Rails(QAbstractListModel):
         if id in self._registeredRails:
             return self._registeredRails[id]
         return None
+
+    @Slot()
+    def checkLoaded(self):
+        if len(self._registeredRails) == self.rowCount():
+            self.set_loaded(True)
 
     @Slot(int, result=Rail)
     def findRailData(self, id) -> Rail:

@@ -108,6 +108,8 @@ Image {
         }
 
         root.forceActiveFocus()
+
+        rails.checkLoaded()
     }
 
     Keys.onPressed: (event)=> {

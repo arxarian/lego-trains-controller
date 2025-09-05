@@ -36,6 +36,7 @@ class Rail(QObject):
             Rail.last_id += 1
             return Rail.last_id
         else:
+            Rail.last_id = max(Rail.last_id, id)
             return id
 
     # ✓ id
