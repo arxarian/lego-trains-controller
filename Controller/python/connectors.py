@@ -12,8 +12,9 @@ class Connectors(QAbstractListModel):
     class Role(IntEnum):
         ObjectRole = Qt.ItemDataRole.UserRole
 
-    def __init__(self, data=[], parent=None) -> None:
+    def __init__(self, data: list=None, parent=None) -> None:
         super().__init__(parent)
+        data = data or []
         self._connectors = [Connector.load_data(d, self) for d in data]
 
     @Slot(QModelIndex, result=int)

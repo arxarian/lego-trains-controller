@@ -68,8 +68,8 @@ class Rail(QObject):
     #     - x
     #     - y
 
-    def __init__(self, type=RailType.Undefined, id=0, length=0, x=0, y=0,
-        rotator=None, connectors=None, parent=None):
+    def __init__(self, type: RailType=RailType.Undefined, id: int=0, length: int=0, x: float=0,
+        y: float=0, rotator: Rotator=None, connectors: Connectors=None, parent=None):
 
         super().__init__(parent)
         self._id = Rail.generate_id(id)             # int

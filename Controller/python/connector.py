@@ -10,8 +10,9 @@ QML_IMPORT_MAJOR_VERSION = 1
 @QmlElement
 class Connector(QObject):
 
-    def __init__(self, data={}, name=str(), connectedRailId=-1, parent=None):
+    def __init__(self, data: dict=None, name: str="", connectedRailId: int=-1, parent=None):
         super().__init__(parent)
+        data = data or {}
         self._name = name
         self._dir = str()
         self._angle = 0
