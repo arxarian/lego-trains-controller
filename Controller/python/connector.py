@@ -1,25 +1,34 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QObject, Slot, Property, Signal
+from enum import IntEnum
+from PySide6.QtCore import QObject, Property, Signal, QEnum
 from PySide6.QtQml import QmlElement
 from rotator import Rotator
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
+@QEnum
+class State(IntEnum):
+    NotConnected = -1
+
 @QmlElement
 class Connector(QObject):
+    QEnum(State)
 
-    def __init__(self, data, parent=None):
+    def __init__(self, data: dict=None, name: str="", connectedRailId: int=State.NotConnected,
+        parent=None):
+
         super().__init__(parent)
-        self._name = str()
+        data = data or {}
+        self._name = name
         self._dir = str()
         self._angle = 0
         self._rotator = None
         self._next = 0
 
-        self._visible = True        # not defined in json
-        self._connectedRailId = -1  # not defined in json
+        self._connectedRailId = connectedRailId     # not defined in json
+        self._visible = not self.connected()        # not defined in json
 
         self.load_metadata(data)
 
@@ -31,8 +40,15 @@ class Connector(QObject):
                     continue
                 setattr(self, key, value)
 
+    def save_data(self):
+        return {"name": self._name, "connectedRailId": self._connectedRailId}
+
+    def load_data(data, parent):
+        return Connector(name=data.get("name", str()),
+            connectedRailId=data.get("connectedRailId", State.NotConnected), parent=parent)
+
     def connected(self):
-        return self._connectedRailId != -1
+        return self._connectedRailId != State.NotConnected
 
     def angle(self):
         return self._angle
@@ -100,7 +116,7 @@ class Connector(QObject):
     def set_connectedRailId(self, value):
         self._connectedRailId = value
         self.connectedRailId_changed.emit()
-        self.set_visible(value == -1)
+        self.set_visible(not self.connected)
 
     connectedRailId_changed = Signal()
     connectedRailId = Property(int, connectedRailId, set_connectedRailId, notify=connectedRailId_changed)

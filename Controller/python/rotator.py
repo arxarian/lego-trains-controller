@@ -11,7 +11,7 @@ QML_IMPORT_MAJOR_VERSION = 1
 @QmlElement
 class Rotator(QObject):
 
-    def __init__(self, x=0, y=0, angle=0, parent=None):
+    def __init__(self, x: float=0, y: float=0, angle: float=0, parent=None):
         super().__init__(parent)
         self._x = x
         self._y = y

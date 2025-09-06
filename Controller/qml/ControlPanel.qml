@@ -7,12 +7,12 @@ Column {
     Row {
         Button {
             text: "Save"
-            onClicked: rails.save()
+            onClicked: rails.save_data()
         }
 
         Button {
             text: "Load"
-            onClicked: rails.load()
+            onClicked: rails.load_data()
         }
 
         CheckBox {

@@ -4,7 +4,7 @@ from enum import IntEnum
 from PySide6.QtCore import QAbstractListModel, QObject, Property, Signal, Slot
 from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
 
-from connector import Connector
+from connector import Connector, State
 
 class Connectors(QAbstractListModel):
 
@@ -12,9 +12,10 @@ class Connectors(QAbstractListModel):
     class Role(IntEnum):
         ObjectRole = Qt.ItemDataRole.UserRole
 
-    def __init__(self, parent=None) -> None:
+    def __init__(self, data: list=None, parent=None) -> None:
         super().__init__(parent)
-        self._connectors = []
+        data = data or []
+        self._connectors = [Connector.load_data(d, self) for d in data]
 
     @Slot(QModelIndex, result=int)
     def rowCount(self, parent=QModelIndex()):
@@ -33,13 +34,26 @@ class Connectors(QAbstractListModel):
         return roles
 
     def setModel(self, data):
-        self.beginInsertRows(QModelIndex(), 0, len(data))
-        for i in data:
-            self._connectors.append(Connector(i, self))
-        self.endInsertRows()
+        if len(self._connectors) > 0:
+            # just update the model
+            for i, d in enumerate(data):
+                self._connectors[i].load_metadata(d)
+        else:
+            # create a new model
+            self.beginInsertRows(QModelIndex(), 0, len(data))
+            for i in data:
+                self._connectors.append(Connector(i, self))
+            self.endInsertRows()
 
     def connectTo(self, toRailId, connectorIndex):
         self._connectors[connectorIndex].set_connectedRailId(toRailId)
+
+    def save_data(self):
+        data = [connector.save_data() for connector in self._connectors]
+        return data
+
+    def load_data(data, parent):
+        return Connectors(data=data, parent=parent)
 
     @Slot(result=int)
     def connections(self):
@@ -62,7 +76,7 @@ class Connectors(QAbstractListModel):
             if connector.connected():
                 nextConnector = self._connectors[connector.next]
                 nextConnector.set_connectedRailId(connector.connectedRailId)
-                connector.set_connectedRailId(-1)
+                connector.set_connectedRailId(State.NotConnected)
                 return nextConnector
         return None
 
