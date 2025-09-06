@@ -18,8 +18,8 @@ class Rails(QAbstractListModel):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self._railways = []
-        self._registeredRails = {}
-        self._loaded = True
+        self._registeredRails = {}      # id -> item
+        self._loaded = True             # TODO - rename to loading
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._railways)

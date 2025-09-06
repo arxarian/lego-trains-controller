@@ -1,26 +1,5 @@
 [
   {
-    "id": 1,
-    "type": 0,
-    "rotator": {
-      "x": 0,
-      "y": 0,
-      "angle": 0
-    },
-    "x": 0,
-    "y": 0,
-    "connectors": [
-      {
-        "name": "start",
-        "connectedRailId": 2
-      },
-      {
-        "name": "end",
-        "connectedRailId": 3
-      }
-    ]
-  },
-  {
     "id": 2,
     "type": 1,
     "rotator": {
@@ -33,7 +12,7 @@
     "connectors": [
       {
         "name": "start",
-        "connectedRailId": 1
+        "connectedRailId": -1
       },
       {
         "name": "end",
@@ -54,7 +33,7 @@
     "connectors": [
       {
         "name": "start",
-        "connectedRailId": 1
+        "connectedRailId": -1
       },
       {
         "name": "end",
