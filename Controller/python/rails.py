@@ -140,6 +140,12 @@ class Rails(QAbstractListModel):
     def remove(self, rail):
         index = self._railways.index(rail)
         if index > -1:
+            siblingsIds = self.siblingsOf(rail.id) # find siblings
+            for id in siblingsIds:
+                siblingRail = self.findRailData(id)
+                if siblingRail: # set not connected for all connectors of siblings
+                    siblingRail.disconnectFrom(rail.id)
+
             self.beginRemoveRows(QModelIndex(), index, index)
             self._railways.remove(rail)
             self.endRemoveRows()
