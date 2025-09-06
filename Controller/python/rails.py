@@ -113,15 +113,16 @@ class Rails(QAbstractListModel):
 
         self.endInsertRows()
 
-    @Slot(int, result=int)
-    def siblingOf(self, railId):
+    @Slot(int, result=list)
+    def siblingsOf(self, railId):
+        siblings = []
         for rail in self._railways:
             for row in range(rail.connectors.rowCount()):
                 index = rail.connectors.index(row, 0)
                 connector = rail.connectors.data(index, Connectors.Role.ObjectRole)
                 if connector.connectedRailId == railId:
-                    return rail.id
-        return -1
+                    siblings.append(rail.id)
+        return siblings
 
     def resetModel(self):
         if (self.rowCount() == 0):
