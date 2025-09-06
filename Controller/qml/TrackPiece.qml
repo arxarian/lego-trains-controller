@@ -10,7 +10,7 @@ Image {
 
     x: root.railData ? root.railData.x : 0
     y: root.railData ? root.railData.y : 0
-    z: root.selected === root ? 10 : 0
+    z: root.selected ? 10 : 0
 
     focus: true
     source: root.railData ? root.railData.source : ""
