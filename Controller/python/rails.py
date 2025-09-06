@@ -114,7 +114,7 @@ class Rails(QAbstractListModel):
         self.endInsertRows()
 
     @Slot(int, result=list)
-    def siblingsOf(self, railId):
+    def findsiblingsOf(self, railId):
         siblings = []
         for rail in self._railways:
             for row in range(rail.connectors.rowCount()):
@@ -140,7 +140,7 @@ class Rails(QAbstractListModel):
     def remove(self, rail):
         index = self._railways.index(rail)
         if index > -1:
-            siblingsIds = self.siblingsOf(rail.id) # find siblings
+            siblingsIds = self.findsiblingsOf(rail.id) # find siblings
             for id in siblingsIds:
                 siblingRail = self.findRailData(id)
                 if siblingRail: # set not connected for all connectors of siblings
