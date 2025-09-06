@@ -27,8 +27,8 @@ class Connector(QObject):
         self._rotator = None
         self._next = 0
 
-        self._visible = connectedRailId == State.NotConnected   # not defined in json
-        self._connectedRailId = connectedRailId                 # not defined in json
+        self._connectedRailId = connectedRailId     # not defined in json
+        self._visible = not self.connected()        # not defined in json
 
         self.load_metadata(data)
 
@@ -116,7 +116,7 @@ class Connector(QObject):
     def set_connectedRailId(self, value):
         self._connectedRailId = value
         self.connectedRailId_changed.emit()
-        self.set_visible(value == State.NotConnected)
+        self.set_visible(not self.connected)
 
     connectedRailId_changed = Signal()
     connectedRailId = Property(int, connectedRailId, set_connectedRailId, notify=connectedRailId_changed)
