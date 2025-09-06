@@ -7,7 +7,6 @@ from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
 from PySide6.QtQuick import QQuickItem
 
 from rail import Rail
-from rail import RailType
 from connectors import Connectors
 
 class Rails(QAbstractListModel):
@@ -50,21 +49,27 @@ class Rails(QAbstractListModel):
     @Slot()
     def save_data(self):
         data = [rail.save_data() for rail in self._railways]
-        with open("rails.json", "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-        print("saved")
+        try:
+            with open("rails.json", "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            print("saved")
+        except IOError as e:
+            print("Error saving rails:", e)
 
     @Slot()
     def load_data(self):
         self.set_loaded(False)
         self.resetModel()
 
-        with open("rails.json", "r", encoding="utf-8") as f:
-            data = json.load(f)
-        self.beginResetModel()
-        self._railways = [Rail.load_data(d, self) for d in data]
-        self.endResetModel()
-        print("loaded, size", len(self._railways))
+        try:
+            with open("rails.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+            self.beginResetModel()
+            self._railways = [Rail.load_data(d, self) for d in data]
+            self.endResetModel()
+            print("loaded, size", len(self._railways))
+        except IOError as e:
+            print("Error loading rails:", e)
 
     @Slot(QQuickItem, int)
     def registerRail(self, item, id):
