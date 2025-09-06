@@ -113,15 +113,16 @@ class Rails(QAbstractListModel):
 
         self.endInsertRows()
 
-    @Slot(int, result=int)
-    def siblingOf(self, railId):
+    @Slot(int, result=list)
+    def findsiblingsOf(self, railId):
+        siblings = []
         for rail in self._railways:
             for row in range(rail.connectors.rowCount()):
                 index = rail.connectors.index(row, 0)
                 connector = rail.connectors.data(index, Connectors.Role.ObjectRole)
                 if connector.connectedRailId == railId:
-                    return rail.id
-        return -1
+                    siblings.append(rail.id)
+        return siblings
 
     def resetModel(self):
         if (self.rowCount() == 0):
@@ -139,6 +140,12 @@ class Rails(QAbstractListModel):
     def remove(self, rail):
         index = self._railways.index(rail)
         if index > -1:
+            siblingsIds = self.findsiblingsOf(rail.id) # find siblings
+            for id in siblingsIds:
+                siblingRail = self.findRailData(id)
+                if siblingRail: # set not connected for all connectors of siblings
+                    siblingRail.disconnectFrom(rail.id)
+
             self.beginRemoveRows(QModelIndex(), index, index)
             self._railways.remove(rail)
             self.endRemoveRows()

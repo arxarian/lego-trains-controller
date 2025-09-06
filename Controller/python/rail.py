@@ -185,3 +185,6 @@ class Rail(QObject):
 
     def connectTo(self, fromRailId, fromIndex):
         self._connectors.connectTo(fromRailId, fromIndex)
+
+    def disconnectFrom(self, fromRailId):
+        self._connectors.disconnectFrom(fromRailId)

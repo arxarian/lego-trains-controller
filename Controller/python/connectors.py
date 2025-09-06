@@ -48,6 +48,11 @@ class Connectors(QAbstractListModel):
     def connectTo(self, toRailId, connectorIndex):
         self._connectors[connectorIndex].set_connectedRailId(toRailId)
 
+    def disconnectFrom(self, fromRailId):
+        for connector in self._connectors:
+            if connector.connectedRailId == fromRailId:
+                connector.set_connectedRailId(State.NotConnected)
+
     def save_data(self):
         data = [connector.save_data() for connector in self._connectors]
         return data

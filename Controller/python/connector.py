@@ -116,7 +116,7 @@ class Connector(QObject):
     def set_connectedRailId(self, value):
         self._connectedRailId = value
         self.connectedRailId_changed.emit()
-        self.set_visible(not self.connected)
+        self.set_visible(not self.connected())
 
     connectedRailId_changed = Signal()
     connectedRailId = Property(int, connectedRailId, set_connectedRailId, notify=connectedRailId_changed)
