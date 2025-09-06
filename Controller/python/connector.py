@@ -1,16 +1,24 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QObject, Property, Signal
+from enum import IntEnum
+from PySide6.QtCore import QObject, Property, Signal, QEnum
 from PySide6.QtQml import QmlElement
 from rotator import Rotator
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
+@QEnum
+class State(IntEnum):
+    NotConnected = -1
+
 @QmlElement
 class Connector(QObject):
+    QEnum(State)
 
-    def __init__(self, data: dict=None, name: str="", connectedRailId: int=-1, parent=None):
+    def __init__(self, data: dict=None, name: str="", connectedRailId: int=State.NotConnected,
+        parent=None):
+
         super().__init__(parent)
         data = data or {}
         self._name = name
@@ -19,8 +27,8 @@ class Connector(QObject):
         self._rotator = None
         self._next = 0
 
-        self._visible = connectedRailId == -1   # not defined in json
-        self._connectedRailId = connectedRailId # not defined in json
+        self._visible = connectedRailId == State.NotConnected   # not defined in json
+        self._connectedRailId = connectedRailId                 # not defined in json
 
         self.load_metadata(data)
 
@@ -37,10 +45,10 @@ class Connector(QObject):
 
     def load_data(data, parent):
         return Connector(name=data.get("name", str()),
-            connectedRailId=data.get("connectedRailId", -1), parent=parent)
+            connectedRailId=data.get("connectedRailId", State.NotConnected), parent=parent)
 
     def connected(self):
-        return self._connectedRailId != -1
+        return self._connectedRailId != State.NotConnected
 
     def angle(self):
         return self._angle
@@ -108,7 +116,7 @@ class Connector(QObject):
     def set_connectedRailId(self, value):
         self._connectedRailId = value
         self.connectedRailId_changed.emit()
-        self.set_visible(value == -1)
+        self.set_visible(value == State.NotConnected)
 
     connectedRailId_changed = Signal()
     connectedRailId = Property(int, connectedRailId, set_connectedRailId, notify=connectedRailId_changed)

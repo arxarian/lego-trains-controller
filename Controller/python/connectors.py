@@ -4,7 +4,7 @@ from enum import IntEnum
 from PySide6.QtCore import QAbstractListModel, QObject, Property, Signal, Slot
 from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
 
-from connector import Connector
+from connector import Connector, State
 
 class Connectors(QAbstractListModel):
 
@@ -76,7 +76,7 @@ class Connectors(QAbstractListModel):
             if connector.connected():
                 nextConnector = self._connectors[connector.next]
                 nextConnector.set_connectedRailId(connector.connectedRailId)
-                connector.set_connectedRailId(-1)
+                connector.set_connectedRailId(State.NotConnected)
                 return nextConnector
         return None
 
