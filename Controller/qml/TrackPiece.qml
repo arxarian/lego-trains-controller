@@ -101,7 +101,8 @@ Image {
         rails.registerRail(root, root.railData.id)
 
         root.connectors.clicked.connect(function (index) {
-            rails.append(Globals.selectedType, root.railData.id, index)
+            console.log("clicked")
+            //rails.append(Globals.selectedType, root.railData.id, index)
         })
 
         if (rails.loaded) {
@@ -144,7 +145,11 @@ Image {
 
     MouseArea {
         anchors.fill: parent
-        onClicked: root.forceActiveFocus()
+        propagateComposedEvents: true
+        onClicked: function(mouse) {
+            mouse.accepted = false
+            root.forceActiveFocus()
+        }
     }
 
     Connectors {

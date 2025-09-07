@@ -33,7 +33,28 @@
     "connectors": [
       {
         "name": "start",
+        "connectedRailId": 4
+      },
+      {
+        "name": "end",
         "connectedRailId": -1
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "type": 0,
+    "rotator": {
+      "x": 160.0,
+      "y": 0.0,
+      "angle": 180.0
+    },
+    "x": -0.0,
+    "y": 640.0,
+    "connectors": [
+      {
+        "name": "start",
+        "connectedRailId": 3
       },
       {
         "name": "end",

@@ -33,7 +33,12 @@ Item
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: root.clicked(index)
+                propagateComposedEvents: true
+                onClicked: function(mouse) {
+                    console.log("mouse", mouse)
+                    mouse.accepted = false
+                    root.clicked(index)
+                }
             }
         }
     }
