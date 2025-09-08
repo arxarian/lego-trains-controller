@@ -8,11 +8,13 @@ from dataclasses import dataclass
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
+INVALID_INDEX = -1
+
 @dataclass
 class ConnectorEvent:
     railType: RailType
-    railId: int
-    connectorIndex: int
+    railId: int=INVALID_INDEX
+    connectorIndex: int=INVALID_INDEX
 
 @QmlElement
 class ConnectorRegister(QObject):
@@ -28,7 +30,8 @@ class ConnectorRegister(QObject):
 
     @Slot(int)
     @Slot(int, int, int)
-    def addEvent(self, railType: RailType, railId: int=-1, connectorIndex: int=-1):
+    def addEvent(self, railType: RailType, railId: int=INVALID_INDEX,
+        connectorIndex: int=INVALID_INDEX):
         self._events.append(ConnectorEvent(railType, railId, connectorIndex))
         self.newEvents.emit()
 
@@ -43,7 +46,5 @@ class ConnectorRegister(QObject):
         elif size > 2:
             print("unexpected number of events", size, "clearing...")
             self._events.clear()
-
-connectorRegister = ConnectorRegister()
 
 

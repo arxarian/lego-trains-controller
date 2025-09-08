@@ -6,7 +6,7 @@ from devices import Devices
 from rails import Rails
 from network import Network
 from connector import Connector
-from connectorregister import connectorRegister
+from connectorregister import ConnectorRegister
 
 import resources.rails_rc
 
@@ -25,17 +25,18 @@ if __name__ == '__main__':
     loop = QEventLoop(app)
     asyncio.set_event_loop(loop)
 
+    connectorRegister = ConnectorRegister()
     devices = Devices()
-    rails = Rails()
+    rails = Rails(connectorRegister)
     network = Network()
 
     engine.addImportPath(Path(__file__).parent)
     engine.addImportPath(os.path.join(Path(__file__).parent, "qml"))
     engine.addImportPath(os.path.join(Path(__file__).parent, "resources"))
+    engine.rootContext().setContextProperty("connectorRegister", connectorRegister)
     engine.rootContext().setContextProperty("devices", devices)
     engine.rootContext().setContextProperty("rails", rails)
     engine.rootContext().setContextProperty("network", network)
-    engine.rootContext().setContextProperty("connectorRegister", connectorRegister)
     engine.loadFromModule("qml", "Main")
 
     if not engine.rootObjects():

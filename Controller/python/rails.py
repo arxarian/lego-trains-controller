@@ -8,8 +8,7 @@ from PySide6.QtQuick import QQuickItem
 
 from rail import Rail
 from connectors import Connectors
-from connectorregister import ConnectorEvent
-from connectorregister import connectorRegister
+from connectorregister import ConnectorEvent, ConnectorRegister
 
 class Rails(QAbstractListModel):
 
@@ -17,7 +16,7 @@ class Rails(QAbstractListModel):
     class Role(IntEnum):
         ObjectRole = Qt.ItemDataRole.UserRole
 
-    def __init__(self, parent=None) -> None:
+    def __init__(self, connectorRegister: ConnectorRegister, parent=None) -> None:
         super().__init__(parent)
         self._railways = []
         self._registeredRails = {}      # id -> item
