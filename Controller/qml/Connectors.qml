@@ -36,7 +36,7 @@ Item
                 propagateComposedEvents: true
                 onClicked: function(mouse) {
                     mouse.accepted = false
-                    connectorRegister.addEvent(Globals.selectedType, mouse, root.railId, index)
+                    connectorRegister.addEvent(Globals.selectedType, root.railId, index)
                 }
             }
         }

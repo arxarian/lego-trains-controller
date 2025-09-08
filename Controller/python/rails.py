@@ -23,6 +23,7 @@ class Rails(QAbstractListModel):
         self._registeredRails = {}      # id -> item
         self._loaded = True             # TODO - rename to loading
         connectorRegister.appendRail.connect(self.append)
+        connectorRegister.connectRails.connect(self.connectRails)
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._railways)
@@ -99,6 +100,10 @@ class Rails(QAbstractListModel):
             if rail.id == id:
                 return rail
         return None
+
+    def connectRails(self, event_0: ConnectorEvent, event_1: ConnectorEvent):
+        print(event_0)
+        print(event_1)
 
     def append(self, connectorEvent: ConnectorEvent):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
