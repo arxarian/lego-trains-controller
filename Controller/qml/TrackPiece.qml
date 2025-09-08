@@ -100,10 +100,6 @@ Image {
     Component.onCompleted: {
         rails.registerRail(root, root.railData.id)
 
-        root.connectors.clicked.connect(function (index) {
-            rails.append(Globals.selectedType, root.railData.id, index)
-        })
-
         if (rails.loaded) {
             root.positionTrackToSibling()
         }
@@ -144,12 +140,17 @@ Image {
 
     MouseArea {
         anchors.fill: parent
-        onClicked: root.forceActiveFocus()
+        propagateComposedEvents: true
+        onClicked: function(mouse) {
+            mouse.accepted = false
+            root.forceActiveFocus()
+        }
     }
 
     Connectors {
         id: connectors
         anchors.fill: parent
+        railId: root.railData.id
         model: root.railData.connectors
     }
 

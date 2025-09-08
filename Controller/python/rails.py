@@ -8,6 +8,7 @@ from PySide6.QtQuick import QQuickItem
 
 from rail import Rail
 from connectors import Connectors
+from connectorregister import ConnectorEvent, ConnectorRegister
 
 class Rails(QAbstractListModel):
 
@@ -15,11 +16,13 @@ class Rails(QAbstractListModel):
     class Role(IntEnum):
         ObjectRole = Qt.ItemDataRole.UserRole
 
-    def __init__(self, parent=None) -> None:
+    def __init__(self, connectorRegister: ConnectorRegister, parent=None) -> None:
         super().__init__(parent)
         self._railways = []
-        self._registeredRails = {}
-        self._loaded = True
+        self._registeredRails = {}      # id -> item
+        self._loaded = True             # TODO - rename to loading
+        connectorRegister.appendRail.connect(self.append)
+        connectorRegister.connectRails.connect(self.connectRails)
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._railways)
@@ -95,21 +98,29 @@ class Rails(QAbstractListModel):
         for rail in self._railways:
             if rail.id == id:
                 return rail
+
+        print("rail", id, "not found")
         return None
 
-    @Slot(int)
-    @Slot(int, int, int)
-    def append(self, type, fromRailId=-1, fromIndex=0):
-        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-        self._railways.append(Rail(type))
+    def connectRails(self, event_0: ConnectorEvent, event_1: ConnectorEvent):
+            rail_0 = self.findRailData(event_0.railId)
+            rail_1 = self.findRailData(event_1.railId)
 
-        if fromRailId > 0:
+            if rail_0 and rail_1:
+                rail_0.connectTo(event_1.railId, event_0.connectorIndex)
+                rail_1.connectTo(event_0.railId, event_1.connectorIndex)
+
+    def append(self, connectorEvent: ConnectorEvent):
+        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+        self._railways.append(Rail(connectorEvent.railType))
+
+        if connectorEvent.railId > 0:
             # connect the new rail to the previous one
-            self._railways[-1].connectTo(fromRailId, 0)
+            self._railways[-1].connectTo(connectorEvent.railId, 0)
             # and the previous one to the new one
-            rail = self.findRailData(fromRailId)
+            rail = self.findRailData(connectorEvent.railId)
             if rail:
-                rail.connectTo(self._railways[-1].id, fromIndex)
+                rail.connectTo(self._railways[-1].id, connectorEvent.connectorIndex)
 
         self.endInsertRows()
 

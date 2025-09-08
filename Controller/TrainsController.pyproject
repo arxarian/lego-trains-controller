@@ -14,6 +14,8 @@
         "python/network.py",
         "python/connectors.py",
         "python/connector.py",
+        "python/rotator.py",
+        "python/connectorregister.py",
         "qml/Main.qml",
         "qml/qmldir",
         "qml/DiscoverDevices.qml",
@@ -25,7 +27,6 @@
         "qml/ControlPanel.qml",
         "qml/Connectors.qml",
         "qml/SelectedMarker.qml",
-        "rails.json",
-        "python/rotator.py"
+        "rails.json"
     ]
 }

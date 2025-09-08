@@ -30,7 +30,7 @@ Item {
 
         onClicked: {
             if (rails.rowCount() === 0) {
-                rails.append(Globals.selectedType)
+                connectorRegister.addEvent(Globals.selectedType)
             }
         }
     }
