@@ -100,11 +100,6 @@ Image {
     Component.onCompleted: {
         rails.registerRail(root, root.railData.id)
 
-        root.connectors.clicked.connect(function (index) {
-            console.log("clicked")
-            //rails.append(Globals.selectedType, root.railData.id, index)
-        })
-
         if (rails.loaded) {
             root.positionTrackToSibling()
         }
@@ -155,6 +150,7 @@ Image {
     Connectors {
         id: connectors
         anchors.fill: parent
+        railId: root.railData.id
         model: root.railData.connectors
     }
 

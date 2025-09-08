@@ -8,6 +8,8 @@ from PySide6.QtQuick import QQuickItem
 
 from rail import Rail
 from connectors import Connectors
+from connectorregister import ConnectorEvent
+from connectorregister import connectorRegister
 
 class Rails(QAbstractListModel):
 
@@ -20,6 +22,7 @@ class Rails(QAbstractListModel):
         self._railways = []
         self._registeredRails = {}      # id -> item
         self._loaded = True             # TODO - rename to loading
+        connectorRegister.appendRail.connect(self.append)
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._railways)
@@ -97,19 +100,17 @@ class Rails(QAbstractListModel):
                 return rail
         return None
 
-    @Slot(int)
-    @Slot(int, int, int)
-    def append(self, type, fromRailId=-1, fromIndex=0):
+    def append(self, connectorEvent: ConnectorEvent):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-        self._railways.append(Rail(type))
+        self._railways.append(Rail(connectorEvent.railType))
 
-        if fromRailId > 0:
+        if connectorEvent.railId > 0:
             # connect the new rail to the previous one
-            self._railways[-1].connectTo(fromRailId, 0)
+            self._railways[-1].connectTo(connectorEvent.railId, 0)
             # and the previous one to the new one
-            rail = self.findRailData(fromRailId)
+            rail = self.findRailData(connectorEvent.railId)
             if rail:
-                rail.connectTo(self._railways[-1].id, fromIndex)
+                rail.connectTo(self._railways[-1].id, connectorEvent.connectorIndex)
 
         self.endInsertRows()
 

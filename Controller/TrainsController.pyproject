@@ -15,6 +15,7 @@
         "python/connectors.py",
         "python/connector.py",
         "python/rotator.py",
+        "python/connectorregister.py",
         "qml/Main.qml",
         "qml/qmldir",
         "qml/DiscoverDevices.qml",

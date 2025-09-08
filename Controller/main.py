@@ -6,6 +6,7 @@ from devices import Devices
 from rails import Rails
 from network import Network
 from connector import Connector
+from connectorregister import connectorRegister
 
 import resources.rails_rc
 
@@ -34,6 +35,7 @@ if __name__ == '__main__':
     engine.rootContext().setContextProperty("devices", devices)
     engine.rootContext().setContextProperty("rails", rails)
     engine.rootContext().setContextProperty("network", network)
+    engine.rootContext().setContextProperty("connectorRegister", connectorRegister)
     engine.loadFromModule("qml", "Main")
 
     if not engine.rootObjects():

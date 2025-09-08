@@ -5,8 +5,8 @@ Item
 {
     id: root
 
+    property int railId: -1
     property var model  // TODO - why var and not Connectors?
-    signal clicked(int index)
 
     Repeater {
         model: root.model
@@ -35,9 +35,8 @@ Item
                 anchors.fill: parent
                 propagateComposedEvents: true
                 onClicked: function(mouse) {
-                    console.log("mouse", mouse)
                     mouse.accepted = false
-                    root.clicked(index)
+                    connectorRegister.addEvent(Globals.selectedType, mouse, root.railId, index)
                 }
             }
         }
