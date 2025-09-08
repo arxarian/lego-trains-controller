@@ -99,6 +99,8 @@ class Rails(QAbstractListModel):
         for rail in self._railways:
             if rail.id == id:
                 return rail
+
+        print("rail", id, "not found")
         return None
 
     def connectRails(self, event_0: ConnectorEvent, event_1: ConnectorEvent):

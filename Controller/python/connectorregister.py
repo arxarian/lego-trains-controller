@@ -33,11 +33,16 @@ class ConnectorRegister(QObject):
         self.newEvents.emit()
 
     def process(self):
-        if len(self._events) == 1:
+        size = len(self._events)
+        if size == 1:
             self.appendRail.emit(self._events.pop())
 
-        elif len(self._events) == 2:
+        elif size == 2:
             self.connectRails.emit(self._events.pop(), self._events.pop())
+
+        elif size > 2:
+            print("unexpected number of events", size, "clearing...")
+            self._events.clear()
 
 connectorRegister = ConnectorRegister()
 
