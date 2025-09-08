@@ -102,8 +102,12 @@ class Rails(QAbstractListModel):
         return None
 
     def connectRails(self, event_0: ConnectorEvent, event_1: ConnectorEvent):
-        print(event_0)
-        print(event_1)
+            rail_0 = self.findRailData(event_0.railId)
+            rail_1 = self.findRailData(event_1.railId)
+
+            if rail_0 and rail_1:
+                rail_0.connectTo(event_1.railId, event_0.connectorIndex)
+                rail_1.connectTo(event_0.railId, event_1.connectorIndex)
 
     def append(self, connectorEvent: ConnectorEvent):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())

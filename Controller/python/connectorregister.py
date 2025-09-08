@@ -31,7 +31,6 @@ class ConnectorRegister(QObject):
     def addEvent(self, railType: RailType, railId: int=-1, connectorIndex: int=-1):
         self._events.append(ConnectorEvent(railType, railId, connectorIndex))
         self.newEvents.emit()
-        print("added")
 
     def process(self):
         if len(self._events) == 1:
