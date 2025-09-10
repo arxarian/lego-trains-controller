@@ -20,7 +20,7 @@ class Rails(QAbstractListModel):
         super().__init__(parent)
         self._railways = []
         self._registeredRails = {}      # id -> item
-        self._loaded = True             # TODO - rename to loading
+        self._loading = False
         connectorRegister.appendRail.connect(self.append)
         connectorRegister.connectRails.connect(self.connectRails)
 
@@ -39,15 +39,15 @@ class Rails(QAbstractListModel):
         roles[Rails.Role.ObjectRole] = QByteArray(b"object")
         return roles
 
-    def loaded(self):
-        return self._loaded
+    def loading(self):
+        return self._loading
 
-    def set_loaded(self, value):
-        self._loaded = value
-        self.loaded_changed.emit()
+    def set_loading(self, value):
+        self._loading = value
+        self.loading_changed.emit()
 
-    loaded_changed = Signal()
-    loaded = Property(bool, loaded, set_loaded, notify=loaded_changed)
+    loading_changed = Signal()
+    loading = Property(bool, loading, set_loading, notify=loading_changed)
 
     @Slot()
     def save_data(self):
@@ -61,7 +61,7 @@ class Rails(QAbstractListModel):
 
     @Slot()
     def load_data(self):
-        self.set_loaded(False)
+        self.set_loading(True)
         self.resetModel()
 
         try:
@@ -91,7 +91,7 @@ class Rails(QAbstractListModel):
     @Slot()
     def checkLoaded(self):
         if len(self._registeredRails) == self.rowCount():
-            self.set_loaded(True)
+            self.set_loading(False)
 
     @Slot(int, result=Rail)
     def findRailData(self, id) -> Rail:

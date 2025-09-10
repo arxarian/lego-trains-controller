@@ -100,7 +100,7 @@ Image {
     Component.onCompleted: {
         rails.registerRail(root, root.railData.id)
 
-        if (rails.loaded) {
+        if (!rails.loading) {
             root.positionTrackToSibling()
         }
 
