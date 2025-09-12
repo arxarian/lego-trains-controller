@@ -60,19 +60,14 @@ class Rails(QAbstractListModel):
             print("Error saving rails:", e)
 
     @Slot()
-    def load_data(self):
+    def load_data(self, data: list):
         self.set_loading(True)
         self.resetModel()
 
-        try:
-            with open("rails.json", "r", encoding="utf-8") as f:
-                data = json.load(f)
-            self.beginResetModel()
-            self._railways = [Rail.load_data(d, self) for d in data]
-            self.endResetModel()
-            print("loaded, size", len(self._railways))
-        except IOError as e:
-            print("Error loading rails:", e)
+        self.beginResetModel()
+        self._railways = data
+        self.endResetModel()
+        print("loaded, size", len(self._railways))
 
     @Slot(QQuickItem, int)
     def registerRail(self, item, id):
