@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
 from pathlib import Path
-from dataclasses import dataclass, field
+from dataclasses import dataclass, asdict
 
 from PySide6.QtCore import QObject, Signal, Property
 
@@ -11,8 +11,9 @@ from connectorregister import ConnectorRegister
 
 @dataclass
 class Settings:
-    canvas_position: dict=field(default_factory={"x": 0, "y": 0})
-    zoom: float=1
+    canvas_x: float=0
+    canvas_y: float=0
+    canvas_zoom: float=1
 
 class Project(QObject):
     def __init__(self, name: str="", data: dict=None, parent=None):
@@ -20,18 +21,18 @@ class Project(QObject):
         self._named = False
         self._connectorRegister = ConnectorRegister(self)
         self._rails = Rails(self._connectorRegister, self)
-        self._settings = Settings
+        self._settings = Settings()
 
         if data:
             self._rails.load_data([Rail.from_dict(d) for d in data.get("rails", [])])
-            self._settings = Settings.from_dict(data.get("settings", {}))
+            self._settings = Settings(**data.get("settings", {}))
 
         self.set_name(name)
 
     def data(self) -> dict:
         return {
-            "rails": [self._rails.to_dict() for rail in self._rails],
-            "settings": self._settings.to_dict() if self._settings else {}
+            "rails": self._rails.save_data(),
+            "settings": asdict(self._settings)
         }
 
     def name(self):

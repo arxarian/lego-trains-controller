@@ -35,6 +35,7 @@ class ProjectStorage(QObject):
         with file.open("r", encoding="utf-8") as f:
             data = json.load(f)
             return Project(name, data, self)
+        print("project loaded")
 
     @Slot(QObject)
     def saveProject(self, project: Project):
@@ -42,6 +43,7 @@ class ProjectStorage(QObject):
 
         with project.path.open("w", encoding="utf-8") as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
+        print("project saved")
 
     @Slot()
     def listProjects(self):

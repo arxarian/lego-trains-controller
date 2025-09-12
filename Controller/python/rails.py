@@ -18,7 +18,7 @@ class Rails(QAbstractListModel):
 
     def __init__(self, connectorRegister: ConnectorRegister, parent=None) -> None:
         super().__init__(parent)
-        self._railways = []
+        self._railways = []             # TODO - rename to rails
         self._registeredRails = {}      # id -> item
         self._loading = False
         connectorRegister.appendRail.connect(self.append)
@@ -49,17 +49,9 @@ class Rails(QAbstractListModel):
     loading_changed = Signal()
     loading = Property(bool, loading, set_loading, notify=loading_changed)
 
-    @Slot()
-    def save_data(self):
-        data = [rail.save_data() for rail in self._railways]
-        try:
-            with open("rails.json", "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-            print("saved")
-        except IOError as e:
-            print("Error saving rails:", e)
+    def save_data(self) -> list:
+        return [rail.save_data() for rail in self._railways]
 
-    @Slot()
     def load_data(self, data: list):
         self.set_loading(True)
         self.resetModel()

@@ -1,65 +1,72 @@
-[
-  {
-    "id": 2,
-    "type": 1,
-    "rotator": {
-      "x": 147.5,
-      "y": 61.0,
-      "angle": 202.5
-    },
-    "x": 12.5,
-    "y": -61.0,
-    "connectors": [
-      {
-        "name": "start",
-        "connectedRailId": -1
-      },
-      {
-        "name": "end",
-        "connectedRailId": -1
-      }
-    ]
-  },
-  {
-    "id": 3,
-    "type": 1,
-    "rotator": {
-      "x": 147.5,
-      "y": 61.0,
-      "angle": 22.5
-    },
-    "x": 12.5,
-    "y": 579.0,
-    "connectors": [
-      {
-        "name": "start",
-        "connectedRailId": 4
-      },
-      {
-        "name": "end",
-        "connectedRailId": -1
-      }
-    ]
-  },
-  {
-    "id": 4,
-    "type": 0,
-    "rotator": {
-      "x": 160.0,
-      "y": 0.0,
-      "angle": 180.0
-    },
-    "x": -0.0,
-    "y": 640.0,
-    "connectors": [
-      {
-        "name": "start",
-        "connectedRailId": 3
-      },
-      {
-        "name": "end",
-        "connectedRailId": -1
-      }
-    ]
-  }
-]
+{
+    "rails": [
+        {
+            "id": 1,
+            "type": 0,
+            "rotator": {
+                "x": 0,
+                "y": 0,
+                "angle": 0
+            },
+            "x": 0,
+            "y": 0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 2
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 3
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "type": 1,
+            "rotator": {
+                "x": 267.0,
+                "y": 658.0,
+                "angle": 0.0
+            },
+            "x": -107.0,
+            "y": -658.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": -1
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 1
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "type": 1,
+            "rotator": {
+                "x": 267.0,
+                "y": 658.0,
+                "angle": -180.0
+            },
+            "x": -107.0,
+            "y": -18.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": -1
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 1
+                }
+            ]
+        }
+    ],
+    "settings": {
+        "canvas_x": 0,
+        "canvas_y": 0,
+        "canvas_zoom": 1
+    }
+}
