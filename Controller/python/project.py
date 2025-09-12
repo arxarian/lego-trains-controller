@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
 from pathlib import Path
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from PySide6.QtCore import QObject, Signal, Property
 
@@ -11,15 +11,16 @@ from connectorregister import ConnectorRegister
 
 @dataclass
 class Settings:
-    canvas_position: dict
+    canvas_position: dict=field(default_factory={"x": 0, "y": 0})
     zoom: float=1
 
 class Project(QObject):
     def __init__(self, name: str="", data: dict=None, parent=None):
         super().__init__(parent)
         self._named = False
-        self._connectorRegister = ConnectorRegister()
-        self._rails = Rails(self._connectorRegister)
+        self._connectorRegister = ConnectorRegister(self)
+        self._rails = Rails(self._connectorRegister, self)
+        self._settings = Settings
 
         if data:
             self._rails.load_data([Rail.from_dict(d) for d in data.get("rails", [])])
