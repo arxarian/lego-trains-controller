@@ -25,7 +25,7 @@ class ProjectStorage(QObject):
         self.currentProject_changed.emit()
 
     currentProject_changed = Signal()
-    currentProject = Property(str, currentProject, set_currentProject, notify=currentProject_changed)
+    currentProject = Property(QObject, currentProject, set_currentProject, notify=currentProject_changed)
 
     @Slot(str)
     def loadProject(self, name: str) -> Project:
