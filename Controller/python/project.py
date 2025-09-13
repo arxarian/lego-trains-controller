@@ -34,7 +34,6 @@ class Project(QObject):
 
     def set_name(self, value):
         self._name = value
-        self._path = Path(self._name + ".json") if self._name else Path()
         self.name_changed.emit()
 
         self.set_named(self._name != str())
@@ -50,17 +49,7 @@ class Project(QObject):
         self.named_changed.emit()
 
     named_changed = Signal()
-    named = Property(str, named, set_named, notify=named_changed)
-
-    def path(self):
-        return self._path
-
-    def set_path(self, value):
-        self._path = value
-        self.path_changed.emit()
-
-    path_changed = Signal()
-    path = Property(Path, path, set_path, notify=path_changed)
+    named = Property(bool, named, set_named, notify=named_changed)
 
     def connectorRegister(self):
         return self._connectorRegister
@@ -90,4 +79,4 @@ class Project(QObject):
         self.settings_changed.emit()
 
     settings_changed = Signal()
-    settings = Property(str, settings, set_settings, notify=settings_changed)
+    settings = Property(QObject, settings, set_settings, notify=settings_changed)

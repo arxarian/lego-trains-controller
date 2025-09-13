@@ -31,6 +31,6 @@
         "qml/ControlPanel.qml",
         "qml/Connectors.qml",
         "qml/SelectedMarker.qml",
-        "rails.json"
+        "projects/rails.json"
     ]
 }
