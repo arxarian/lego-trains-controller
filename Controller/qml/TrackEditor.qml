@@ -4,10 +4,10 @@ import QtQuick.Controls
 Item {
     id: root
 
-    property real scaleFactor: 0.2
-    property real minimalScale: 0.1
-    property real maximalScale: 3
-    property bool animationEnabled: !mouseArea.pressed
+    readonly property real scaleFactor: 0.05
+    readonly property real minimalScale: 0.05
+    readonly property real maximalScale: 0.4
+    readonly property bool animationEnabled: !mouseArea.pressed
 
     MouseArea {
         id: mouseArea
@@ -93,7 +93,7 @@ Item {
 
         Behavior on scale {
             enabled: root.animationEnabled
-            NumberAnimation { duration: area.scale > 1.5 ? 150 : 250 }
+            NumberAnimation { duration: area.scale > 0.25 ? 150 : 250 }
         }
 
         Behavior on x {
