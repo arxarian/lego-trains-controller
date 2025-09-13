@@ -67,6 +67,6 @@
     "settings": {
         "canvas_x": 0,
         "canvas_y": 0,
-        "canvas_zoom": 1
+        "canvas_zoom": 0.3
     }
 }

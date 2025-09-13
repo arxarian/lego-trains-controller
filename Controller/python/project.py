@@ -1,19 +1,13 @@
 # This Python file uses the following encoding: utf-8
 
 from pathlib import Path
-from dataclasses import dataclass, asdict
 
 from PySide6.QtCore import QObject, Signal, Property
 
 from rail import Rail
 from rails import Rails
+from settings import Settings
 from connectorregister import ConnectorRegister
-
-@dataclass
-class Settings:
-    canvas_x: float=0
-    canvas_y: float=0
-    canvas_zoom: float=1
 
 class Project(QObject):
     def __init__(self, name: str="", data: dict=None, parent=None):
@@ -25,14 +19,14 @@ class Project(QObject):
 
         if data:
             self._rails.load_data([Rail.load_data(d, self._rails) for d in data.get("rails", [])])
-            self._settings = Settings(data.get("settings", {}))
+            self._settings = Settings.load_data(data.get("settings", {}), self)
 
         self.set_name(name)
 
     def data(self) -> dict:
         return {
             "rails": self._rails.save_data(),
-            "settings": asdict(self._settings)
+            "settings": self._settings.save_data()
         }
 
     def name(self):

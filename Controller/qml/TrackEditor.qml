@@ -47,9 +47,9 @@ Item {
         id: wheel
         onWheel: (event) => {
             if (event.angleDelta.y > 0) {
-                area.scale = Math.min(maximalScale, area.scale + scaleFactor)
+                settings.canvas_zoom = Math.min(maximalScale, area.scale + scaleFactor)
             } else {
-                area.scale = Math.max(minimalScale, area.scale - scaleFactor)
+                settings.canvas_zoom = Math.max(minimalScale, area.scale - scaleFactor)
             }
         }
     }
@@ -58,7 +58,7 @@ Item {
         id: area
         height: parent.height
         width: parent.width
-        scale: 0.3
+        scale: settings.canvas_zoom
 
         Repeater {
             model: rails

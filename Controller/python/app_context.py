@@ -28,6 +28,7 @@ class AppContext:
     @Slot()
     def updateProjectProperties(self):
             self.setContextProperty("project", self.projectStorage.currentProject)
+            self.setContextProperty("settings", self.projectStorage.currentProject.settings)
             self.setContextProperty("connectorRegister", self.projectStorage.currentProject.connectorRegister)
             self.setContextProperty("rails", self.projectStorage.currentProject.rails)
 
