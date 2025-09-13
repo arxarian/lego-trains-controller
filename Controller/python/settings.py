@@ -12,7 +12,7 @@ class Settings(QObject):
         self._canvas_zoom = canvas_zoom
 
     def save_data(self):
-        return {"canvas_x": self._canvas_x, "canvas_y": self._canvas_y,
+        return {"canvas_x": round(self._canvas_x, 1), "canvas_y": round(self._canvas_y, 1),
             "canvas_zoom": round(self._canvas_zoom, 2)}
 
     def load_data(data, parent):
