@@ -89,13 +89,13 @@ class Rails(QAbstractListModel):
         print("rail", id, "not found")
         return None
 
-    def connectRails(self, event_0: ConnectorEvent, event_1: ConnectorEvent):
-            rail_0 = self.findRailData(event_0.railId)
-            rail_1 = self.findRailData(event_1.railId)
+    def connectRails(self, connector_0: ConnectorEvent, connector_1: ConnectorEvent):
+            rail_0 = self.findRailData(connector_0.railId)
+            rail_1 = self.findRailData(connector_1.railId)
 
             if rail_0 and rail_1:
-                rail_0.connectTo(event_1.railId, event_0.connectorIndex)
-                rail_1.connectTo(event_0.railId, event_1.connectorIndex)
+                rail_0.connectTo(connector_1.railId, connector_0.connectorIndex)
+                rail_1.connectTo(connector_0.railId, connector_1.connectorIndex)
 
     def append(self, connectorEvent: ConnectorEvent):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())

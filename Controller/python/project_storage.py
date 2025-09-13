@@ -11,7 +11,7 @@ class ProjectStorage(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.projects = []
-        self.base_path = Path("projects")
+        self.base_path = Path("projects")   # TODO - is it used?
         self.base_path.mkdir(parents=True, exist_ok=True)
         self._currentProject = Project("rails", parent=self)  # a default projet name for now
 
@@ -27,15 +27,15 @@ class ProjectStorage(QObject):
 
     @Slot(str)
     def loadProject(self, name: str) -> Project:
-        file = self.project_file(name + ".json")
+        file = Path(name + ".json")
 
         if not file.exists():
             raise FileNotFoundError(f"Project '{name}' not found")
 
         with file.open("r", encoding="utf-8") as f:
             data = json.load(f)
-            return Project(name, data, self)
-        print("project loaded")
+            self.set_currentProject(Project(name, data, self))
+            print("project loaded")
 
     @Slot(QObject)
     def saveProject(self, project: Project):

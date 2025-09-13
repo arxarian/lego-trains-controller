@@ -24,8 +24,8 @@ class Project(QObject):
         self._settings = Settings()
 
         if data:
-            self._rails.load_data([Rail.from_dict(d) for d in data.get("rails", [])])
-            self._settings = Settings(**data.get("settings", {}))
+            self._rails.load_data([Rail.load_data(d, self._rails) for d in data.get("rails", [])])
+            self._settings = Settings(data.get("settings", {}))
 
         self.set_name(name)
 
