@@ -16,6 +16,10 @@
         "python/connector.py",
         "python/rotator.py",
         "python/connectorregister.py",
+        "python/project_storage.py",
+        "python/project.py",
+        "python/app_context.py",
+        "python/settings.py",
         "qml/Main.qml",
         "qml/qmldir",
         "qml/DiscoverDevices.qml",
@@ -27,6 +31,6 @@
         "qml/ControlPanel.qml",
         "qml/Connectors.qml",
         "qml/SelectedMarker.qml",
-        "rails.json"
+        "projects/rails.json"
     ]
 }

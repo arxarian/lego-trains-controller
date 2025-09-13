@@ -7,6 +7,7 @@ Item {
     property real scaleFactor: 0.2
     property real minimalScale: 0.1
     property real maximalScale: 3
+    property bool animationEnabled: !mouseArea.pressed
 
     MouseArea {
         id: mouseArea
@@ -24,8 +25,8 @@ Item {
             mouseArea.offsetY = mouse.y
         }
         onPositionChanged: (mouse) => {
-            area.x = mouse.x - mouseArea.offsetX + mouseArea.startX
-            area.y = mouse.y - mouseArea.offsetY + mouseArea.startY
+            settings.canvas_x = mouse.x - mouseArea.offsetX + mouseArea.startX
+            settings.canvas_y = mouse.y - mouseArea.offsetY + mouseArea.startY
         }
 
         onClicked: {
@@ -47,18 +48,20 @@ Item {
         id: wheel
         onWheel: (event) => {
             if (event.angleDelta.y > 0) {
-                area.scale = Math.min(maximalScale, area.scale + scaleFactor)
+                settings.canvas_zoom = Math.min(maximalScale, area.scale + scaleFactor)
             } else {
-                area.scale = Math.max(minimalScale, area.scale - scaleFactor)
+                settings.canvas_zoom = Math.max(minimalScale, area.scale - scaleFactor)
             }
         }
     }
 
     Item {
         id: area
+        x: settings ? settings.canvas_x : 0
+        y: settings ? settings.canvas_y : 0
         height: parent.height
         width: parent.width
-        scale: 0.3
+        scale: settings ? settings.canvas_zoom : 1
 
         Repeater {
             model: rails
@@ -89,7 +92,18 @@ Item {
         }
 
         Behavior on scale {
+            enabled: root.animationEnabled
             NumberAnimation { duration: area.scale > 1.5 ? 150 : 250 }
+        }
+
+        Behavior on x {
+            enabled: root.animationEnabled
+            NumberAnimation { duration: 250 }
+        }
+
+        Behavior on y {
+            enabled: root.animationEnabled
+            NumberAnimation { duration: 250 }
         }
     }
 }
