@@ -15,10 +15,11 @@ class Project(QObject):
         self._named = False
         self._connectorRegister = ConnectorRegister(self)
         self._rails = Rails(self._connectorRegister, self)
-        self._settings = Settings()
+        self._settings = Settings(parent=self)
 
         if data:
             self._rails.load_data([Rail.load_data(d, self._rails) for d in data.get("rails", [])])
+            self._settings.deleteLater()
             self._settings = Settings.load_data(data.get("settings", {}), self)
 
         self.set_name(name)
