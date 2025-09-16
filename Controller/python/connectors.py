@@ -76,7 +76,7 @@ class Connectors(QAbstractListModel):
         return None
 
     @Slot(result=QObject)
-    def setNextConnector(self):
+    def getAndSetNextConnector(self):
         for connector in self._connectors:
             if connector.connected():
                 nextConnector = self._connectors[connector.next]
