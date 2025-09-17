@@ -106,15 +106,17 @@ class Rails(QAbstractListModel):
             fromRail = self.findRailData(fromEvent.railId)
 
             # connect the new rail to the previous one
-            toRail.connectTo(fromEvent.railId, 0) # HERE
+            toRail.connectTo(fromEvent.railId, 0)
             # and the previous one to the new one
             fromRail.connectTo(toRail.id, fromEvent.connectorIndex)
 
             toDir = toRail.connectors.get(0).dir
             fromDir = fromRail.connectors.get(fromEvent.connectorIndex).dir
 
+            # if the dir is the same, set the next connector so for example when placing curved track,
+            # the rotation is preserved
             if fromDir == toDir:
-                toRail.connectors.getAndSetNextConnector()
+                toRail.connectors.setNextConnector()
 
         self.endInsertRows()
 
