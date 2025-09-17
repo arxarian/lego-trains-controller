@@ -67,10 +67,10 @@ Image {
         const fromConnector = siblingData.connectors.findFromConnector(root.railData.id)
 
         const start = (fromConnector.dir === Globals.dir.start)
-        const toConnector = root.railData.connectors.get(0)
+        const toConnector = root.railData.connectors.getFirstConnected()
         const rotationOffset = (toConnector.angle - fromConnector.angle) * 22.5
 
-        root.railData.rotator.angle = siblingData.rotator.angle + (start ? 180 : 0)
+        root.railData.rotator.angle = siblingData.rotator.angle
 
         const siblingItem = rails.findRailItem(siblingId)
 
