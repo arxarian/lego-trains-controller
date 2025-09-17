@@ -97,17 +97,26 @@ class Rails(QAbstractListModel):
                 rail_0.connectTo(connector_1.railId, connector_0.connectorIndex)
                 rail_1.connectTo(connector_0.railId, connector_1.connectorIndex)
 
-    def append(self, connectorEvent: ConnectorEvent):
+    def append(self, fromEvent: ConnectorEvent):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-        self._rails.append(Rail(connectorEvent.railType))
+        self._rails.append(Rail(fromEvent.railType)) # the first rail has to be appended anyway
 
-        if connectorEvent.railId > 0:
+        if fromEvent.railId > 0:
+            toRail = self._rails[-1]
+            fromRail = self.findRailData(fromEvent.railId)
+
             # connect the new rail to the previous one
-            self._rails[-1].connectTo(connectorEvent.railId, 0)
+            toRail.connectTo(fromEvent.railId, 0)
             # and the previous one to the new one
-            rail = self.findRailData(connectorEvent.railId)
-            if rail:
-                rail.connectTo(self._rails[-1].id, connectorEvent.connectorIndex)
+            fromRail.connectTo(toRail.id, fromEvent.connectorIndex)
+
+            toDir = toRail.connectors.get(0).dir
+            fromDir = fromRail.connectors.get(fromEvent.connectorIndex).dir
+
+            # if the dir is the same, set the next connector so for example when placing curved track,
+            # the rotation is preserved
+            if fromDir == toDir:
+                toRail.connectors.setNextConnector()
 
         self.endInsertRows()
 

@@ -4,10 +4,6 @@
         { "from": "start", "to": "end", "length": 16 },
         { "from": "end", "to": "start", "length": 16 }
     ],
-    "ports": [
-        { "port": "start", "connectors": [0] },
-        { "port": "end", "connectors": [1] }
-    ],
     "connectors":[
         { "name": "start", "dir": "start", "angle": 1, "rotator": { "x": 147.5, "y": 61, "angle": 202.5 },
             "next": 1 },

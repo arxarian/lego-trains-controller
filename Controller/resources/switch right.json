@@ -6,11 +6,6 @@
         { "from": "start", "to": "end_curved", "length": 35 },
         { "from": "end_curved", "to": "start", "length": 35 }
     ],
-    "ports": [
-        { "port": "start", "connectors": [0] },
-        { "port": "end_straight", "connectors": [1] },
-        { "port": "end_curved", "connectors": [2] }
-    ],
     "connectors":[
         { "name": "start", "dir": "start", "angle": 0, "rotator": { "x": 669.5, "y": 0, "angle": 180 },
             "next": 1 },

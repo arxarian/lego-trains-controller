@@ -85,6 +85,13 @@ class Connectors(QAbstractListModel):
                 return nextConnector
         return None
 
+    @Slot(result=QObject)
+    def getFirstConnected(self):
+        for connector in self._connectors:
+            if connector.connected():
+                return connector
+        return None
+
     @Slot(int, result=QObject)
     def get(self, index):
         if 0 <= index < len(self._connectors):
