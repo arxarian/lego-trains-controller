@@ -36,7 +36,7 @@ class Markers(QAbstractListModel):
     def setModel(self, data):
         self.beginInsertRows(QModelIndex(), 0, len(data))
         for i in data:
-            self._items.append(Marker(i, self))
+            self._items.append(Marker(data=i, parent=self))
         self.endInsertRows()
 
     def save_data(self):

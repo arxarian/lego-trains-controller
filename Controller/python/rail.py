@@ -140,7 +140,7 @@ class Rail(QObject):
     connectors = Property(QObject, connectors, constant=True)
 
     def markers(self):
-        return self._connectors
+        return self._markers
 
     markers = Property(QObject, markers, constant=True)
 

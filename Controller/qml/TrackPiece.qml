@@ -154,6 +154,12 @@ Image {
         model: root.railData.connectors
     }
 
+    Markers {
+        id: markers
+        anchors.fill: parent
+        model: root.railData.markers
+    }
+
     Behavior on x {
         enabled: animation.enabled
         NumberAnimation { duration: animation.duration; easing.type: animation.type }

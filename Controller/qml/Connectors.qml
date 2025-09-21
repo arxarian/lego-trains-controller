@@ -15,7 +15,6 @@ Item
             property Connector connector: model.object
             property real size: 100
 
-            rotation: item.connector.angle * -22.5
             visible: item.connector.visible
             x: item.connector.rotator.x - item.size / 2
             y: item.connector.rotator.y - item.size / 2

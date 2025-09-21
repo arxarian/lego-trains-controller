@@ -32,6 +32,12 @@ Column {
             checked: Globals.rotationPointsVisible
             onClicked: Globals.rotationPointsVisible = checked
         }
+
+        CheckBox {
+            text: "Marker Points"
+            checked: Globals.markerPointsVisible
+            onClicked: Globals.markerPointsVisible = checked
+        }
     }
 
     Row {

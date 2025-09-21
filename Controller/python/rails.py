@@ -99,7 +99,7 @@ class Rails(QAbstractListModel):
 
     def append(self, fromEvent: ConnectorEvent):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-        self._rails.append(Rail(fromEvent.railType)) # the first rail has to be appended anyway
+        self._rails.append(Rail(type=fromEvent.railType, parent=self)) # the first rail has to be appended anyway
 
         if fromEvent.railId > 0:
             toRail = self._rails[-1]
