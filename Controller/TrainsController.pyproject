@@ -14,6 +14,8 @@
         "python/network.py",
         "python/connectors.py",
         "python/connector.py",
+        "python/markers.py",
+        "python/marker.py",
         "python/rotator.py",
         "python/connectorregister.py",
         "python/project_storage.py",

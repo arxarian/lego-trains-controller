@@ -9,5 +9,6 @@
             "next": 1 },
         { "name": "end", "dir": "end", "angle": 0, "rotator": { "x": 267, "y": 658, "angle": -202.5 },
             "next": 0 }
-    ]
+    ],
+    "markers": []
 }

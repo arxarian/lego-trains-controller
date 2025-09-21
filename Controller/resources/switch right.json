@@ -13,5 +13,6 @@
             "next": 2 },
         { "name": "end_straight", "dir": "end", "angle": 0, "rotator": { "x": 669.5, "y": 1279, "angle": 22.5 },
             "next": 0 }
-    ]
+    ],
+    "markers": []
 }

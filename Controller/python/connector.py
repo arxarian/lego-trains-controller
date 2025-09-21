@@ -20,7 +20,6 @@ class Connector(QObject):
         parent=None):
 
         super().__init__(parent)
-        data = data or {}
         self._name = name
         self._dir = str()
         self._angle = 0

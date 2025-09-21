@@ -3,8 +3,6 @@ from __future__ import annotations
 from PySide6.QtCore import QObject, Property, Signal
 from PySide6.QtQml import QmlElement
 
-import inspect
-
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 

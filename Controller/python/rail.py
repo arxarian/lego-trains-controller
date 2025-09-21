@@ -6,6 +6,7 @@ from PySide6.QtCore import QObject, Property, Signal, QEnum
 from PySide6.QtQml import QmlElement
 
 from connectors import Connectors
+from markers import Markers
 from rotator import Rotator
 
 QML_IMPORT_NAME = "TrainView"
@@ -69,7 +70,8 @@ class Rail(QObject):
     #     - y
 
     def __init__(self, type: RailType=RailType.Undefined, id: int=0, length: int=0, x: float=0,
-        y: float=0, rotator: Rotator=None, connectors: Connectors=None, parent=None):
+        y: float=0, rotator: Rotator=None, connectors: Connectors=None, markers: Markers=None,
+        parent=None):
 
         super().__init__(parent)
         self._id = Rail.generate_id(id)             # int
@@ -79,8 +81,9 @@ class Rail(QObject):
         self._x = x                                 # float
         self._y = y                                 # float
         self._rotator = rotator if rotator is not None else Rotator(parent=self)    # Rotator/QObject
-
+        self._markers = markers if markers is not None else Markers(parent=self)    # QAbstractListModel
         self._connectors = connectors if connectors is not None else Connectors(parent=self)    # QAbstractListModel
+
         self._paths = {}                            # dictionary
 
         self.load_metadata()
@@ -96,6 +99,9 @@ class Rail(QObject):
                 if hasattr(self, key):
                     if key == "connectors":
                         self._connectors.setModel(value)
+                        continue
+                    if key == "markers":
+                        self._markers.setModel(value)
                         continue
                     setattr(self, key, value)
 
@@ -132,6 +138,11 @@ class Rail(QObject):
         return self._connectors
 
     connectors = Property(QObject, connectors, constant=True)
+
+    def markers(self):
+        return self._connectors
+
+    markers = Property(QObject, markers, constant=True)
 
     def type(self):
         return self._type
