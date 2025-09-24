@@ -15,4 +15,5 @@ QtObject {
     property bool markerPointsVisible: true
 
     property int selectedType: Rail.Straight   // TODO - fix RailType registration
+    property int selectedMarker: -1
 }

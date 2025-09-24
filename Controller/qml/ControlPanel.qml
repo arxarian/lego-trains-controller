@@ -69,4 +69,31 @@ Column {
             onClicked: Globals.selectedType = Rail.SwitchRight
         }
     }
+
+    ButtonGroup { id: group }
+
+    Row {
+        Label {
+            text: "Markers"
+        }
+
+        Repeater {
+            model: markerTypes
+
+            Button {
+                id: item
+                property MarkerType marker: model.object
+
+                checkable: true
+                text: item.marker.name
+
+                onClicked: {
+                    Globals.selectedMarker = index
+                    Globals.selectedRail = Rail.Undefined
+                }
+
+                ButtonGroup.group: group
+            }
+        }
+    }
 }
