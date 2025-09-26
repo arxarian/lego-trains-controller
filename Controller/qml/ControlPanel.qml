@@ -40,37 +40,39 @@ Column {
         }
     }
 
+    ButtonGroup { id: group }
+
     Row {
-        Button {
-            checked: Globals.selectedType === Rail.Straight
-            checkable: true
-            text: "Straight"
-            onClicked: Globals.selectedType = Rail.Straight
+        id: rowRails
+
+        property var map: {"Straight": Rail.Straight, "Curved": Rail.Curved,
+            "Switch Left": Rail.SwitchLeft, "Switch Right": Rail.SwitchRight}
+
+        Label {
+            text: "Rails"
         }
 
-        Button {
-            checked: Globals.selectedType === Rail.Curved
-            checkable: true
-            text: "Curved"
-            onClicked: Globals.selectedType = Rail.Curved
-        }
+        Repeater {
+            model: railTypes
 
-        Button {
-            checked: Globals.selectedType === Rail.SwitchLeft
-            checkable: true
-            text: "Switch Left"
-            onClicked: Globals.selectedType = Rail.SwitchLeft
-        }
+            Button {
+                 id: railItem
+                property RailType rail: model.object
 
-        Button {
-            checked: Globals.selectedType === Rail.SwitchRight
-            checkable: true
-            text: "Switch Right"
-            onClicked: Globals.selectedType = Rail.SwitchRight
+                checked: Globals.selectedRail === index  // just for the init
+                checkable: true
+                text: railItem.rail.name
+                onClicked: {
+                    Globals.selectedMarker = -1
+                    Globals.selectedRail = index
+                    markerTypes.markersActive = false
+                    railTypes.railsActive = true
+                }
+
+                ButtonGroup.group: group
+            }
         }
     }
-
-    ButtonGroup { id: group }
 
     Row {
         Label {
@@ -81,15 +83,17 @@ Column {
             model: markerTypes
 
             Button {
-                id: item
+                id: markerItem
                 property MarkerType marker: model.object
 
                 checkable: true
-                text: item.marker.name
+                text: markerItem.marker.name
 
                 onClicked: {
                     Globals.selectedMarker = index
-                    Globals.selectedRail = Rail.Undefined
+                    Globals.selectedRail = -1
+                    markerTypes.markersActive = true
+                    railTypes.railsActive = false
                 }
 
                 ButtonGroup.group: group

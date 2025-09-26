@@ -7,7 +7,7 @@ Item
 
     property var model
 
-    visible: Globals.markerPointsVisible
+    visible: Globals.markerPointsVisible && markerTypes.markersActive
 
     Repeater {
         model: root.model
@@ -33,7 +33,7 @@ Item
                 onClicked: function(mouse) {
                     console.log("marked clicked", JSON.stringify(item.marker))
                     //mouse.accepted = false
-                    //connectorRegister.addEvent(Globals.selectedType, root.railId, index)
+                    //connectorRegister.addEvent(Globals.selectedRail, root.railId, index)
                 }
             }
         }

@@ -8,6 +8,8 @@ Item
     property int railId: -1
     property var model  // TODO - why var and not Connectors?
 
+    visible: railTypes.railsActive
+
     Repeater {
         model: root.model
         delegate: Rectangle {
@@ -35,7 +37,7 @@ Item
                 propagateComposedEvents: true
                 onClicked: function(mouse) {
                     mouse.accepted = false
-                    connectorRegister.addEvent(Globals.selectedType, root.railId, index)
+                    connectorRegister.addEvent(Globals.selectedRail, root.railId, index)
                 }
             }
         }
