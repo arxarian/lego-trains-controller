@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from PySide6.QtCore import QObject, Signal, Property
 from PySide6.QtQml import QmlElement
+from PySide6.QtGui import QColor
+
 from rotator import Rotator
 
 QML_IMPORT_NAME = "TrainView"
@@ -10,9 +12,10 @@ QML_IMPORT_MAJOR_VERSION = 1
 @QmlElement
 class Marker(QObject):
 
-    def __init__(self, data: dict=None, visible=True, parent=None):
+    def __init__(self, data: dict=None, visible=False, parent=None):
         super().__init__(parent)
         self._visible = visible
+        self._color = QColor("gold")
         self._rotator = None
 
         self.load_metadata(data)
@@ -34,6 +37,16 @@ class Marker(QObject):
 
     visible_changed = Signal()
     visible = Property(bool, visible, set_visible, notify=visible_changed)
+
+    def color(self):
+        return self._color
+
+    def set_color(self, value):
+        self._color = value
+        self.color_changed.emit()
+
+    color_changed = Signal()
+    color = Property(QColor, color, set_color, notify=color_changed)
 
     def rotator(self):
         return self._rotator

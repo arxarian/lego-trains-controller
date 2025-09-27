@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
-from PySide6.QtCore import QAbstractListModel, Property, Slot, QEnum, Qt, QModelIndex, QByteArray, QObject
+from PySide6.QtCore import QAbstractListModel, Slot, QEnum, Qt, QModelIndex, QByteArray
 
 from marker import Marker
 

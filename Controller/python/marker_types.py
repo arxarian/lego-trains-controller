@@ -5,7 +5,8 @@ from __future__ import annotations
 import json
 
 from enum import IntEnum
-from PySide6.QtCore import QAbstractListModel, Slot, QEnum, Qt, QModelIndex, QByteArray, Signal, Property
+from PySide6.QtCore import (QAbstractListModel, Slot, Qt, QEnum, QModelIndex, QByteArray,
+    Signal, Property, QObject)
 
 from marker_type import MarkerType
 
@@ -45,6 +46,12 @@ class MarkerTypes(QAbstractListModel):
             self.beginInsertRows(QModelIndex(), 0, len(data))
             self._items = [MarkerType(data=d, parent=self) for d in data]
             self.endInsertRows()
+
+    @Slot(int, result=QObject)
+    def get(self, index: int):
+        if index < 0 or index >= self.rowCount():
+            return None
+        return self._items[index]
 
     def markersActive(self):
         return self._markersActive

@@ -11,29 +11,44 @@ Item
 
     Repeater {
         model: root.model
-        delegate: Rectangle {
+        delegate: Item {
             id: item
+
             property Marker marker: model.object
-            property real size: 50
 
-            visible: item.marker.visible
-            x: item.marker.rotator.x - item.size / 2
-            y: item.marker.rotator.y - item.size / 2
-            rotation: item.marker.rotator.angle
+            Rectangle {
 
-            radius: item.size
-            width: item.size
-            height: item.size
+                id: markerBrick
+                visible: item.marker.visible
+                anchors.centerIn: markerPoint
+                color: item.marker.color
+                width: 160
+                height: 80
+            }
 
-            color: "#88FF00FF"
+            Rectangle {
+                id: markerPoint
 
-            MouseArea {
-                anchors.fill: parent
-                propagateComposedEvents: true
-                onClicked: function(mouse) {
-                    console.log("marked clicked", JSON.stringify(item.marker))
-                    //mouse.accepted = false
-                    //connectorRegister.addEvent(Globals.selectedRail, root.railId, index)
+                property real size: 50
+
+                visible: !item.marker.visible
+                x: item.marker.rotator.x - markerPoint.size / 2
+                y: item.marker.rotator.y - markerPoint.size / 2
+                rotation: item.marker.rotator.angle
+
+                radius: markerPoint.size
+                width: markerPoint.size
+                height: markerPoint.size
+
+                color: "#88FF00FF"
+
+                MouseArea {
+                    anchors.fill: parent
+                    propagateComposedEvents: true
+                    onClicked: function(mouse) {
+                        item.marker.color = markerTypes.get(Globals.selectedMarker).color
+                        item.marker.visible = true
+                    }
                 }
             }
         }
