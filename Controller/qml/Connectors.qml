@@ -8,7 +8,7 @@ Item
     property int railId: -1
     property var model  // TODO - why var and not Connectors?
 
-    visible: railTypes.railsActive
+    visible: railTypes ? railTypes.railsActive : false
 
     Repeater {
         model: root.model
