@@ -1,7 +1,5 @@
 # This Python file uses the following encoding: utf-8
 
-from pathlib import Path
-
 from PySide6.QtCore import QObject, Signal, Property
 
 from rail import Rail

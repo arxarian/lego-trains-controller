@@ -7,7 +7,7 @@ Item
 
     property var model
 
-    visible: Globals.markerPointsVisible && markerTypes.markersActive
+    visible: markerTypes.markersActive
 
     Repeater {
         model: root.model
