@@ -20,7 +20,6 @@ class Connector(QObject):
         parent=None):
 
         super().__init__(parent)
-        data = data or {}
         self._name = name
         self._dir = str()
         self._angle = 0
@@ -33,6 +32,9 @@ class Connector(QObject):
         self.load_metadata(data)
 
     def load_metadata(self, data):
+        if data == None:
+            return
+
         for key, value in data.items():
             if hasattr(self, key):
                 if key == "rotator":

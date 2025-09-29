@@ -91,7 +91,7 @@ class Devices(QAbstractListModel):
             await client.connect()
             if client.is_connected:
                 print("Connected")
-                self.append(Device(client, hub_name))
+                self.append(Device(client=client, hubname=hub_name, parent=self))
                 await self._devices[-1].configure()
             else:
                 print("Connection to", hub_name, "failed")

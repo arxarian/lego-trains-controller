@@ -13,5 +13,6 @@ QtObject {
     property bool trackFrameVisible: false
     property bool rotationPointsVisible: false
 
-    property int selectedType: Rail.Straight   // TODO - fix RailType registration
+    property int selectedRail: Rail.Straight   // TODO - fix RailType registration
+    property int selectedMarker: -1
 }

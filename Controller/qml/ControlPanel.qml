@@ -34,33 +34,61 @@ Column {
         }
     }
 
+    ButtonGroup { id: group }
+
     Row {
-        Button {
-            checked: Globals.selectedType === Rail.Straight
-            checkable: true
-            text: "Straight"
-            onClicked: Globals.selectedType = Rail.Straight
+        id: rowRails
+
+        Label {
+            text: "Rails"
         }
 
-        Button {
-            checked: Globals.selectedType === Rail.Curved
-            checkable: true
-            text: "Curved"
-            onClicked: Globals.selectedType = Rail.Curved
+        Repeater {
+            model: railTypes
+
+            Button {
+                 id: railItem
+                property RailType rail: model.object
+
+                checked: Globals.selectedRail === index  // just for the init
+                checkable: true
+                text: railItem.rail.name
+                onClicked: {
+                    Globals.selectedMarker = -1
+                    Globals.selectedRail = index
+                    markerTypes.markersActive = false
+                    railTypes.railsActive = true
+                }
+
+                ButtonGroup.group: group
+            }
+        }
+    }
+
+    Row {
+        Label {
+            text: "Markers"
         }
 
-        Button {
-            checked: Globals.selectedType === Rail.SwitchLeft
-            checkable: true
-            text: "Switch Left"
-            onClicked: Globals.selectedType = Rail.SwitchLeft
-        }
+        Repeater {
+            model: markerTypes
 
-        Button {
-            checked: Globals.selectedType === Rail.SwitchRight
-            checkable: true
-            text: "Switch Right"
-            onClicked: Globals.selectedType = Rail.SwitchRight
+            Button {
+                id: markerItem
+                property MarkerType marker: model.object
+
+                checkable: true
+                text: markerItem.marker.name
+
+                onClicked: {
+                    Globals.selectedMarker = index
+                    Globals.selectedRail = -1
+                    markerTypes.markersActive = true
+                    railTypes.railsActive = false
+                }
+
+                ButtonGroup.group: group
+            }
         }
     }
 }
