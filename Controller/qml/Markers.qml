@@ -20,6 +20,7 @@ Item
 
                 id: markerBrick
                 visible: item.marker.visible
+                rotation: item.marker.rotator.angle
                 anchors.centerIn: markerPoint
                 color: item.marker.color
                 width: 160
