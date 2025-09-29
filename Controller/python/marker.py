@@ -28,6 +28,12 @@ class Marker(QObject):
                     continue
                 setattr(self, key, value)
 
+    def save_data(self):
+        pass
+
+    def load_data(data, parent):
+        pass
+
     def visible(self):
         return self._visible
 
