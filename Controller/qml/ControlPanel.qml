@@ -39,9 +39,6 @@ Column {
     Row {
         id: rowRails
 
-        property var map: {"Straight": Rail.Straight, "Curved": Rail.Curved,
-            "Switch Left": Rail.SwitchLeft, "Switch Right": Rail.SwitchRight}
-
         Label {
             text: "Rails"
         }
