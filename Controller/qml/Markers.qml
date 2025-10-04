@@ -47,11 +47,12 @@ Item
                     anchors.fill: parent
                     propagateComposedEvents: true
                     onClicked: function(mouse) {
-                        if (Globals.selectedMarker < 0) {
+                        if (Globals.selectedMarker >= 0) {
                             item.marker.color = markerTypes.get(Globals.selectedMarker).color
                             item.marker.visible = true
                         } else {
-                            console.warn("Globals.selectedMarker equals to", Globals.selectedMarker)
+                            console.warn("Marker was not found, Globals.selectedMarker equals to",
+                                Globals.selectedMarker)
                         }
                     }
                 }

@@ -12,15 +12,18 @@ QML_IMPORT_MAJOR_VERSION = 1
 @QmlElement
 class Marker(QObject):
 
-    def __init__(self, data: dict=None, visible=False, parent=None):
+    def __init__(self, data: dict=None, color=None, parent=None):
         super().__init__(parent)
-        self._visible = visible
-        self._color = QColor("gold")
+        self._visible = False
+        self._color = color
         self._rotator = None
 
         self.load_metadata(data)
 
     def load_metadata(self, data):
+        if data == None:
+            return
+
         for key, value in data.items():
             if hasattr(self, key):
                 if key == "rotator":
@@ -29,10 +32,10 @@ class Marker(QObject):
                 setattr(self, key, value)
 
     def save_data(self):
-        pass
+         return { "color": self._color.name() } if self._color is not None else {}
 
     def load_data(data, parent):
-        pass
+        return Marker(color=data.get("color", None), parent=parent)
 
     def visible(self):
         return self._visible

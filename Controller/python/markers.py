@@ -14,7 +14,7 @@ class Markers(QAbstractListModel):
     def __init__(self, data: list=None, parent=None) -> None:
         super().__init__(parent)
         data = data or []
-        self._items = [Marker.load_data(d, self) for d in data]
+        self._items = []
 
     @Slot(QModelIndex, result=int)
     def rowCount(self, parent=QModelIndex()):
@@ -39,7 +39,11 @@ class Markers(QAbstractListModel):
         self.endInsertRows()
 
     def save_data(self):
-        data = [marker.save_data() for marker in self._items]
+        data = [
+            marker_data
+            for marker in self._items
+            if (marker_data := marker.save_data())
+        ]
         return data
 
     def load_data(data, parent):
