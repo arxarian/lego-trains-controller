@@ -33,12 +33,8 @@ class Marker(QObject):
                 setattr(self, key, value)
 
     def save_data(self):
-        if self._color is None:
-            return {}
-        return { "index": self._index, "color": self._color.name() }
-
-    def load_data(data, parent):
-        return Marker(color=data.get("color", None), parent=parent)
+        if self._color is not None:
+            return { "index": self._index, "color": self._color.name() }
 
     def visible(self):
         return self._visible

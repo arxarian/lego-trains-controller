@@ -42,7 +42,7 @@ class Markers(QAbstractListModel):
         for i, d in enumerate(metaData):
             self._items.append(Marker(data=d, index=i, color=self.resolveColor(i) , parent=self))
         self.endInsertRows()
-        self._data = []
+        self._data = [] # clear the original data, not needed anymore
 
     def save_data(self):
         data = [
