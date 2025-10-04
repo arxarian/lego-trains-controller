@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from enum import IntEnum
 from PySide6.QtCore import QAbstractListModel, Slot, QEnum, Qt, QModelIndex, QByteArray
+from PySide6.QtGui import QColor
 
 from marker import Marker
 
@@ -13,8 +14,8 @@ class Markers(QAbstractListModel):
 
     def __init__(self, data: list=None, parent=None) -> None:
         super().__init__(parent)
-        data = data or []
-        self._items = [Marker.load_data(d, self) for d in data]
+        self._data = data or []
+        self._items = []
 
     @Slot(QModelIndex, result=int)
     def rowCount(self, parent=QModelIndex()):
@@ -32,14 +33,23 @@ class Markers(QAbstractListModel):
         roles[Markers.Role.ObjectRole] = QByteArray(b"object")
         return roles
 
-    def setModel(self, data):
-        self.beginInsertRows(QModelIndex(), 0, len(data))
-        for i in data:
-            self._items.append(Marker(data=i, parent=self))
+    def resolveColor(self, index):
+        color = next((d["color"] for d in self._data if d["index"] == index), None)
+        return None if color is None else QColor(color)
+
+    def setModel(self, metaData):
+        self.beginInsertRows(QModelIndex(), 0, len(metaData))
+        for i, d in enumerate(metaData):
+            self._items.append(Marker(data=d, index=i, color=self.resolveColor(i) , parent=self))
         self.endInsertRows()
+        self._data = [] # clear the original data, not needed anymore
 
     def save_data(self):
-        data = [marker.save_data() for marker in self._items]
+        data = [
+            marker_data
+            for marker in self._items
+            if (marker_data := marker.save_data())
+        ]
         return data
 
     def load_data(data, parent):
