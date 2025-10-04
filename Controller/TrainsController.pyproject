@@ -34,7 +34,7 @@
         "qml/DiscoverDevices.qml",
         "qml/TrainControlPanel.qml",
         "qml/TrackEditor.qml",
-        "qml/TrackPiece.qml",
+        "qml/RailItem.qml",
         "qml/Globals.qml",
         "qml/RotationPoints.qml",
         "qml/ControlPanel.qml",

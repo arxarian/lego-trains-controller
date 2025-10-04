@@ -65,7 +65,7 @@ Item {
 
         Repeater {
             model: rails
-            delegate: TrackPiece {
+            delegate: RailItem {
                 railData: model.object
             }
         }
