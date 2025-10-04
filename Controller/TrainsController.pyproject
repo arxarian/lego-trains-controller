@@ -1,6 +1,7 @@
 {
     "files": [
         "main.py",
+        "projects/rails.json",
         "resources/rails_rc.py",
         "resources/straight.json",
         "resources/curved.json",
@@ -40,6 +41,7 @@
         "qml/Connectors.qml",
         "qml/Markers.qml",
         "qml/SelectedMarker.qml",
-        "projects/rails.json"
+        "qml/MarkerItem.qml",
+        "qml/SelectableItem.qml"
     ]
 }
