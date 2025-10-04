@@ -30,7 +30,7 @@ Item
 
                 property real size: 50
 
-                visible: markerTypes.markersActive && !item.marker.visible
+                visible: (markerTypes ? markerTypes.markersActive : true) && !item.marker.visible
                 x: item.marker.rotator.x - markerPoint.size / 2
                 y: item.marker.rotator.y - markerPoint.size / 2
                 rotation: item.marker.rotator.angle
