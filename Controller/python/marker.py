@@ -12,9 +12,10 @@ QML_IMPORT_MAJOR_VERSION = 1
 @QmlElement
 class Marker(QObject):
 
-    def __init__(self, data: dict=None, color=None, parent=None):
+    def __init__(self, data: dict=None, color=None, index=-1, parent=None):
         super().__init__(parent)
         self._visible = False
+        self._index = index
         self._color = color
         self._rotator = None
 
@@ -32,7 +33,9 @@ class Marker(QObject):
                 setattr(self, key, value)
 
     def save_data(self):
-         return { "color": self._color.name() } if self._color is not None else {}
+        if self._color is None:
+            return {}
+        return { "index": self._index, "color": self._color.name() }
 
     def load_data(data, parent):
         return Marker(color=data.get("color", None), parent=parent)
@@ -56,6 +59,16 @@ class Marker(QObject):
 
     color_changed = Signal()
     color = Property(QColor, color, set_color, notify=color_changed)
+
+    def index(self):
+        return self._index
+
+    def set_index(self, value):
+        self._index = value
+        self.index_changed.emit()
+
+    index_changed = Signal()
+    index = Property(int, index, set_index, notify=index_changed)
 
     def rotator(self):
         return self._rotator

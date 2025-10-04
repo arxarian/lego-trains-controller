@@ -34,8 +34,8 @@ class Markers(QAbstractListModel):
 
     def setModel(self, metaData):
         self.beginInsertRows(QModelIndex(), 0, len(metaData))
-        for i in metaData:
-            self._items.append(Marker(data=i, parent=self))
+        for i, d in enumerate(metaData):
+            self._items.append(Marker(data=d, index=i, parent=self))
         self.endInsertRows()
 
     def save_data(self):
