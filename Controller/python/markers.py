@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from enum import IntEnum
 from PySide6.QtCore import QAbstractListModel, Slot, QEnum, Qt, QModelIndex, QByteArray
+from PySide6.QtGui import QColor
 
 from marker import Marker
 
@@ -33,7 +34,8 @@ class Markers(QAbstractListModel):
         return roles
 
     def color(self, index):
-        return next((d["color"] for d in self._data if d["index"] == index), None)
+        color = next((d["color"] for d in self._data if d["index"] == index), None)
+        return None if color is None else QColor(color)
 
     def setModel(self, metaData):
         self.beginInsertRows(QModelIndex(), 0, len(metaData))
