@@ -29,6 +29,11 @@ Item {
 
             visible: item.marker.visible
             color: item.marker.color
+
+            onVisibleChanged: { if (visible) {
+                    selectableItem.forceActiveFocus()
+                }
+            }
         }
 
         Rectangle {

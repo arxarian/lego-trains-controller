@@ -10,6 +10,10 @@ Item {
         console.warn("no delete action defined")
     }
 
+    function rotateAction() {
+        console.warn("no rotate action defined")
+    }
+
     z: root.selected ? 10 : 0
 
     focus: true
@@ -17,6 +21,9 @@ Item {
     Keys.onPressed: (event)=> {
                         if (event.key === Qt.Key_Delete) {
                             root.deleteAction()
+                            event.accepted = true
+                        } else if (event.key === Qt.Key_R) {
+                            root.rotateAction()
                             event.accepted = true
                         }
                     }
