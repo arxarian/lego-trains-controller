@@ -14,7 +14,7 @@ class Marker(QObject):
 
     def __init__(self, data: dict=None, color=None, index=-1, parent=None):
         super().__init__(parent)
-        self._visible = False
+        self._visible = False if color is None else True
         self._index = index
         self._color = color
         self._rotator = None

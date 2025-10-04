@@ -13,7 +13,7 @@ class Markers(QAbstractListModel):
 
     def __init__(self, data: list=None, parent=None) -> None:
         super().__init__(parent)
-        data = data or []
+        self._data = data or []
         self._items = []
 
     @Slot(QModelIndex, result=int)
@@ -32,11 +32,15 @@ class Markers(QAbstractListModel):
         roles[Markers.Role.ObjectRole] = QByteArray(b"object")
         return roles
 
+    def color(self, index):
+        return next((d["color"] for d in self._data if d["index"] == index), None)
+
     def setModel(self, metaData):
         self.beginInsertRows(QModelIndex(), 0, len(metaData))
         for i, d in enumerate(metaData):
-            self._items.append(Marker(data=d, index=i, parent=self))
+            self._items.append(Marker(data=d, index=i, color=self.color(i) , parent=self))
         self.endInsertRows()
+        self._data = []
 
     def save_data(self):
         data = [
