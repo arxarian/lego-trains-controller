@@ -16,11 +16,10 @@ Item {
             console.log("wanna delete")
         }
 
-        propagateComposedEvents: !item.marker.visible
-
         anchors.centerIn: parent
         width: 160
         height: 80
+        enabled: item.marker.visible
         rotation: item.marker.rotator.angle
 
         Rectangle {

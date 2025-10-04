@@ -5,8 +5,7 @@ Item {
 
     readonly property bool selected: root.activeFocus
     property bool propagateComposedEvents: false
-
-
+    property bool enabled: true
 
     property var rotateAction: function () {
         console.warn("no rotate action defined")
@@ -39,6 +38,7 @@ Item {
 
     MouseArea {
         anchors.fill: parent
+        enabled: root.enabled
         propagateComposedEvents: root.propagateComposedEvents
         onClicked: function(mouse) {
             mouse.accepted = !propagateComposedEvents
