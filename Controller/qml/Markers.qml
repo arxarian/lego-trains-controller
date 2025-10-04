@@ -7,8 +7,6 @@ Item
 
     property var model
 
-    visible: markerTypes.markersActive
-
     Repeater {
         model: root.model
         delegate: Item {
@@ -32,7 +30,7 @@ Item
 
                 property real size: 50
 
-                visible: !item.marker.visible
+                visible: markerTypes.markersActive && !item.marker.visible
                 x: item.marker.rotator.x - markerPoint.size / 2
                 y: item.marker.rotator.y - markerPoint.size / 2
                 rotation: item.marker.rotator.angle
