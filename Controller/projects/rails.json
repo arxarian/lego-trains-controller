@@ -22,12 +22,16 @@
             ],
             "markers": [
                 {
-                    "color": "#ffff00",
-                    "index": 2
+                    "index": 1,
+                    "color": "#ff0000"
                 },
                 {
-                    "color": "#ffff00",
-                    "index": 3
+                    "index": 2,
+                    "color": "#ffff00"
+                },
+                {
+                    "index": 3,
+                    "color": "#ffff00"
                 }
             ]
         },
@@ -53,8 +57,16 @@
             ],
             "markers": [
                 {
-                    "color": "#ffff00",
-                    "index": 1
+                    "index": 1,
+                    "color": "#ffff00"
+                },
+                {
+                    "index": 2,
+                    "color": "#008000"
+                },
+                {
+                    "index": 3,
+                    "color": "#0000ff"
                 }
             ]
         },
@@ -77,8 +89,7 @@
                     "name": "end",
                     "connectedRailId": 2
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 4,
@@ -99,8 +110,7 @@
                     "name": "end",
                     "connectedRailId": 3
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 5,
@@ -122,7 +132,12 @@
                     "connectedRailId": 6
                 }
             ],
-            "markers": []
+            "markers": [
+                {
+                    "index": 2,
+                    "color": "#000000"
+                }
+            ]
         },
         {
             "id": 6,
@@ -143,8 +158,7 @@
                     "name": "end",
                     "connectedRailId": 7
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 7,
@@ -165,8 +179,7 @@
                     "name": "end",
                     "connectedRailId": 8
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 8,
@@ -187,8 +200,7 @@
                     "name": "end",
                     "connectedRailId": 9
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 9,
@@ -209,8 +221,7 @@
                     "name": "end",
                     "connectedRailId": 10
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 10,
@@ -231,8 +242,7 @@
                     "name": "end",
                     "connectedRailId": 11
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 11,
@@ -253,8 +263,7 @@
                     "name": "end",
                     "connectedRailId": 12
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 12,
@@ -275,8 +284,7 @@
                     "name": "end",
                     "connectedRailId": 13
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 13,
@@ -297,8 +305,7 @@
                     "name": "end",
                     "connectedRailId": 14
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 14,
@@ -319,8 +326,7 @@
                     "name": "end",
                     "connectedRailId": 15
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 15,
@@ -341,8 +347,7 @@
                     "name": "end",
                     "connectedRailId": 16
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 16,
@@ -363,8 +368,7 @@
                     "name": "end",
                     "connectedRailId": 17
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 17,
@@ -385,8 +389,7 @@
                     "name": "end",
                     "connectedRailId": 18
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 18,
@@ -407,8 +410,7 @@
                     "name": "end",
                     "connectedRailId": 19
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 19,
@@ -429,8 +431,7 @@
                     "name": "end",
                     "connectedRailId": 20
                 }
-            ],
-            "markers": []
+            ]
         },
         {
             "id": 20,
@@ -451,8 +452,7 @@
                     "name": "end",
                     "connectedRailId": 4
                 }
-            ],
-            "markers": []
+            ]
         }
     ],
     "settings": {

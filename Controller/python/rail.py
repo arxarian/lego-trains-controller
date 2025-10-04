@@ -108,7 +108,7 @@ class Rail(QObject):
     def save_data(self):  # TODO - why to save rotator? Is it needed?
         return {"id": self._id, "type": self._type, "rotator": self._rotator.save_data(),
             "x": round(self._x, 1), "y": round(self._y, 1), "connectors": self._connectors.save_data(),
-            "markers": self._markers.save_data() }
+            **({"markers": self._markers.save_data()} if self._markers.save_data() else {})}
 
     def load_data(data, parent):
         return Rail(type=data.get("type", 0), id=data.get("id", 0), x=data.get("x", 0), y=data.get("y", 0),
