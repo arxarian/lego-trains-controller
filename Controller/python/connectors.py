@@ -33,16 +33,16 @@ class Connectors(QAbstractListModel):
         roles[Connectors.Role.ObjectRole] = QByteArray(b"object")
         return roles
 
-    def setModel(self, data):
+    def setModel(self, metaData):
         if len(self._items) > 0:
             # just update the model
-            for i, d in enumerate(data):
+            for i, d in enumerate(metaData):
                 self._items[i].load_metadata(d)
         else:
             # create a new model
-            self.beginInsertRows(QModelIndex(), 0, len(data))
-            for i in data:
-                self._items.append(Connector(i, self))
+            self.beginInsertRows(QModelIndex(), 0, len(metaData))
+            for d in metaData:
+                self._items.append(Connector(d, self))
             self.endInsertRows()
 
     def connectTo(self, toRailId, connectorIndex):

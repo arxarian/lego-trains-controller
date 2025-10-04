@@ -32,9 +32,9 @@ class Markers(QAbstractListModel):
         roles[Markers.Role.ObjectRole] = QByteArray(b"object")
         return roles
 
-    def setModel(self, data):
-        self.beginInsertRows(QModelIndex(), 0, len(data))
-        for i in data:
+    def setModel(self, metaData):
+        self.beginInsertRows(QModelIndex(), 0, len(metaData))
+        for i in metaData:
             self._items.append(Marker(data=i, parent=self))
         self.endInsertRows()
 
