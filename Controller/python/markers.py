@@ -33,14 +33,14 @@ class Markers(QAbstractListModel):
         roles[Markers.Role.ObjectRole] = QByteArray(b"object")
         return roles
 
-    def color(self, index):
+    def resolveColor(self, index):
         color = next((d["color"] for d in self._data if d["index"] == index), None)
         return None if color is None else QColor(color)
 
     def setModel(self, metaData):
         self.beginInsertRows(QModelIndex(), 0, len(metaData))
         for i, d in enumerate(metaData):
-            self._items.append(Marker(data=d, index=i, color=self.color(i) , parent=self))
+            self._items.append(Marker(data=d, index=i, color=self.resolveColor(i) , parent=self))
         self.endInsertRows()
         self._data = []
 
