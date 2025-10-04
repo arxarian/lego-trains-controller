@@ -12,7 +12,7 @@ Item {
     SelectableItem {
         id: selectableItem
 
-        function deleteAction() {
+        deleteAction: function() {
             console.log("wanna delete")
         }
 

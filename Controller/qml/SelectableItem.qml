@@ -6,12 +6,14 @@ Item {
     readonly property bool selected: root.activeFocus
     property bool propagateComposedEvents: false
 
-    function deleteAction() {
-        console.warn("no delete action defined")
+
+
+    property var rotateAction: function () {
+        console.warn("no rotate action defined")
     }
 
-    function rotateAction() {
-        console.warn("no rotate action defined")
+    property var deleteAction: function () {
+        console.warn("no delete action defined")
     }
 
     z: root.selected ? 10 : 0

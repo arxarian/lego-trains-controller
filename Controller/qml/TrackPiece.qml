@@ -15,11 +15,11 @@ SelectableItem {
     height: image.sourceSize.height
     propagateComposedEvents: true
 
-    function deleteAction() {
+    deleteAction: function() {
         rails.remove(root.railData)
     }
 
-    function rotateAction() {
+    rotateAction: function() {
         root.rotate()
     }
 
