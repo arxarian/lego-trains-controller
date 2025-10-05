@@ -12,9 +12,7 @@ Item {
     SelectableItem {
         id: selectableItem
 
-        deleteAction: function() {
-            console.log("wanna delete")
-        }
+        deleteAction: function() {item.marker.remove()}
 
         anchors.centerIn: parent
         width: 160

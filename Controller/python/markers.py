@@ -2,10 +2,15 @@ from __future__ import annotations
 
 from enum import IntEnum
 from PySide6.QtCore import QAbstractListModel, Slot, QEnum, Qt, QModelIndex, QByteArray
+from PySide6.QtQml import QmlElement
 from PySide6.QtGui import QColor
 
 from marker import Marker
 
+QML_IMPORT_NAME = "TrainView"
+QML_IMPORT_MAJOR_VERSION = 1
+
+@QmlElement
 class Markers(QAbstractListModel):
 
     @QEnum

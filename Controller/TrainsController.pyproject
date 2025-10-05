@@ -39,7 +39,7 @@
         "qml/RotationPoints.qml",
         "qml/ControlPanel.qml",
         "qml/Connectors.qml",
-        "qml/Markers.qml",
+        "qml/MarkerView.qml",
         "qml/SelectedMarker.qml",
         "qml/MarkerItem.qml",
         "qml/SelectableItem.qml"
