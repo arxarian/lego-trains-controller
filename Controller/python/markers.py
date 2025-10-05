@@ -59,11 +59,3 @@ class Markers(QAbstractListModel):
 
     def load_data(data, parent):
         return Markers(data=data, parent=parent)
-
-    @Slot(Marker)
-    def remove(self, marker):
-        index = self._items.index(marker)
-        if index > -1:
-            self.beginRemoveRows(QModelIndex(), index, index)
-            self._items.remove(marker)
-            self.endRemoveRows()

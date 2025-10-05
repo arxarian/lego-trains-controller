@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QObject, Signal, Property
+from PySide6.QtCore import QObject, Signal, Property, Slot
 from PySide6.QtQml import QmlElement
 from PySide6.QtGui import QColor
 
@@ -35,6 +35,11 @@ class Marker(QObject):
     def save_data(self):
         if self._color is not None:
             return { "index": self._index, "color": self._color.name() }
+
+    @Slot()
+    def remove(self):
+        self.set_color(None)
+        self.set_visible(False)
 
     def visible(self):
         return self._visible
