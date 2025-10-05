@@ -29,6 +29,8 @@ Item {
 
             onVisibleChanged: { if (visible) {
                     selectableItem.forceActiveFocus()
+                } else {
+                    item.forceActiveFocus()
                 }
             }
         }
