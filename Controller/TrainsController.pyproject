@@ -1,6 +1,7 @@
 {
     "files": [
         "main.py",
+        "projects/rails.json",
         "resources/rails_rc.py",
         "resources/straight.json",
         "resources/curved.json",
@@ -33,13 +34,14 @@
         "qml/DiscoverDevices.qml",
         "qml/TrainControlPanel.qml",
         "qml/TrackEditor.qml",
-        "qml/TrackPiece.qml",
+        "qml/RailItem.qml",
         "qml/Globals.qml",
         "qml/RotationPoints.qml",
         "qml/ControlPanel.qml",
         "qml/Connectors.qml",
         "qml/Markers.qml",
         "qml/SelectedMarker.qml",
-        "projects/rails.json"
+        "qml/MarkerItem.qml",
+        "qml/SelectableItem.qml"
     ]
 }

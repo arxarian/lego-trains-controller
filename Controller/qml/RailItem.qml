@@ -1,19 +1,32 @@
 import QtQuick
 import TrainView
 
-Image {
+SelectableItem {
+
     id: root
 
     /*required*/ property Rail railData // TODO - required is not working for some reason
-    readonly property bool selected: root.activeFocus
     property alias connectors: connectors
 
     x: root.railData ? root.railData.x : 0
     y: root.railData ? root.railData.y : 0
-    z: root.selected ? 10 : 0
 
-    focus: true
-    source: root.railData ? root.railData.source : ""
+    width: image.sourceSize.width
+    height: image.sourceSize.height
+    propagateComposedEvents: true
+
+    deleteAction: function() {
+        rails.remove(root.railData)
+    }
+
+    rotateAction: function() {
+        root.rotate()
+    }
+
+    Image {
+        id: image
+        source: root.railData ? root.railData.source : ""
+    }
 
     QtObject {
         id: animation
@@ -109,16 +122,6 @@ Image {
         rails.checkLoaded()
     }
 
-    Keys.onPressed: (event)=> {
-                        if (event.key === Qt.Key_Delete) {
-                            rails.remove(root.railData)
-                            event.accepted = true
-                        } else if (event.key === Qt.Key_R) {
-                            root.rotate()
-                            event.accepted = true
-                        }
-                    }
-
     RotationPoints {
         anchors.fill: parent
         model: root.railData.connectors
@@ -129,22 +132,6 @@ Image {
         visible: Globals.trackFrameVisible
         color: "transparent"
         border.width: 4
-    }
-
-    SelectedMarker {
-        anchors.fill: parent
-        anchors.margins: -radius / 2
-        z: 10
-        visible: root.selected
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        propagateComposedEvents: true
-        onClicked: function(mouse) {
-            mouse.accepted = false
-            root.forceActiveFocus()
-        }
     }
 
     Connectors {
