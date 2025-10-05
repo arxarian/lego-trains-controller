@@ -2,10 +2,15 @@ from __future__ import annotations
 
 from enum import IntEnum
 from PySide6.QtCore import QAbstractListModel, Slot, QEnum, Qt, QModelIndex, QByteArray
+from PySide6.QtQml import QmlElement
 from PySide6.QtGui import QColor
 
 from marker import Marker
 
+QML_IMPORT_NAME = "TrainView"
+QML_IMPORT_MAJOR_VERSION = 1
+
+@QmlElement
 class Markers(QAbstractListModel):
 
     @QEnum
@@ -54,3 +59,11 @@ class Markers(QAbstractListModel):
 
     def load_data(data, parent):
         return Markers(data=data, parent=parent)
+
+    @Slot(Marker)
+    def remove(self, marker):
+        index = self._items.index(marker)
+        if index > -1:
+            self.beginRemoveRows(QModelIndex(), index, index)
+            self._items.remove(marker)
+            self.endRemoveRows()

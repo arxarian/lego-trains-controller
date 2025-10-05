@@ -11,6 +11,7 @@ Item
         model: root.model
         delegate: MarkerItem {
             marker: model.object
+            markers: root.model
         }
     }
 }

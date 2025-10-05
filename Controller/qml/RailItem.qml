@@ -141,7 +141,7 @@ SelectableItem {
         model: root.railData.connectors
     }
 
-    Markers {
+    MarkerView {
         id: markers
         anchors.fill: parent
         model: root.railData.markers

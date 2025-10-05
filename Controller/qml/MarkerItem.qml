@@ -5,6 +5,7 @@ Item {
     id: item
 
     property Marker marker
+    property Markers markers
 
     x: item.marker.rotator.x
     y: item.marker.rotator.y
@@ -12,9 +13,7 @@ Item {
     SelectableItem {
         id: selectableItem
 
-        deleteAction: function() {
-            console.log("wanna delete")
-        }
+        deleteAction: function() {item.markers.remove(item.marker)}
 
         anchors.centerIn: parent
         width: 160
