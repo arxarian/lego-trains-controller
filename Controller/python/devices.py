@@ -67,12 +67,12 @@ class Devices(QAbstractListModel):
         self._discovered = []
         self.discovered_changed.emit()
 
-        async def async_disover(self):
+        async def async_discover(self):
             devices = await BleakScanner.discover()
             self._discovered = [device.name for device in devices if device.name is not None]
             self.discovered_changed.emit()  # TODO - when no device found, the busy indicator is still visible
 
-        asyncio.create_task(async_disover(self))
+        asyncio.create_task(async_discover(self))
 
     @Slot(str)
     def connect_to(self, hub_name):
@@ -92,7 +92,6 @@ class Devices(QAbstractListModel):
             if client.is_connected:
                 print("Connected")
                 self.append(Device(client=client, hub_name=hub_name, parent=self))
-                await self._devices[-1].configure()
             else:
                 print("Connection to", hub_name, "failed")
 

@@ -27,6 +27,7 @@ class Device(QObject):
         self._voltage = 0
         self._speed = 0
         asyncio.create_task(self.async_voltage_status())
+        asyncio.create_task(self.configure())
 
     async def async_voltage_status(self):
         await self.ready_event.wait()
