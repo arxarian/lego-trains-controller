@@ -26,6 +26,7 @@ class Device(QObject):
         self._name = hub_name
         self._voltage = 0
         self._speed = 0
+        self._initialized = False
         asyncio.create_task(self.async_voltage_status())
         asyncio.create_task(self.configure())
 
@@ -44,6 +45,16 @@ class Device(QObject):
 
     color_changed = Signal()
     color = Property(QColor, color, set_color, notify=color_changed)
+
+    def initialized(self):
+        return self._initialized
+
+    def set_initialized(self, value):
+        self._initialized = value
+        self.initialized_changed.emit()
+
+    initialized_changed = Signal()
+    initialized = Property(bool, initialized, set_initialized, notify=initialized_changed)
 
     def speed(self):
         return self._speed
@@ -97,6 +108,8 @@ class Device(QObject):
                         self.set_color(TRANSPARENT_COLOR)
                     else:
                         self.set_color(QColor(color))
+                elif payload == b"int":
+                    self.set_initialized(True)
                 else:
                     print("Received:", payload)
 
