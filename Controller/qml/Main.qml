@@ -60,18 +60,23 @@ ApplicationWindow {
 
             TrackEditor {}
 
-            ListView {
-                id: trainView
-                model: devices
-                orientation: Qt.Horizontal
+            Item {
+                ListView {
+                    id: trainView
+                    anchors.fill: parent
+                    anchors.topMargin: 10
+                    anchors.leftMargin: 10
 
-                delegate: TrainControlPanel {
-                    height: trainView.height
-                    width: 70
+                    model: devices
+                    orientation: Qt.Horizontal
+
+                    delegate: TrainControlPanel {
+                        height: trainView.height
+                        width: 100
+                    }
                 }
             }
         }
-
     }
 
     DiscoverDevices {

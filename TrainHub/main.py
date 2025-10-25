@@ -18,6 +18,9 @@ sensor = ColorDistanceSensor(Port.B)
 keyboard = poll()
 keyboard.register(stdin)
 
+stdout.buffer.write(b"int")
+wait(10) # wait 10 ms for the int command to be sent
+
 while True:
 
     # Let the remote program know we are ready for a command.
@@ -52,6 +55,8 @@ while True:
         train_motor.dc(-speed)
     elif cmd == b"bye":
         break
+    elif cmd == b"sht":
+        hub.system.shutdown()
     elif cmd == b"vol":
         stdout.buffer.write(b"vol" + hub.battery.voltage().to_bytes(2, 'big'))
     else:
