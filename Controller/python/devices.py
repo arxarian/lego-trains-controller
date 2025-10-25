@@ -20,6 +20,9 @@ class Devices(QAbstractListModel):
         self._devices = []
         self._discovered = []
 
+        # self.append(Device(client=None, hub_name="Express train", parent=self))
+        # self.append(Device(client=None, hub_name="Polar express", parent=self))
+
     def rowCount(self, parent=QModelIndex()):
         return len(self._devices)
 
@@ -74,6 +77,9 @@ class Devices(QAbstractListModel):
 
         asyncio.create_task(async_discover(self))
 
+    def hello_disconnected(self, client):
+        print("hello_disconnected")
+
     @Slot(str)
     def connect_to(self, hub_name):
         print("Wanna connect to", hub_name)
@@ -87,7 +93,7 @@ class Devices(QAbstractListModel):
 
             print("Found", hub_name)
 
-            client = BleakClient(device)    # TODO add handle disconnect
+            client = BleakClient(device, self.hello_disconnected)    # TODO add handle disconnect
             await client.connect()
             if client.is_connected:
                 print("Connected")

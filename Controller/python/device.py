@@ -94,6 +94,7 @@ class Device(QObject):
 
     async def set_rx_method(self):
         def handle_rx(_, data: bytearray):
+            print("Data", data)
             if data[0] == 0x01:  # "write stdout" event (0x01)
                 payload = data[1:4]
 
