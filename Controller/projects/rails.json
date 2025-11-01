@@ -19,20 +19,6 @@
                     "name": "end",
                     "connectedRailId": 5
                 }
-            ],
-            "markers": [
-                {
-                    "index": 1,
-                    "color": "#ff0000"
-                },
-                {
-                    "index": 2,
-                    "color": "#ffff00"
-                },
-                {
-                    "index": 3,
-                    "color": "#ffff00"
-                }
             ]
         },
         {
@@ -56,10 +42,6 @@
                 }
             ],
             "markers": [
-                {
-                    "index": 1,
-                    "color": "#ffff00"
-                },
                 {
                     "index": 2,
                     "color": "#008000"
@@ -131,12 +113,6 @@
                     "name": "end",
                     "connectedRailId": 6
                 }
-            ],
-            "markers": [
-                {
-                    "index": 2,
-                    "color": "#000000"
-                }
             ]
         },
         {
@@ -200,6 +176,12 @@
                     "name": "end",
                     "connectedRailId": 9
                 }
+            ],
+            "markers": [
+                {
+                    "index": 3,
+                    "color": "#ffff00"
+                }
             ]
         },
         {
@@ -220,6 +202,12 @@
                 {
                     "name": "end",
                     "connectedRailId": 10
+                }
+            ],
+            "markers": [
+                {
+                    "index": 0,
+                    "color": "#0000ff"
                 }
             ]
         },
@@ -305,6 +293,12 @@
                     "name": "end",
                     "connectedRailId": 14
                 }
+            ],
+            "markers": [
+                {
+                    "index": 3,
+                    "color": "#ffff00"
+                }
             ]
         },
         {
@@ -325,6 +319,12 @@
                 {
                     "name": "end",
                     "connectedRailId": 15
+                }
+            ],
+            "markers": [
+                {
+                    "index": 0,
+                    "color": "#008000"
                 }
             ]
         },
@@ -410,6 +410,12 @@
                     "name": "end",
                     "connectedRailId": 19
                 }
+            ],
+            "markers": [
+                {
+                    "index": 3,
+                    "color": "#008000"
+                }
             ]
         },
         {
@@ -430,6 +436,12 @@
                 {
                     "name": "end",
                     "connectedRailId": 20
+                }
+            ],
+            "markers": [
+                {
+                    "index": 0,
+                    "color": "#ff0000"
                 }
             ]
         },
@@ -456,8 +468,8 @@
         }
     ],
     "settings": {
-        "canvas_x": 246.0,
-        "canvas_y": 40.0,
-        "canvas_zoom": 0.27
+        "canvas_x": 223.0,
+        "canvas_y": 56.0,
+        "canvas_zoom": 0.1
     }
 }
