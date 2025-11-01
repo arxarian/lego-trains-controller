@@ -28,61 +28,54 @@ ApplicationWindow {
             }
         }
 
-        Row {
-            Layout.preferredHeight: discoverButton.availableHeight * 1.5
+        Rectangle {
+            color: Qt.darker("gold")
+
+            Layout.preferredHeight: 25
             Layout.fillWidth: true
 
-            Button {
-                id: discoverButton
-                text: "Discover"
-                onClicked: {
-                    discoveredDevices.open()
-                    devices.discover()
+            Row {
+                anchors.fill: parent
+
+                Button {
+                    id: runButton
+                    text: "Run Mode"
+                    autoExclusive: true
+                    checkable: true
+                    checked: true
+                }
+
+                Button {
+                    text: "Edit Mode"
+                    autoExclusive: true
+                    checkable: true
                 }
             }
 
-            Button {
-                text: "Connect to Pybricks Hub"
-                onClicked: devices.connect_to("Pybricks Hub")
-            }
-
-            Button {
-                text: "Connect to Express Train"
-                onClicked: devices.connect_to("Express Train")
-            }
         }
 
         StackLayout {
-            z: -1
-            currentIndex: trainView.count > 0 ? 1 : 0
+            currentIndex: runButton.checked ? 0 : 1
             Layout.fillHeight: true
             Layout.fillWidth: true
 
-            TrackEditor {}
+            RunScreen {}
 
-            Item {
-                ListView {
-                    id: trainView
-                    anchors.fill: parent
-                    anchors.topMargin: 10
-                    anchors.leftMargin: 10
-
-                    model: devices
-                    orientation: Qt.Horizontal
-
-                    delegate: TrainControlPanel {
-                        height: trainView.height
-                        width: 100
-                    }
-                }
-            }
+            TrackEditorScreen {}
         }
     }
 
     DiscoverDevices {
-        id: discoveredDevices
+        id: discoveredDevicesPopup
         anchors.centerIn: Overlay.overlay
         height: Overlay.overlay.height - 40
         width: Overlay.overlay.width - 40
+
+        Connections {
+            target: devices
+            function onOpenDiscoverPopup() {
+                discoveredDevicesPopup.open()
+            }
+        }
     }
 }

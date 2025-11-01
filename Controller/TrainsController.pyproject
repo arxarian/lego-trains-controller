@@ -33,7 +33,7 @@
         "qml/qmldir",
         "qml/DiscoverDevices.qml",
         "qml/TrainControlPanel.qml",
-        "qml/TrackEditor.qml",
+        "qml/TrackEditorScreen.qml",
         "qml/RailItem.qml",
         "qml/Globals.qml",
         "qml/RotationPoints.qml",
@@ -42,6 +42,7 @@
         "qml/MarkerView.qml",
         "qml/SelectedMarker.qml",
         "qml/MarkerItem.qml",
-        "qml/SelectableItem.qml"
+        "qml/SelectableItem.qml",
+        "qml/RunScreen.qml"
     ]
 }
