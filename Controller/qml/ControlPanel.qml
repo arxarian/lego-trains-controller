@@ -1,10 +1,17 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 
-Column {
+ColumnLayout {
     id: root
 
+    readonly property real buttonWidth: 55
+
+    spacing: 0
+
     Row {
+        id: projectButtons
+
         Button {
             text: "Save"
             onClicked: projectStorage.saveProject(project)
@@ -36,8 +43,8 @@ Column {
 
     ButtonGroup { id: group }
 
-    Row {
-        id: rowRails
+    GridLayout {
+        columns: 6
 
         Label {
             text: "Rails"
@@ -47,7 +54,7 @@ Column {
             model: railTypes
 
             Button {
-                 id: railItem
+                id: railItem
                 property RailType rail: model.object
 
                 checked: Globals.selectedRail === index  // just for the init
@@ -61,11 +68,12 @@ Column {
                 }
 
                 ButtonGroup.group: group
+                Layout.preferredWidth: root.buttonWidth
             }
         }
-    }
 
-    Row {
+        Item {}
+
         Label {
             text: "Markers"
         }
@@ -88,6 +96,7 @@ Column {
                 }
 
                 ButtonGroup.group: group
+                Layout.preferredWidth: root.buttonWidth
             }
         }
     }

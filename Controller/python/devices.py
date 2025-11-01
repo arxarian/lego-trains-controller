@@ -58,21 +58,28 @@ class Devices(QAbstractListModel):
     def discovered(self):
         return self._discovered
 
-    discovered_changed = Signal()
-    discovered = Property(list, discovered, notify=discovered_changed)
+    openDiscoverPopup = Signal()
+
+    def set_discovered(self, value):
+        self._discovered = value
+        self.discovered_changed.emit()
 
     @Slot()
     def discover(self):
         print("Discovering...")
-        self._discovered = []
-        self.discovered_changed.emit()
+        self.set_discovered([])
+        self.openDiscoverPopup.emit()
 
         async def async_discover(self):
             devices = await BleakScanner.discover()
-            self._discovered = [device.name for device in devices if device.name is not None]
-            self.discovered_changed.emit()  # TODO - when no device found, the busy indicator is still visible
+
+            # TODO - when no device found, the busy indicator is still visible
+            self.set_discovered([device.name for device in devices if device.name is not None])
 
         asyncio.create_task(async_discover(self))
+
+    discovered_changed = Signal()
+    discovered = Property(list, discovered, set_discovered, notify=discovered_changed)
 
     @Slot(str)
     def connect_to(self, hub_name):

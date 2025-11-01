@@ -1,6 +1,6 @@
 [
 	{"name": "Straight", "source": "straight.json"},
 	{"name": "Curved", "source": "curved.json"},
-	{"name": "Switch Left", "source": "switch left.json"},
-	{"name": "Switch Right", "source": "switch right.json"}
+	{"name": "Switch L", "source": "switch left.json"},
+	{"name": "Switch R", "source": "switch right.json"}
 ]

@@ -37,10 +37,10 @@ Item {
     }
 
     ControlPanel {
-        anchors.right: parent.right
-        anchors.rightMargin: 20
         anchors.top: parent.top
-        anchors.topMargin: -24
+        anchors.topMargin: 5
+        anchors.right: parent.right
+        anchors.rightMargin: 5
         z: 1
     }
 
