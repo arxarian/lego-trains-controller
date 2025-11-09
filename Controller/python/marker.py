@@ -17,7 +17,8 @@ class Marker(QObject):
         self._visible = False if color is None else True
         self._index = index
         self._color = color
-        self._rotator = None
+        self._rotator = None    # set in load_metadata
+        self._distance = 0      # set in load_metadata
 
         self.load_metadata(data)
 
@@ -75,3 +76,13 @@ class Marker(QObject):
         return self._rotator
 
     rotator = Property(QObject, rotator, constant=True)
+
+    def distance(self):
+        return self._distance
+
+    def set_distance(self, value):
+        self._distance = value
+        self.distance_changed.emit()
+
+    distance_changed = Signal()
+    distance = Property(int, distance, set_distance, notify=distance_changed)

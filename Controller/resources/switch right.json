@@ -14,8 +14,12 @@
         { "name": "end_straight", "dir": "end", "angle": 0, "rotator": { "x": 669.5, "y": 1279, "angle": 22.5 },
             "next": 0 }
     ],
-    "markers": [{"rotator": { "x": 669.5, "y": 0, "angle": 180 }}, {"rotator": { "x": 148, "y": 1322.5,
-        "angle": 22.5 }}, {"rotator": { "x": 669.5, "y": 1279, "angle": 0 }}, {"rotator": { "x": 669.5,
-        "y": 1120, "angle": 0 }}, {"rotator": { "x": 669.5, "y": 960, "angle": 0 }}, {"rotator": { "x":
-        214, "y": 1184, "angle": 28.125 }}, {"rotator": { "x": 307, "y": 1023, "angle": 33.75 }}]
+    "markers": [
+        {"rotator": { "x": 669.5, "y": 0, "angle": 0 }, "distance": 0},
+        {"rotator": { "x": 669.5, "y": 960, "angle": 0 }, "distance": 24},
+        {"rotator": { "x": 669.5, "y": 1120, "angle": 0 }, "distance": 28},
+        {"rotator": { "x": 669.5, "y": 1279, "angle": 0 }, "distance": 32},
+        {"rotator": { "x": 307, "y": 1023, "angle": 33.75 }, "distance": 27},
+        {"rotator": { "x": 214, "y": 1184, "angle": 28.125 }, "distance": 31},
+        {"rotator": { "x": 148, "y": 1322.5, "angle": 22.5 }, "distance": 35}]
 }

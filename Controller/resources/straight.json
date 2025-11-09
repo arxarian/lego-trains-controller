@@ -10,7 +10,10 @@
         { "name": "end", "dir": "end", "angle": 0, "rotator": { "x": 160, "y": 640, "angle": -180 },
             "next": 0 }
     ],
-    "markers": [{"rotator": {"x": 160, "y": 0, "angle": 0}}, {"rotator": {"x": 160, "y": 160, "angle": 0}},
-        {"rotator": {"x": 160, "y": 320, "angle": 0}}, {"rotator": {"x": 160, "y": 480, "angle": 0}},
-        {"rotator": {"x": 160, "y": 640, "angle": 0}}]
+    "markers": [
+        {"rotator": {"x": 160, "y": 0, "angle": 0}, "distance": 0},
+        {"rotator": {"x": 160, "y": 160, "angle": 0}, "distance": 4},
+        {"rotator": {"x": 160, "y": 320, "angle": 0}, "distance": 8},
+        {"rotator": {"x": 160, "y": 480, "angle": 0}, "distance": 12},
+        {"rotator": {"x": 160, "y": 640, "angle": 0}, "distance": 16}]
 }
