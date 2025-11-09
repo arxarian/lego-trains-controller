@@ -18,20 +18,20 @@ class Rails(QAbstractListModel):
 
     def __init__(self, connectorRegister: ConnectorRegister, parent=None) -> None:
         super().__init__(parent)
-        self._rails = []
+        self._items = []
         self._registeredRails = {}      # id -> item
         self._loading = False
         connectorRegister.appendRail.connect(self.append)
         connectorRegister.connectRails.connect(self.connectRails)
 
     def rowCount(self, parent=QModelIndex()):
-        return len(self._rails)
+        return len(self._items)
 
     def data(self, index: QModelIndex, role: int):
         row = index.row()
         if row < self.rowCount():
             if role == Rails.Role.ObjectRole:
-                return self._rails[row]
+                return self._items[row]
         return None
 
     def roleNames(self):
@@ -50,16 +50,16 @@ class Rails(QAbstractListModel):
     loading = Property(bool, loading, set_loading, notify=loading_changed)
 
     def save_data(self) -> list:
-        return [rail.save_data() for rail in self._rails]
+        return [item.save_data() for item in self._items]
 
     def load_data(self, data: list):
         self.set_loading(True)
         self.resetModel()
 
         self.beginResetModel()
-        self._rails = data
+        self._items = data
         self.endResetModel()
-        print("loaded, size", len(self._rails))
+        print("loaded, size", len(self._items))
 
     @Slot(QQuickItem, int)
     def registerRail(self, item, id):
@@ -82,7 +82,7 @@ class Rails(QAbstractListModel):
 
     @Slot(int, result=Rail)
     def findRailData(self, id) -> Rail:
-        for rail in self._rails:
+        for rail in self._items:
             if rail.id == id:
                 return rail
 
@@ -99,10 +99,10 @@ class Rails(QAbstractListModel):
 
     def append(self, fromEvent: ConnectorEvent):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-        self._rails.append(Rail(type=fromEvent.railType, parent=self)) # the first rail has to be appended anyway
+        self._items.append(Rail(type=fromEvent.railType, parent=self)) # the first rail has to be appended anyway
 
         if fromEvent.railId > 0:
-            toRail = self._rails[-1]
+            toRail = self._items[-1]
             fromRail = self.findRailData(fromEvent.railId)
 
             # connect the new rail to the previous one
@@ -123,7 +123,7 @@ class Rails(QAbstractListModel):
     @Slot(int, result=list)
     def findsiblingsOf(self, railId):
         siblings = []
-        for rail in self._rails:
+        for rail in self._items:
             for row in range(rail.connectors.rowCount()):
                 index = rail.connectors.index(row, 0)
                 connector = rail.connectors.data(index, Connectors.Role.ObjectRole)
@@ -138,14 +138,14 @@ class Rails(QAbstractListModel):
         self._registeredRails.clear()
 
         self.beginRemoveRows(QModelIndex(), 0, self.rowCount() - 1)
-        for rail in self._rails:
-            rail.deleteLater()
-        self._rails.clear()
+        for item in self._items:
+            item.deleteLater()
+        self._items.clear()
         self.endRemoveRows()
 
     @Slot(Rail)
     def remove(self, rail):
-        index = self._rails.index(rail)
+        index = self._items.index(rail)
         if index > -1:
             siblingsIds = self.findsiblingsOf(rail.id) # find siblings
             for id in siblingsIds:
@@ -154,6 +154,6 @@ class Rails(QAbstractListModel):
                     siblingRail.disconnectFrom(rail.id)
 
             self.beginRemoveRows(QModelIndex(), index, index)
-            self._rails.remove(rail)
+            self._items.remove(rail)
             self.endRemoveRows()
 
