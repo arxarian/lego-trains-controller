@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import json
 from enum import IntEnum
-from PySide6.QtCore import QAbstractListModel, Slot, Signal, Property
+from PySide6.QtCore import QAbstractListModel, Slot, Signal, Property, QObject
 from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
 from PySide6.QtQuick import QQuickItem
 
@@ -130,6 +129,19 @@ class Rails(QAbstractListModel):
                 if connector.connectedRailId == railId:
                     siblings.append(rail.id)
         return siblings
+
+    @Slot(int, result=QObject)
+    def get(self, index):
+        if 0 <= index < len(self._items):
+            return self._items[index]
+        return None
+
+    @Slot(int, result=QObject)
+    def getById(self, id: int):
+        for rail in self._items:
+            if rail._id == id:
+                return rail
+        return None
 
     def resetModel(self):
         if (self.rowCount() == 0):

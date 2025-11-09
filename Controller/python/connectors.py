@@ -97,3 +97,10 @@ class Connectors(QAbstractListModel):
         if 0 <= index < len(self._items):
             return self._items[index]
         return None
+
+    @Slot(int, result=QObject)
+    def getByName(self, name: str):
+        for connector in self._items:
+            if connector._name == name:
+                return connector
+        return None
