@@ -116,6 +116,12 @@ class Rail(QObject):
             connectors=Connectors.load_data(data.get("connectors", []), parent),
             markers=Markers.load_data(data.get("markers", []), parent), parent=parent)
 
+    def toString(self):
+        ret = "id " + str(self.id) + " connectors "
+        for connector in self.connectors._items:
+            ret = ret + connector.toString() + " "
+        return ret
+
     def id(self):
         return self._id
 
