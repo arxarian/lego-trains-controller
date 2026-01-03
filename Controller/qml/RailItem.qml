@@ -156,4 +156,23 @@ SelectableItem {
         enabled: animation.enabled
         NumberAnimation { duration: animation.duration; easing.type: animation.type }
     }
+
+    Text {
+        anchors.centerIn: parent
+        font.pixelSize: 150
+        font.bold: true
+        color: "gold"
+        text: root.railData.id
+        rotation: 360 - root.railData.rotator.angle
+    }
+
+    MouseArea {
+        id: mouse
+        anchors.fill: parent
+        propagateComposedEvents: true
+        onClicked: (mouse) => {
+            mouse.accepted = false
+            console.log(root.railData.id)
+        }
+    }
 }
