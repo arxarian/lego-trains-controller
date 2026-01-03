@@ -38,7 +38,9 @@ class Network(QObject):
         self.graph = None
         self.clusteredMarkers = []
 
-    def createNodeName(self, id0, id1):
+    def createNodeName(self, id0, id1=None):
+        if id1 == None:
+            return str(id0)
         return str(min(id0, id1)) + "-" + str(max(id0, id1))
 
     def clusterMarkers(self, rails):
@@ -74,18 +76,32 @@ class Network(QObject):
         for rail in rails._items:
             #print(rail.toString())
 
-            paths = rail._paths
-            for from_connector in rail.connectors._items:
-                if from_connector.connected():
-                    from_name = from_connector.name
-                    path = next(path for path in paths if path["from"] == from_name)
-                    to_connector = rail.connectors.getByName(path["to"])
+            vertex_degree = rail.connectors.activeConnectionsCount()
 
-                    if to_connector.connected():
-                        node_0 = self.createNodeName(rail.id, from_connector.connectedRailId)
-                        node_1 = self.createNodeName(rail.id, to_connector.connectedRailId)
+            # skip not connected
+            if vertex_degree == 0:
+                continue
 
-                        graph.add_edge(node_0, node_1, weight=path["length"])
+            # mark the end of the track
+            elif vertex_degree == 1:
+                connectedRailId = rail.connectors.getFirstConnected().connectedRailId
+                node_0 = self.createNodeName(rail.id)
+                node_1 = self.createNodeName(rail.id, connectedRailId)
+                graph.add_edge(node_0, node_1, weight=16)   # TODO - length
+
+            else:
+                paths = rail._paths
+                for from_connector in rail.connectors._items:
+                    if from_connector.connected():
+                        from_name = from_connector.name
+                        path = next(path for path in paths if path["from"] == from_name)
+                        to_connector = rail.connectors.getByName(path["to"])
+
+                        if to_connector.connected():
+                            node_0 = self.createNodeName(rail.id, from_connector.connectedRailId)
+                            node_1 = self.createNodeName(rail.id, to_connector.connectedRailId)
+
+                            graph.add_edge(node_0, node_1, weight=path["length"])
 
         #edges = list(nx.dfs_edges(graph, source=rails._items[0].id))
         print("nodes", graph.nodes())

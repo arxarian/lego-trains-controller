@@ -60,6 +60,9 @@ class Connectors(QAbstractListModel):
     def load_data(data, parent):
         return Connectors(data=data, parent=parent)
 
+    def activeConnectionsCount(self):
+        return sum(1 for item in self._items if item.connected())
+
     @Slot(result=int)
     def connections(self):
         count = 0
