@@ -60,23 +60,17 @@ class Connectors(QAbstractListModel):
     def load_data(data, parent):
         return Connectors(data=data, parent=parent)
 
-    def activeConnectionsCount(self):
-        return sum(1 for item in self._items if item.connected())
+    @Slot(result=int)
+    def count(self):
+        return self.rowCount()
 
     @Slot(result=int)
-    def connections(self):
-        count = 0
-        for connector in self._items:
-            if connector.connected():
-                count += 1
-        return count
+    def active(self):
+        return sum(1 for item in self._items if item.connected())
 
     @Slot(int, result=QObject)
     def findFromConnector(self, siblingRailId):
-        for connector in self._items:
-            if connector.connectedRailId == siblingRailId:
-                return connector
-        return None
+        return next((c for c in self._items if c.connectedRailId == siblingRailId), None)
 
     @Slot(result=QObject)
     def setNextConnector(self):

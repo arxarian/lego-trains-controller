@@ -31,17 +31,18 @@ class ClusteredMarker:
             print(webcolors.hex_to_name(color.name()), end=" ")
         print()
 
+def createNodeName(id0, id1=None):
+    if id1 == None:
+        return str(id0)
+    return min(str(id0), str(id1)) + "-" + max(str(id0), str(id1))
+
 class Network(QObject):
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.graph = None
+        self.rails = None
         self.clusteredMarkers = []
-
-    def createNodeName(self, id0, id1=None):
-        if id1 == None:
-            return str(id0)
-        return str(min(id0, id1)) + "-" + str(max(id0, id1))
 
     def clusterMarkers(self, rails):
         distance = 0
@@ -65,52 +66,48 @@ class Network(QObject):
             markers.prettyPrint()
 
 
+    def addEdge(self, node_0, node_1, marker, weight):
+        self.graph.add_edge(node_0, node_1, weight=weight)
+        self.graph.add_node(node_0, marker=marker)
+
+    def createGraph(self):
+        for rail in self.rails._items:
+            #print(rail.toString())
+
+            activeConnectors = rail.connectors.active()
+            paths = rail._paths
+
+            # skip not connected
+            if activeConnectors == 0:
+                print("Network: Skipping not connected rail")
+                continue
+
+            for from_connector in rail.connectors._items:
+                from_name = from_connector.name
+                path = next(path for path in paths if path["from"] == from_name)
+                to_connector = rail.connectors.getByName(path["to"])
+
+                if from_connector.connected() and to_connector.connected():
+                    node_0 = createNodeName(rail.id, from_connector.connectedRailId)
+                    node_1 = createNodeName(rail.id, to_connector.connectedRailId)
+                    self.addEdge(node_0, node_1, False, weight=path["length"])
+                elif from_connector.connected() or to_connector.connected():
+                    node_0 = createNodeName(str(rail.id) + path["path"])
+                    node_1 = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
+                    self.addEdge(node_0, node_1, True, 16) # TODO - length
+
+
     @Slot(QObject)
     def generate(self, rails):
         print("Network: Generating...")
 
-        graph = nx.Graph()
+        self.graph = nx.Graph()
+        self.rails = rails
 
-        print("Start", rails._items[0].id)
-
-        for rail in rails._items:
-            #print(rail.toString())
-
-            vertex_degree = rail.connectors.activeConnectionsCount()
-
-            # skip not connected
-            if vertex_degree == 0:
-                continue
-
-            # mark the end of the track
-            elif vertex_degree == 1:
-                connectedRailId = rail.connectors.getFirstConnected().connectedRailId
-                node_0 = self.createNodeName(rail.id)
-                node_1 = self.createNodeName(rail.id, connectedRailId)
-                graph.add_edge(node_0, node_1, weight=16)   # TODO - length
-
-            else:
-                paths = rail._paths
-                for from_connector in rail.connectors._items:
-                    if from_connector.connected():
-                        from_name = from_connector.name
-                        path = next(path for path in paths if path["from"] == from_name)
-                        to_connector = rail.connectors.getByName(path["to"])
-
-                        if to_connector.connected():
-                            node_0 = self.createNodeName(rail.id, from_connector.connectedRailId)
-                            node_1 = self.createNodeName(rail.id, to_connector.connectedRailId)
-
-                            graph.add_edge(node_0, node_1, weight=path["length"])
-
-        #edges = list(nx.dfs_edges(graph, source=rails._items[0].id))
-        print("nodes", graph.nodes())
-        print("edges", graph.edges())
-
-        nx.nx_pydot.write_dot(graph, "debug_graph.dot")
+        self.createGraph()
 
 
-        self.graph = graph
+        nx.nx_pydot.write_dot(self.graph, "debug_graph.dot")
 
         print("Network: Done")
 

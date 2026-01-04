@@ -93,11 +93,11 @@ SelectableItem {
     }
 
     function rotate() {
-        if (root.railData.connectors.connections() === 0) {
+        if (root.railData.connectors.active() === 0) {
             root.railData.rotator.x = root.width / 2
             root.railData.rotator.y = root.height / 2
             root.railData.rotator.angle = root.railData.rotator.angle + 22.5
-        } else if (root.railData.connectors.connections() === 1) {
+        } else if (root.railData.connectors.active() === 1) {
             // TODO - no need to have a real sibling here
             const siblingId = rails.findsiblingsOf(root.railData.id)[0] // return the first sibling
             const siblingData = rails.findRailData(siblingId)

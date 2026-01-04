@@ -1,10 +1,10 @@
 {
     "source": "qrc:/switch left.png",
     "paths": [
-        { "from": "start", "to": "end_straight", "length": 32 },
-        { "from": "end_straight", "to": "start", "length": 32 },
-        { "from": "start", "to": "end_curved", "length": 35 },
-        { "from": "end_curved", "to": "start", "length": 35 }
+        { "from": "start", "to": "end_straight", "length": 32, "path": "A" },
+        { "from": "end_straight", "to": "start", "length": 32, "path": "A" },
+        { "from": "start", "to": "end_curved", "length": 35, "path": "B"  },
+        { "from": "end_curved", "to": "start", "length": 35, "path": "B"  }
     ],
     "connectors": [
         { "name": "start", "dir": "start", "angle": 0, "rotator": { "x": 159.5, "y": 0, "angle": 180 },
