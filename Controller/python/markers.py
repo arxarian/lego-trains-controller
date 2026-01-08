@@ -59,3 +59,7 @@ class Markers(QAbstractListModel):
 
     def load_data(data, parent):
         return Markers(data=data, parent=parent)
+
+    @Slot(result=int)
+    def activeCount(self):
+        return sum(1 for item in self._items if item.visible)

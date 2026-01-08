@@ -65,7 +65,7 @@ class Connectors(QAbstractListModel):
         return self.rowCount()
 
     @Slot(result=int)
-    def active(self):
+    def activeCount(self):
         return sum(1 for item in self._items if item.connected())
 
     @Slot(int, result=QObject)

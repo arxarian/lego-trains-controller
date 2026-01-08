@@ -72,9 +72,9 @@ class Network(QObject):
 
     def createGraph(self):
         for rail in self.rails._items:
-            #print(rail.toString())
+            print(rail.toString())
 
-            activeConnectors = rail.connectors.active()
+            activeConnectors = rail.connectors.activeCount()
             paths = rail._paths
 
             # skip not connected
@@ -87,14 +87,31 @@ class Network(QObject):
                 path = next(path for path in paths if path["from"] == from_name)
                 to_connector = rail.connectors.getByName(path["to"])
 
-                if from_connector.connected() and to_connector.connected():
-                    node_0 = createNodeName(rail.id, from_connector.connectedRailId)
-                    node_1 = createNodeName(rail.id, to_connector.connectedRailId)
-                    self.addEdge(node_0, node_1, False, weight=path["length"])
-                elif from_connector.connected() or to_connector.connected():
-                    node_0 = createNodeName(str(rail.id) + path["path"])
-                    node_1 = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
-                    self.addEdge(node_0, node_1, True, 16) # TODO - length
+                if rail.markers.activeCount() == 0:
+                    if from_connector.connected() and to_connector.connected():
+                        node_0 = createNodeName(rail.id, from_connector.connectedRailId)
+                        node_1 = createNodeName(rail.id, to_connector.connectedRailId)
+                        self.addEdge(node_0, node_1, False, weight=path["length"])
+                    elif from_connector.connected() or to_connector.connected():
+                        node_0 = createNodeName(str(rail.id) + path["path"])
+                        node_1 = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
+                        self.addEdge(node_0, node_1, True, 16) # TODO - length
+                else:
+                    node = None
+                    lastNode = None
+                    if from_connector.connected() and to_connector.connected():
+                        node = createNodeName(rail.id, from_connector.connectedRailId)
+                        lastNode = createNodeName(rail.id, to_connector.connectedRailId)
+                    elif from_connector.connected() or to_connector.connected():
+                        node = createNodeName(str(rail.id) + path["path"])
+                        lastNode = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
+
+                    for marker in filter(lambda x: x.visible, rail.markers._items):
+                        to_node = str(rail.id) + "M" + str(marker.distance)
+                        self.addEdge(node, to_node, True, 16) # TODO - length
+                        node = to_node
+
+                    self.addEdge(node, lastNode, True, 16) # TODO - length
 
 
     @Slot(QObject)

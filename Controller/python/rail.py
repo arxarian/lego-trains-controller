@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import webcolors
 from enum import IntEnum
 from PySide6.QtCore import QObject, Property, Signal, QEnum
 from PySide6.QtQml import QmlElement
@@ -117,9 +118,10 @@ class Rail(QObject):
             markers=Markers.load_data(data.get("markers", []), parent), parent=parent)
 
     def toString(self):
-        ret = "id " + str(self.id) + " connectors "
-        for connector in self.connectors._items:
-            ret = ret + connector.toString() + " "
+        ret = "id " + str(self.id) + " markers "
+        for m in self.markers._items:
+            if m.visible:
+                ret = ret + webcolors.hex_to_name(m.color.name()) + " "
         return ret
 
     def id(self):
