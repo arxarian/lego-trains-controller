@@ -1,40 +1,14 @@
 from __future__ import annotations
 
-import webcolors
 import networkx as nx
 
 from PySide6.QtCore import QObject, Slot
-from PySide6.QtGui import QColor
-from connector import State
-
-MARKERS_MAX_DIST = 1
-
-class Node:
-    def __init__(self, rail_id, connector_name):
-        self.id = f"{rail_id}:{connector_name}"
-        self.rail_id = rail_id
-        self.connector = connector_name
-        self.markers = []  # optional markers along the rail between connectors
-
-class ClusteredMarker:
-    def __init__(self, marker: QObject):
-        self.startPosition = marker.index
-        self.endPosition = marker.index
-        self.colors = [marker.color]
-
-    def addMarker(self, marker: QObject):
-        self.endPosition = marker.index
-        self.colors.append(marker.color)
-
-    def prettyPrint(self):
-        for color in self.colors:
-            print(webcolors.hex_to_name(color.name()), end=" ")
-        print()
 
 def createNodeName(id0, id1=None):
-    if id1 == None:
+    if id1 is None:
         return str(id0)
-    return min(str(id0), str(id1)) + "-" + max(str(id0), str(id1))
+    a, b = sorted((str(id0), str(id1)))
+    return f"{a}-{b}"
 
 class Network(QObject):
 
@@ -42,29 +16,6 @@ class Network(QObject):
         super().__init__(parent)
         self.graph = None
         self.rails = None
-        self.clusteredMarkers = []
-
-    def clusterMarkers(self, rails):
-        distance = 0
-
-        for rail in rails._items:   # TODO - last and first rail
-            markers = rail._markers._items
-
-            for marker in markers:
-                if marker.visible:
-                    if distance > MARKERS_MAX_DIST:
-                        self.clusteredMarkers.append(ClusteredMarker(marker))
-                        distance = -1
-                    else:
-                        self.clusteredMarkers[-1].addMarker(marker)
-                        distance = -1
-
-                distance = distance + 1
-
-        print("Clusters")
-        for markers in self.clusteredMarkers:
-            markers.prettyPrint()
-
 
     def addEdge(self, node_0, node_1, marker, weight):
         self.graph.add_edge(node_0, node_1, weight=weight)
@@ -72,8 +23,6 @@ class Network(QObject):
 
     def createGraph(self):
         for rail in self.rails._items:
-            print(rail.toString())
-
             activeConnectors = rail.connectors.activeCount()
             paths = rail._paths
 
@@ -87,22 +36,22 @@ class Network(QObject):
                 path = next(path for path in paths if path["from"] == from_name)
                 to_connector = rail.connectors.getByName(path["to"])
 
+                both_connected = from_connector.connected() and to_connector.connected()
+                either_connected = from_connector.connected() or to_connector.connected()
+
                 if rail.markers.activeCount() == 0:
-                    if from_connector.connected() and to_connector.connected():
+                    if both_connected:
                         node_0 = createNodeName(rail.id, from_connector.connectedRailId)
                         node_1 = createNodeName(rail.id, to_connector.connectedRailId)
                         self.addEdge(node_0, node_1, False, weight=path["length"])
-                    elif from_connector.connected() or to_connector.connected():
-                        node_0 = createNodeName(str(rail.id) + path["path"])
+                    elif either_connected:
+                        node_0 = createNodeName(f"{rail.id}{path['path']}")
                         node_1 = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
                         self.addEdge(node_0, node_1, True, 16) # TODO - length
                 else:
                     node = None
                     lastNode = None
                     lastDistance = 0
-
-                    both_connected = from_connector.connected() and to_connector.connected()
-                    either_connected = from_connector.connected() or to_connector.connected()
 
                     if both_connected:
                         node = createNodeName(rail.id, from_connector.connectedRailId)
@@ -122,8 +71,6 @@ class Network(QObject):
 
                     self.addEdge(node, lastNode, True, weight=path["length"] - lastDistance)
 
-
-
     @Slot(QObject)
     def generate(self, rails):
         print("Network: Generating...")
@@ -132,7 +79,6 @@ class Network(QObject):
         self.rails = rails
 
         self.createGraph()
-
 
         nx.nx_pydot.write_dot(self.graph, "debug_graph.dot")
 

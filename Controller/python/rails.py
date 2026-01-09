@@ -138,10 +138,7 @@ class Rails(QAbstractListModel):
 
     @Slot(int, result=QObject)
     def getById(self, id: int):
-        for rail in self._items:
-            if rail._id == id:
-                return rail
-        return None
+        return next((rail for rail in self._items if rail.id == id), None)
 
     def resetModel(self):
         if (self.rowCount() == 0):

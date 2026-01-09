@@ -158,6 +158,7 @@ SelectableItem {
     }
 
     Text {
+        visible: Globals.railIdVisible
         anchors.centerIn: parent
         font.pixelSize: 150
         font.bold: true
@@ -172,7 +173,7 @@ SelectableItem {
         propagateComposedEvents: true
         onClicked: (mouse) => {
             mouse.accepted = false
-            console.log(root.railData.id)
+            console.log("rail id", root.railData.id)
         }
     }
 }
