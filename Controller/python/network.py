@@ -100,25 +100,25 @@ class Network(QObject):
                     node = None
                     lastNode = None
                     lastDistance = 0
-                    if from_connector.connected() and to_connector.connected():
+
+                    both_connected = from_connector.connected() and to_connector.connected()
+                    either_connected = from_connector.connected() or to_connector.connected()
+
+                    if both_connected:
                         node = createNodeName(rail.id, from_connector.connectedRailId)
                         lastNode = createNodeName(rail.id, to_connector.connectedRailId)
-                    elif from_connector.connected() or to_connector.connected():
-                        node = createNodeName(str(rail.id) + path["path"])
+                    elif either_connected:
+                        node = createNodeName(f"{rail.id}{path['path']}")
                         lastNode = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
 
-                    if from_connector.dir == "start":
-                        for marker in filter(lambda x: x.visible, rail.markers._items):
-                            to_node = str(rail.id) + "M" + str(marker.distance)
-                            self.addEdge(node, to_node, True, marker.distance)
-                            node = to_node
-                            lastDistance = marker.distance
-                    else:
-                        for marker in filter(lambda x: x.visible, reversed(rail.markers._items)):
-                            to_node = str(rail.id) + "M" + str(marker.distance)
-                            self.addEdge(node, to_node, True, marker.distance)
-                            node = to_node
-                            lastDistance = marker.distance
+                    markers = rail.markers._items if from_connector.dir == "start" else reversed(rail.markers._items)
+                    visible_markers = (m for m in markers if m.visible)
+
+                    for marker in visible_markers:
+                        to_node = f"{rail.id}D{marker.distance}"
+                        self.addEdge(node, to_node, True, marker.distance)
+                        node = to_node
+                        lastDistance = marker.distance
 
                     self.addEdge(node, lastNode, True, weight=path["length"] - lastDistance)
 
