@@ -99,6 +99,7 @@ class Network(QObject):
                 else:
                     node = None
                     lastNode = None
+                    lastDistance = 0
                     if from_connector.connected() and to_connector.connected():
                         node = createNodeName(rail.id, from_connector.connectedRailId)
                         lastNode = createNodeName(rail.id, to_connector.connectedRailId)
@@ -106,12 +107,21 @@ class Network(QObject):
                         node = createNodeName(str(rail.id) + path["path"])
                         lastNode = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
 
-                    for marker in filter(lambda x: x.visible, rail.markers._items):
-                        to_node = str(rail.id) + "M" + str(marker.distance)
-                        self.addEdge(node, to_node, True, 16) # TODO - length
-                        node = to_node
+                    if from_connector.dir == "start":
+                        for marker in filter(lambda x: x.visible, rail.markers._items):
+                            to_node = str(rail.id) + "M" + str(marker.distance)
+                            self.addEdge(node, to_node, True, marker.distance)
+                            node = to_node
+                            lastDistance = marker.distance
+                    else:
+                        for marker in filter(lambda x: x.visible, reversed(rail.markers._items)):
+                            to_node = str(rail.id) + "M" + str(marker.distance)
+                            self.addEdge(node, to_node, True, marker.distance)
+                            node = to_node
+                            lastDistance = marker.distance
 
-                    self.addEdge(node, lastNode, True, 16) # TODO - length
+                    self.addEdge(node, lastNode, True, weight=path["length"] - lastDistance)
+
 
 
     @Slot(QObject)
