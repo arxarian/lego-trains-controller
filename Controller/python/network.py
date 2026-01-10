@@ -52,7 +52,7 @@ class Network(QObject):
                     node = None
                     lastNode = None
                     lastDistance = 0
-                    dir = from_connector.dir == "start" # forward vs reverse
+                    dir = from_connector.dir == "forward" # forward vs reverse
 
                     if both_connected:
                         node = createNodeName(rail.id, from_connector.connectedRailId)

@@ -5,8 +5,8 @@ import TrainView
 
 QtObject {
     readonly property QtObject dir: QtObject {
-        readonly property string start: "start"
-        readonly property string end: "end"
+        readonly property string forward: "forward"
+        readonly property string reverse: "reverse"
     }
 
     property bool gridVisible: false

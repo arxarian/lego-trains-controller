@@ -5,9 +5,9 @@
         { "from": "end", "to": "start", "length": 16, "path": "A"  }
     ],
     "connectors":[
-        { "name": "start", "dir": "start", "angle": 1, "rotator": { "x": 147.5, "y": 61, "angle": 202.5 },
+        { "name": "start", "dir": "forward", "angle": 1, "rotator": { "x": 147.5, "y": 61, "angle": 202.5 },
             "next": 1 },
-        { "name": "end", "dir": "end", "angle": 0, "rotator": { "x": 267, "y": 658, "angle": -202.5 },
+        { "name": "end", "dir": "reverse", "angle": 0, "rotator": { "x": 267, "y": 658, "angle": -202.5 },
             "next": 0 }
     ],
     "markers": [
