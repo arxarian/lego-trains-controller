@@ -4,11 +4,6 @@ import QtQuick
 import TrainView
 
 QtObject {
-    readonly property QtObject dir: QtObject {
-        readonly property string forward: "forward"
-        readonly property string reverse: "reverse"
-    }
-
     property bool gridVisible: false
     property bool trackFrameVisible: false
     property bool rotationPointsVisible: false
