@@ -33,9 +33,21 @@ Item {
             }
 
             Button {
-                text: "Generate graph"
-                onClicked: network.generate()
+                text: "Generate big graph"
+                onClicked: {
+                    projectStorage.loadProject("rails_big")    // DEBUG - remove
+                    network.generate(rails)
+                }
             }
+
+            Button {
+                text: "Generate small graph"
+                onClicked: {
+                    projectStorage.loadProject("rails")    // DEBUG - remove
+                    network.generate(rails)
+                }
+            }
+
         }
 
         ListView {

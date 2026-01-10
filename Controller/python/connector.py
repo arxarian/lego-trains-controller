@@ -49,6 +49,10 @@ class Connector(QObject):
         return Connector(name=data.get("name", str()),
             connectedRailId=data.get("connectedRailId", State.NotConnected), parent=parent)
 
+    def toString(self):
+        if self.connected():
+            return str(self._connectedRailId)
+
     def connected(self):
         return self._connectedRailId != State.NotConnected
 

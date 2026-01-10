@@ -93,11 +93,11 @@ SelectableItem {
     }
 
     function rotate() {
-        if (root.railData.connectors.connections() === 0) {
+        if (root.railData.connectors.activeCount() === 0) {
             root.railData.rotator.x = root.width / 2
             root.railData.rotator.y = root.height / 2
             root.railData.rotator.angle = root.railData.rotator.angle + 22.5
-        } else if (root.railData.connectors.connections() === 1) {
+        } else if (root.railData.connectors.activeCount() === 1) {
             // TODO - no need to have a real sibling here
             const siblingId = rails.findsiblingsOf(root.railData.id)[0] // return the first sibling
             const siblingData = rails.findRailData(siblingId)
@@ -155,5 +155,25 @@ SelectableItem {
     Behavior on y {
         enabled: animation.enabled
         NumberAnimation { duration: animation.duration; easing.type: animation.type }
+    }
+
+    Text {
+        visible: Globals.railIdVisible
+        anchors.centerIn: parent
+        font.pixelSize: 150
+        font.bold: true
+        color: "gold"
+        text: root.railData.id
+        rotation: 360 - root.railData.rotator.angle
+    }
+
+    MouseArea {
+        id: mouse
+        anchors.fill: parent
+        propagateComposedEvents: true
+        onClicked: (mouse) => {
+            mouse.accepted = false
+            console.log("rail id", root.railData.id)
+        }
     }
 }

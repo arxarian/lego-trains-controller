@@ -39,6 +39,12 @@ ColumnLayout {
             checked: Globals.rotationPointsVisible
             onClicked: Globals.rotationPointsVisible = checked
         }
+
+        CheckBox {
+            text: "Rails Ids"
+            checked: Globals.railIdVisible
+            onClicked: Globals.railIdVisible = checked
+        }
     }
 
     ButtonGroup { id: group }
