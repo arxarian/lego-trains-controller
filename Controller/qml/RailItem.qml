@@ -79,7 +79,6 @@ SelectableItem {
         const siblingData = rails.findRailData(siblingId)
         const fromConnector = siblingData.connectors.findFromConnector(root.railData.id)
 
-        const start = (fromConnector.dir === Globals.dir.start)
         const toConnector = root.railData.connectors.getFirstConnected()
         const rotationOffset = (toConnector.angle - fromConnector.angle) * 22.5
 

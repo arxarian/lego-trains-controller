@@ -7,11 +7,11 @@
         { "from": "end_curved", "to": "start", "length": 35, "path": "B"  }
     ],
     "connectors":[
-        { "name": "start", "dir": "start", "angle": 0, "rotator": { "x": 669.5, "y": 0, "angle": 180 },
+        { "name": "start", "dir": "forward", "angle": 0, "rotator": { "x": 669.5, "y": 0, "angle": 180 },
             "next": 1 },
-        { "name": "end_curved", "dir": "end", "angle": -1, "rotator": { "x": 148, "y": 1322.5, "angle": -202.5 },
+        { "name": "end_curved", "dir": "reverse", "angle": -1, "rotator": { "x": 148, "y": 1322.5, "angle": -202.5 },
             "next": 2 },
-        { "name": "end_straight", "dir": "end", "angle": 0, "rotator": { "x": 669.5, "y": 1279, "angle": 22.5 },
+        { "name": "end_straight", "dir": "reverse", "angle": 0, "rotator": { "x": 669.5, "y": 1279, "angle": 22.5 },
             "next": 0 }
     ],
     "markers": [
