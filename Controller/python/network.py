@@ -52,6 +52,7 @@ class Network(QObject):
                     node = None
                     lastNode = None
                     lastDistance = 0
+                    dir = from_connector.dir == "start" # forward vs reverse
 
                     if both_connected:
                         node = createNodeName(rail.id, from_connector.connectedRailId)
@@ -59,8 +60,11 @@ class Network(QObject):
                     elif either_connected:
                         node = createNodeName(f"{rail.id}{path['path']}")
                         lastNode = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
+                        if dir is True: # swap when going forward
+                            node, lastNode = lastNode, node
 
-                    markers = rail.markers._items if from_connector.dir == "start" else reversed(rail.markers._items)
+
+                    markers = rail.markers._items if dir else reversed(rail.markers._items)
                     visible_markers = (m for m in markers if m.visible)
 
                     for marker in visible_markers:
