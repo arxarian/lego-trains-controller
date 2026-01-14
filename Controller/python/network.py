@@ -17,7 +17,13 @@ class Network(QObject):
         self.graph = None
         self.rails = None
 
+    def hasEdge(self, node_0, node_1):
+        return self.graph.has_edge(node_0, node_1)
+
     def addEdge(self, node_0, node_1, marker, weight):
+        if self.hasEdge(node_0, node_1):
+            return
+
         self.graph.add_edge(node_0, node_1, weight=weight)
         self.graph.add_node(node_0, marker=marker)
 
@@ -47,7 +53,7 @@ class Network(QObject):
                     elif either_connected:
                         node_0 = createNodeName(f"{rail.id}{path['path']}")
                         node_1 = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
-                        self.addEdge(node_0, node_1, True, 16) # TODO - length
+                        self.addEdge(node_0, node_1, True, weight=path["length"])
                 else:
                     node = None
                     lastNode = None
@@ -69,7 +75,7 @@ class Network(QObject):
 
                     for marker in visible_markers:
                         to_node = f"{rail.id}D{marker.distance}"
-                        self.addEdge(node, to_node, True, marker.distance)
+                        self.addEdge(node, to_node, True, marker.distance - lastDistance)
                         node = to_node
                         lastDistance = marker.distance
 
