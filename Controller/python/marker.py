@@ -96,4 +96,4 @@ class Marker(QObject):
         self.path_id_changed.emit()
 
     path_id_changed = Signal()
-    path_id = Property(int, path_id, set_path_id, notify=path_id_changed)
+    path_id = Property(str, path_id, set_path_id, notify=path_id_changed)
