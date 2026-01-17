@@ -61,5 +61,8 @@ class Markers(QAbstractListModel):
         return Markers(data=data, parent=parent)
 
     @Slot(result=int)
-    def activeCount(self):
-        return sum(1 for item in self._items if item.visible)
+    def activeCount(self, path_id = None):
+        if path_id == None:
+            return sum(1 for item in self._items if item.visible)
+        else:
+            return sum(1 for item in self._items if item.visible and item.path_id == path_id)
