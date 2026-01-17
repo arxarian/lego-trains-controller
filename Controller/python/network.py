@@ -45,13 +45,13 @@ class Network(QObject):
                 both_connected = from_connector.connected() and to_connector.connected()
                 either_connected = from_connector.connected() or to_connector.connected()
 
-                if rail.markers.activeCount() == 0:
+                if rail.markers.activeCount(path["path_id"]) == 0:
                     if both_connected:
                         node_0 = createNodeName(rail.id, from_connector.connectedRailId)
                         node_1 = createNodeName(rail.id, to_connector.connectedRailId)
                         self.addEdge(node_0, node_1, False, weight=path["length"])
                     elif either_connected:
-                        node_0 = createNodeName(f"{rail.id}{path['path']}")
+                        node_0 = createNodeName(f"{rail.id}{path['path_id']}")
                         node_1 = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
                         self.addEdge(node_0, node_1, True, weight=path["length"])
                 else:
@@ -64,7 +64,7 @@ class Network(QObject):
                         node = createNodeName(rail.id, from_connector.connectedRailId)
                         lastNode = createNodeName(rail.id, to_connector.connectedRailId)
                     elif either_connected:
-                        node = createNodeName(f"{rail.id}{path['path']}")
+                        node = createNodeName(f"{rail.id}{path['path_id']}")
                         lastNode = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
                         if dir is True: # swap when going forward
                             node, lastNode = lastNode, node
@@ -74,7 +74,7 @@ class Network(QObject):
                     visible_markers = (m for m in markers if m.visible)
 
                     for marker in visible_markers:
-                        to_node = f"{rail.id}D{marker.distance}"
+                        to_node = f"{rail.id}{path['path_id']}{marker.distance}"
                         self.addEdge(node, to_node, True, marker.distance - lastDistance)
                         node = to_node
                         lastDistance = marker.distance

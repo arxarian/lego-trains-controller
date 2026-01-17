@@ -19,6 +19,7 @@ class Marker(QObject):
         self._color = color
         self._rotator = None    # set in load_metadata
         self._distance = 0      # set in load_metadata
+        self._path_id = None    # set in load_metadata
 
         self.load_metadata(data)
 
@@ -86,3 +87,13 @@ class Marker(QObject):
 
     distance_changed = Signal()
     distance = Property(int, distance, set_distance, notify=distance_changed)
+
+    def path_id(self):
+        return self._path_id
+
+    def set_path_id(self, value):
+        self._path_id = value
+        self.path_id_changed.emit()
+
+    path_id_changed = Signal()
+    path_id = Property(int, path_id, set_path_id, notify=path_id_changed)

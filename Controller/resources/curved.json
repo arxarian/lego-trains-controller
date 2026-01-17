@@ -1,8 +1,8 @@
 {
     "source": "qrc:/curved.png",
     "paths": [
-        { "from": "start", "to": "end", "length": 16, "path": "A"  },
-        { "from": "end", "to": "start", "length": 16, "path": "A"  }
+        { "from": "start", "to": "end", "length": 16, "path_id": "A" },
+        { "from": "end", "to": "start", "length": 16, "path_id": "A" }
     ],
     "connectors":[
         { "name": "start", "dir": "forward", "angle": 1, "rotator": { "x": 147.5, "y": 61, "angle": 202.5 },
