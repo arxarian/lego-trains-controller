@@ -1,8 +1,8 @@
 import QtQuick
+import QtQuick.Shapes
 import TrainView
 
 SelectableItem {
-
     id: root
 
     /*required*/ property Rail railData // TODO - required is not working for some reason
@@ -173,6 +173,19 @@ SelectableItem {
         onClicked: (mouse) => {
             mouse.accepted = false
             console.log("rail id", root.railData.id)
+        }
+    }
+
+    Shape {
+        anchors.fill: parent
+
+        ShapePath {
+            strokeColor: "red"
+            strokeWidth: 10
+            fillColor: "transparent"
+
+            startX: 160; startY: 0
+            PathLine { x: 160; y: 640 }
         }
     }
 }

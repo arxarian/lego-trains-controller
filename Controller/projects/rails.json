@@ -2,7 +2,7 @@
     "rails": [
         {
             "id": 1,
-            "type": 0,
+            "type": 2,
             "rotator": {
                 "x": 0,
                 "y": 0,
@@ -16,8 +16,12 @@
                     "connectedRailId": 2
                 },
                 {
-                    "name": "end",
-                    "connectedRailId": 5
+                    "name": "end_curved",
+                    "connectedRailId": 4
+                },
+                {
+                    "name": "end_straight",
+                    "connectedRailId": 3
                 }
             ]
         },
@@ -26,11 +30,32 @@
             "type": 0,
             "rotator": {
                 "x": 160.0,
-                "y": 0.0,
-                "angle": 180.0
+                "y": 640.0,
+                "angle": 0.0
             },
-            "x": 0.0,
-            "y": -0.0,
+            "x": -0.5,
+            "y": -640.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": -1
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 1
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 0.0,
+                "angle": 0.0
+            },
+            "x": -0.5,
+            "y": 1279.0,
             "connectors": [
                 {
                     "name": "start",
@@ -38,72 +63,20 @@
                 },
                 {
                     "name": "end",
-                    "connectedRailId": 3
-                }
-            ],
-            "markers": [
-                {
-                    "index": 2,
-                    "color": "#008000"
-                },
-                {
-                    "index": 3,
-                    "color": "#0000ff"
-                }
-            ]
-        },
-        {
-            "id": 3,
-            "type": 1,
-            "rotator": {
-                "x": 267.0,
-                "y": 658.0,
-                "angle": 0.0
-            },
-            "x": -107.0,
-            "y": -1298.0,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 4
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 2
+                    "connectedRailId": 5
                 }
             ]
         },
         {
             "id": 4,
-            "type": 1,
+            "type": 0,
             "rotator": {
-                "x": 267.0,
-                "y": 658.0,
+                "x": 160.0,
+                "y": 0.0,
                 "angle": -22.5
             },
-            "x": -226.5,
-            "y": -1895.0,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 20
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 3
-                }
-            ]
-        },
-        {
-            "id": 5,
-            "type": 1,
-            "rotator": {
-                "x": 147.5,
-                "y": 61.0,
-                "angle": 22.5
-            },
-            "x": 12.5,
-            "y": 579.0,
+            "x": 521.0,
+            "y": 1322.5,
             "connectors": [
                 {
                     "name": "start",
@@ -116,15 +89,73 @@
             ]
         },
         {
-            "id": 6,
-            "type": 1,
+            "id": 5,
+            "type": 0,
             "rotator": {
-                "x": 147.5,
-                "y": 61.0,
-                "angle": 45.0
+                "x": 160.0,
+                "y": 0.0,
+                "angle": 0.0
             },
-            "x": -105.6,
-            "y": 1176.3,
+            "x": -0.5,
+            "y": 1919.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 3
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 7
+                }
+            ],
+            "markers": [
+                {
+                    "index": 1,
+                    "color": "#008000"
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 0.0,
+                "angle": -22.5
+            },
+            "x": 765.9,
+            "y": 1913.8,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 4
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": -1
+                }
+            ],
+            "markers": [
+                {
+                    "index": 2,
+                    "color": "#ff0000"
+                },
+                {
+                    "index": 3,
+                    "color": "#ff0000"
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 0.0,
+                "angle": 0.0
+            },
+            "x": -0.5,
+            "y": 2559.0,
             "connectors": [
                 {
                     "name": "start",
@@ -132,344 +163,14 @@
                 },
                 {
                     "name": "end",
-                    "connectedRailId": 7
-                }
-            ]
-        },
-        {
-            "id": 7,
-            "type": 1,
-            "rotator": {
-                "x": 147.5,
-                "y": 61.0,
-                "angle": 67.5
-            },
-            "x": -443.2,
-            "y": 1682.9,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 6
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 8
-                }
-            ]
-        },
-        {
-            "id": 8,
-            "type": 1,
-            "rotator": {
-                "x": 147.5,
-                "y": 61.0,
-                "angle": 90.0
-            },
-            "x": -949.0,
-            "y": 2021.8,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 7
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 9
-                }
-            ],
-            "markers": [
-                {
-                    "index": 3,
-                    "color": "#ffff00"
-                }
-            ]
-        },
-        {
-            "id": 9,
-            "type": 1,
-            "rotator": {
-                "x": 147.5,
-                "y": 61.0,
-                "angle": 112.5
-            },
-            "x": -1546.0,
-            "y": 2141.3,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 8
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 10
-                }
-            ],
-            "markers": [
-                {
-                    "index": 0,
-                    "color": "#0000ff"
-                }
-            ]
-        },
-        {
-            "id": 10,
-            "type": 1,
-            "rotator": {
-                "x": 147.5,
-                "y": 61.0,
-                "angle": 135.0
-            },
-            "x": -2143.3,
-            "y": 2023.2,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 9
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 11
-                }
-            ]
-        },
-        {
-            "id": 11,
-            "type": 1,
-            "rotator": {
-                "x": 147.5,
-                "y": 61.0,
-                "angle": 157.5
-            },
-            "x": -2650.0,
-            "y": 1685.6,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 10
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 12
-                }
-            ]
-        },
-        {
-            "id": 12,
-            "type": 1,
-            "rotator": {
-                "x": 147.5,
-                "y": 61.0,
-                "angle": 180.0
-            },
-            "x": -2988.8,
-            "y": 1179.8,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 11
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 13
-                }
-            ]
-        },
-        {
-            "id": 13,
-            "type": 0,
-            "rotator": {
-                "x": 160.0,
-                "y": 0.0,
-                "angle": 180.0
-            },
-            "x": -3120.8,
-            "y": 643.8,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 12
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 14
-                }
-            ],
-            "markers": [
-                {
-                    "index": 3,
-                    "color": "#ffff00"
-                }
-            ]
-        },
-        {
-            "id": 14,
-            "type": 0,
-            "rotator": {
-                "x": 160.0,
-                "y": 0.0,
-                "angle": 180.0
-            },
-            "x": -3120.8,
-            "y": 3.8,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 13
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 15
-                }
-            ],
-            "markers": [
-                {
-                    "index": 0,
-                    "color": "#008000"
-                }
-            ]
-        },
-        {
-            "id": 15,
-            "type": 1,
-            "rotator": {
-                "x": 147.5,
-                "y": 61.0,
-                "angle": 202.5
-            },
-            "x": -3108.3,
-            "y": -697.2,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 14
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 16
-                }
-            ]
-        },
-        {
-            "id": 16,
-            "type": 1,
-            "rotator": {
-                "x": 147.5,
-                "y": 61.0,
-                "angle": 225.0
-            },
-            "x": -2990.3,
-            "y": -1294.5,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 15
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 17
-                }
-            ]
-        },
-        {
-            "id": 17,
-            "type": 1,
-            "rotator": {
-                "x": 147.5,
-                "y": 61.0,
-                "angle": 247.5
-            },
-            "x": -2652.6,
-            "y": -1801.2,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 16
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 18
-                }
-            ]
-        },
-        {
-            "id": 18,
-            "type": 1,
-            "rotator": {
-                "x": 147.5,
-                "y": 61.0,
-                "angle": 270.0
-            },
-            "x": -2146.8,
-            "y": -2140.0,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 17
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 19
-                }
-            ],
-            "markers": [
-                {
-                    "index": 3,
-                    "color": "#008000"
-                }
-            ]
-        },
-        {
-            "id": 19,
-            "type": 1,
-            "rotator": {
-                "x": 147.5,
-                "y": 61.0,
-                "angle": 292.5
-            },
-            "x": -1549.8,
-            "y": -2259.5,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 18
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 20
-                }
-            ],
-            "markers": [
-                {
-                    "index": 0,
-                    "color": "#ff0000"
-                }
-            ]
-        },
-        {
-            "id": 20,
-            "type": 1,
-            "rotator": {
-                "x": 147.5,
-                "y": 61.0,
-                "angle": 315.0
-            },
-            "x": -952.5,
-            "y": -2141.5,
-            "connectors": [
-                {
-                    "name": "start",
-                    "connectedRailId": 19
-                },
-                {
-                    "name": "end",
-                    "connectedRailId": 4
+                    "connectedRailId": -1
                 }
             ]
         }
     ],
     "settings": {
-        "canvas_x": 223.0,
-        "canvas_y": 56.0,
-        "canvas_zoom": 0.1
+        "canvas_x": -171.0,
+        "canvas_y": -321.0,
+        "canvas_zoom": 0.23
     }
 }

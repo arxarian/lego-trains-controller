@@ -22,5 +22,16 @@
         {"rotator": { "x": 422, "y": 867, "angle": -33.75 }, "distance": 23, "path_id": "B"},
         {"rotator": { "x": 525, "y": 1024, "angle": -33.75 }, "distance": 27, "path_id": "B"},
         {"rotator": { "x": 615, "y": 1185, "angle": -28.125 }, "distance": 31, "path_id": "B"},
-        {"rotator": { "x": 681, "y": 1322.5, "angle": -22.5 }, "distance": 35, "path_id": "B"}]
+        {"rotator": { "x": 681, "y": 1322.5, "angle": -22.5 }, "distance": 35, "path_id": "B"}
+    ],
+    "path_indicators": [
+        {"x": 159.5, "y": 0, "path_id": "A" },
+        {"x": 159.5, "y": 960, "path_id": "A" },
+        {"x": 159.5, "y": 1120, "path_id": "A" },
+        {"x": 159.5, "y": 1279, "path_id": "A" },
+        {"x": 422, "y": 867, "path_id": "B" },
+        {"x": 525, "y": 1024, "path_id": "B" },
+        {"x": 615, "y": 1185, "path_id": "B" },
+        {"x": 681, "y": 1322.5, "path_id": "B" }
+    ]
 }

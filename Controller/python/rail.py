@@ -84,6 +84,7 @@ class Rail(QObject):
         self._rotator = rotator if rotator is not None else Rotator(parent=self)    # Rotator/QObject
         self._markers = markers if markers is not None else Markers(parent=self)    # QAbstractListModel
         self._connectors = connectors if connectors is not None else Connectors(parent=self)    # QAbstractListModel
+        self._track
 
         self._paths = {}                            # dictionary
 
