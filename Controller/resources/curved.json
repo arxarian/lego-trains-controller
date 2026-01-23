@@ -11,9 +11,9 @@
             "next": 0 }
     ],
     "markers": [
-        {"rotator": {"x": 147.5, "y": 61, "angle": -22.5}, "distance": 0},
-        {"rotator": {"x": 198, "y": 205, "angle": -16.875}, "distance": 4},
-        {"rotator": {"x": 235, "y": 354, "angle": -11.25}, "distance": 8},
-        {"rotator": {"x": 258, "y": 505, "angle": -5.625}, "distance": 12},
-        {"rotator": {"x": 267, "y": 658, "angle": 0}, "distance": 16}]
+        {"rotator": {"x": 147.5, "y": 61, "angle": -22.5}, "distance": 0, "path_id": "A"},
+        {"rotator": {"x": 198, "y": 205, "angle": -16.875}, "distance": 4, "path_id": "A"},
+        {"rotator": {"x": 235, "y": 354, "angle": -11.25}, "distance": 8, "path_id": "A"},
+        {"rotator": {"x": 258, "y": 505, "angle": -5.625}, "distance": 12, "path_id": "A"},
+        {"rotator": {"x": 267, "y": 658, "angle": 0}, "distance": 16, "path_id": "A"}]
 }
