@@ -9,6 +9,7 @@ from PySide6.QtQml import QmlElement
 from connectors import Connectors
 from markers import Markers
 from rotator import Rotator
+from path_indicators import PathIndicators
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -72,7 +73,7 @@ class Rail(QObject):
 
     def __init__(self, type: RailType=RailType.Undefined, id: int=0, length: int=0, x: float=0,
         y: float=0, rotator: Rotator=None, connectors: Connectors=None, markers: Markers=None,
-        parent=None):
+        path_indicators: PathIndicators=None, parent=None): # TODO - do I need to put path_indicators here?
 
         super().__init__(parent)
         self._id = Rail.generate_id(id)             # int
@@ -82,9 +83,11 @@ class Rail(QObject):
         self._x = x                                 # float
         self._y = y                                 # float
         self._rotator = rotator if rotator is not None else Rotator(parent=self)    # Rotator/QObject
-        self._markers = markers if markers is not None else Markers(parent=self)    # QAbstractListModel
-        self._connectors = connectors if connectors is not None else Connectors(parent=self)    # QAbstractListModel
-        self._track
+
+        # QAbstractListModels
+        self._markers = markers if markers is not None else Markers(parent=self)
+        self._connectors = connectors if connectors is not None else Connectors(parent=self)
+        self._path_indicators = path_indicators if path_indicators is not None else PathIndicators(parent=self)
 
         self._paths = {}                            # dictionary
 
@@ -104,6 +107,9 @@ class Rail(QObject):
                         continue
                     if key == "markers":
                         self._markers.setModel(value)
+                        continue
+                    if key == "path_indicators":
+                        self._path_indicators.setModel(value)
                         continue
                     setattr(self, key, value)
 
@@ -154,6 +160,11 @@ class Rail(QObject):
         return self._markers
 
     markers = Property(QObject, markers, constant=True)
+
+    def path_indicators(self):
+        return self._path_indicators
+
+    path_indicators = Property(QObject, path_indicators, constant=True)
 
     def type(self):
         return self._type

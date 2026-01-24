@@ -3,15 +3,15 @@ from __future__ import annotations
 from enum import IntEnum
 from PySide6.QtCore import QAbstractListModel, Slot, QEnum, Qt, QModelIndex, QByteArray
 from PySide6.QtQml import QmlElement
-from PySide6.QtGui import QColor
+#from PySide6.QtGui import QColor
 
-from marker import Marker
+from path_indicator import PathIndicator
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
 @QmlElement
-class Track(QAbstractListModel):
+class PathIndicators(QAbstractListModel):
 
     @QEnum
     class Role(IntEnum):
@@ -19,7 +19,7 @@ class Track(QAbstractListModel):
 
     def __init__(self, data: list=None, parent=None) -> None:
         super().__init__(parent)
-        self._data = data or []
+        self._data = data or [] # TODO - why? Is it needed?
         self._items = []
 
     @Slot(QModelIndex, result=int)
@@ -29,21 +29,21 @@ class Track(QAbstractListModel):
     def data(self, index: QModelIndex, role: int):
         row = index.row()
         if row < self.rowCount():
-            if role == Track.Role.ObjectRole:
+            if role == PathIndicators.Role.ObjectRole:
                 return self._items[row]
         return None
 
     def roleNames(self):
         roles = super().roleNames()
-        roles[Track.Role.ObjectRole] = QByteArray(b"object")
+        roles[PathIndicators.Role.ObjectRole] = QByteArray(b"object")
         return roles
 
     def setModel(self, metaData):
         self.beginInsertRows(QModelIndex(), 0, len(metaData))
         for i, d in enumerate(metaData):
-            self._items.append(Marker(data=d, index=i, color=self.resolveColor(i) , parent=self))
+            self._items.append(PathIndicator(data=d, parent=self))
         self.endInsertRows()
         self._data = [] # clear the original data, not needed anymore
 
-    def load_data(data, parent):
-        return Track(data=data, parent=parent)
+    #def load_data(data, parent):
+    #    return PathIndicators(data=data, parent=parent)

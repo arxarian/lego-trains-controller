@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QObject, Signal, Property, Slot
+from PySide6.QtCore import QObject, Signal, Property
 from PySide6.QtQml import QmlElement
 from PySide6.QtGui import QColor
 
@@ -11,12 +11,20 @@ QML_IMPORT_MAJOR_VERSION = 1
 @QmlElement
 class PathIndicator(QObject):
 
-    def __init__(self, data: dict=None, color=None, index=-1, parent=None):
+    def __init__(self, data: dict=None, parent=None):
         super().__init__(parent)
-        self._visible = False if color is None else True
-        self._color = color
+        self._visible = True    # TODO - change to false
+                                #
+        self._color = "red"     # TODO - no color setting at creation, it should be set when visible true?
+                                #      - what about for more indicators?
+
+        self._x = 0             # set in load_metadata
+        self._y = 0             # set in load_metadata
+        self._path_id = None    # set in load_metadata
 
         self.load_metadata(data)
+
+        print("PathIndicator created", self._x, self._y, self._path_id)
 
     def load_metadata(self, data):
         if data == None:
@@ -24,24 +32,13 @@ class PathIndicator(QObject):
 
         for key, value in data.items():
             if hasattr(self, key):
-                if key == "rotator":
-                    self._rotator = Rotator.load_data(value, self)
-                    continue
                 setattr(self, key, value)
-
-    def save_data(self):
-        if self._color is not None:
-            return { "index": self._index, "color": self._color.name() }
-
-    @Slot()
-    def remove(self):
-        self.set_color(None)
-        self.set_visible(False)
 
     def visible(self):
         return self._visible
 
     def set_visible(self, value):
+        # set color if true
         self._visible = value
         self.visible_changed.emit()
 
@@ -58,30 +55,25 @@ class PathIndicator(QObject):
     color_changed = Signal()
     color = Property(QColor, color, set_color, notify=color_changed)
 
-    def index(self):
-        return self._index
+    def x(self):
+        return self._x
 
-    def set_index(self, value):
-        self._index = value
-        self.index_changed.emit()
+    def set_x(self, value):
+        self._x = value
+        self.x_changed.emit()
 
-    index_changed = Signal()
-    index = Property(int, index, set_index, notify=index_changed)
+    x_changed = Signal()
+    x = Property(float, x, set_x, notify=x_changed)
 
-    def rotator(self):
-        return self._rotator
+    def y(self):
+        return self._y
 
-    rotator = Property(QObject, rotator, constant=True)
+    def set_y(self, value):
+        self._y = value
+        self.y_changed.emit()
 
-    def distance(self):
-        return self._distance
-
-    def set_distance(self, value):
-        self._distance = value
-        self.distance_changed.emit()
-
-    distance_changed = Signal()
-    distance = Property(int, distance, set_distance, notify=distance_changed)
+    y_changed = Signal()
+    y = Property(float, y, set_y, notify=y_changed)
 
     def path_id(self):
         return self._path_id
