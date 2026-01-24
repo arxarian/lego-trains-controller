@@ -1,12 +1,11 @@
 import QtQuick
-import QtQuick.Shapes
 import TrainView
 
 SelectableItem {
     id: root
 
     /*required*/ property Rail railData // TODO - required is not working for some reason
-    property alias connectors: connectors
+    property alias connectors: connectors   // TODO - is it necessary?
 
     x: root.railData ? root.railData.x : 0
     y: root.railData ? root.railData.y : 0
@@ -176,16 +175,8 @@ SelectableItem {
         }
     }
 
-    Shape {
+    PathIndicatorView {
         anchors.fill: parent
-
-        ShapePath {
-            strokeColor: "red"
-            strokeWidth: 10
-            fillColor: "transparent"
-
-            startX: 160; startY: 0
-            PathLine { x: 160; y: 640 }
-        }
+        model: root.railData.path_indicators
     }
 }

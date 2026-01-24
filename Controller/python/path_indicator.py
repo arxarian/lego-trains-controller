@@ -13,7 +13,7 @@ class PathIndicator(QObject):
 
     def __init__(self, data: dict=None, parent=None):
         super().__init__(parent)
-        self._visible = True    # TODO - change to false
+        self._visible = True    # TODO - change to false. Move to parent component?
                                 #
         self._color = "red"     # TODO - no color setting at creation, it should be set when visible true?
                                 #      - what about for more indicators?
@@ -22,9 +22,10 @@ class PathIndicator(QObject):
         self._y = 0             # set in load_metadata
         self._path_id = None    # set in load_metadata
 
-        self.load_metadata(data)
+        # TODO - type - line or curve
+        # TODO - move color to parent component?
 
-        print("PathIndicator created", self._x, self._y, self._path_id)
+        self.load_metadata(data)
 
     def load_metadata(self, data):
         if data == None:

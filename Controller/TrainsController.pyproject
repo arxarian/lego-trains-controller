@@ -45,6 +45,7 @@
         "qml/SelectedMarker.qml",
         "qml/MarkerItem.qml",
         "qml/SelectableItem.qml",
-        "qml/RunScreen.qml"
+        "qml/RunScreen.qml",
+        "qml/PathIndicatorView.qml"
     ]
 }
