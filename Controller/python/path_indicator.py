@@ -20,7 +20,7 @@ class PathIndicator(QObject):
 
         self._x = 0             # set in load_metadata
         self._y = 0             # set in load_metadata
-        self._path_id = None    # set in load_metadata
+        self._path_id = ""      # set in load_metadata, can be empty => applies for paths
 
         # TODO - type - line or curve
         # TODO - move color to parent component?

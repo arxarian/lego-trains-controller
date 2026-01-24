@@ -8,6 +8,7 @@ from network import Network
 from project_storage import ProjectStorage
 from marker_types import MarkerTypes
 from rail_types import RailTypes
+from path_indicators_filter import PathIndicatorsFilter
 
 class AppContext:
     def __init__(self, engine: QQmlApplicationEngine):

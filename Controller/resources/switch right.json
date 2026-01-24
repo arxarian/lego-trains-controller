@@ -25,7 +25,7 @@
         {"rotator": { "x": 148, "y": 1322.5, "angle": 22.5 }, "distance": 35, "path_id": "B"}
     ],
     "path_indicators": [
-        { "x": 669.5, "y": 0, "path_id": "A" },
+        { "x": 669.5, "y": 0, "path_id": "" },
         { "x": 669.5, "y": 960, "path_id": "A" },
         { "x": 669.5, "y": 1120, "path_id": "A" },
         { "x": 669.5, "y": 1279, "path_id": "A" },

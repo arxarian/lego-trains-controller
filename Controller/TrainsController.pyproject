@@ -30,6 +30,7 @@
         "python/rail_types.py",
         "python/rail_type.py",
         "python/path_indicators.py",
+        "python/path_indicators_filter.py",
         "python/path_indicator.py",
         "qml/Main.qml",
         "qml/qmldir",
