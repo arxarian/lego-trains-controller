@@ -1,3 +1,4 @@
 *.user
 *.pyc
 *.autosave
+*.dot
