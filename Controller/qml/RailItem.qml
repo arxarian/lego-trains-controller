@@ -177,6 +177,10 @@ SelectableItem {
 
     PathIndicatorView {
         anchors.fill: parent
-        model: root.railData.path_indicators
+        model: PathIndicatorsFilter {
+            id: filter
+            sourceModel: root.railData.path_indicators
+            path_id: "A"
+        }
     }
 }

@@ -22,8 +22,11 @@ class PathIndicator(QObject):
         self._y = 0             # set in load_metadata
         self._path_id = ""      # set in load_metadata, can be empty => applies for paths
 
-        # TODO - type - line or curve
-        # TODO - move color to parent component?
+        # TODO - lineType: line or curve
+        #      - pointType: start/end point vs control point
+        #      - active: selected for planning
+        #      - active influnce z axis and color? In QML?
+        # TODO - move color to parent component? How about in case switches?
 
         self.load_metadata(data)
 
