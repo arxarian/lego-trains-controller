@@ -175,12 +175,8 @@ SelectableItem {
         }
     }
 
-    PathIndicatorView {
+    MultiPathView {
         anchors.fill: parent
-        model: PathIndicatorsFilter {
-            id: filter
-            sourceModel: root.railData.path_indicators
-            path_id: "A"
-        }
+        model: root.railData.path_indicators
     }
 }

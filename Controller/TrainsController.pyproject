@@ -32,6 +32,8 @@
         "python/path_indicators.py",
         "python/path_indicators_filter.py",
         "python/path_indicator.py",
+        "python/multi_path_indicators.py",
+        "python/multi_path_indicator.py",
         "qml/Main.qml",
         "qml/qmldir",
         "qml/DiscoverDevices.qml",
@@ -47,6 +49,7 @@
         "qml/MarkerItem.qml",
         "qml/SelectableItem.qml",
         "qml/RunScreen.qml",
-        "qml/PathIndicatorView.qml"
+        "qml/PathIndicatorView.qml",
+        "qml/MultiPathView.qml"
     ]
 }
