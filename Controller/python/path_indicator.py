@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from PySide6.QtCore import QObject, Signal, Property
 from PySide6.QtQml import QmlElement
-from PySide6.QtGui import QColor
-
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -13,20 +11,13 @@ class PathIndicator(QObject):
 
     def __init__(self, data: dict=None, parent=None):
         super().__init__(parent)
-        self._visible = True    # TODO - change to false. Move to parent component?
-                                #
-        self._color = "red"     # TODO - no color setting at creation, it should be set when visible true?
-                                #      - what about for more indicators?
 
         self._x = 0             # set in load_metadata
         self._y = 0             # set in load_metadata
-        self._path_id = ""      # set in load_metadata, can be empty => applies for paths
+        self._path_id = ""      # set in load_metadata, can be empty => applies for all paths
 
         # TODO - lineType: line or curve
         #      - pointType: start/end point vs control point
-        #      - active: selected for planning
-        #      - active influnce z axis and color? In QML?
-        # TODO - move color to parent component? How about in case switches?
 
         self.load_metadata(data)
 
@@ -37,27 +28,6 @@ class PathIndicator(QObject):
         for key, value in data.items():
             if hasattr(self, key):
                 setattr(self, key, value)
-
-    def visible(self):
-        return self._visible
-
-    def set_visible(self, value):
-        # set color if true
-        self._visible = value
-        self.visible_changed.emit()
-
-    visible_changed = Signal()
-    visible = Property(bool, visible, set_visible, notify=visible_changed)
-
-    def color(self):
-        return self._color
-
-    def set_color(self, value):
-        self._color = value
-        self.color_changed.emit()
-
-    color_changed = Signal()
-    color = Property(QColor, color, set_color, notify=color_changed)
 
     def x(self):
         return self._x

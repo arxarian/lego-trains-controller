@@ -6,6 +6,8 @@ from PySide6.QtCore import QAbstractListModel, QModelIndex, Slot, QByteArray, QE
 
 from multi_path_indicator import MultiPathIndicator
 
+DEFAULT_PATH = "A"
+
 class MultiPathIndicators(QAbstractListModel):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -34,13 +36,12 @@ class MultiPathIndicators(QAbstractListModel):
     def setModel(self, metaData):
         path_ids = set()
         for d in metaData:
-            if "path_id" in d and d["path_id"] != None and d["path_id"] != "":
+            if "path_id" in d and d["path_id"] != None and d["path_id"] != "":  # add only named paths
                 path_ids.add(d["path_id"])
         if len(path_ids) == 0:
-            path_ids.add("A")
+            path_ids.add(DEFAULT_PATH)
 
         self.beginInsertRows(QModelIndex(), 0, len(path_ids))
-        colors = ["gold", "red"]    # TODO - resolve how to use more colors in case of more paths
-        for i, id in enumerate(path_ids):
-            self._items.append(MultiPathIndicator(id=id, color=colors[i], parent=self))
+        for id in path_ids:
+            self._items.append(MultiPathIndicator(id=id, parent=self))
         self.endInsertRows()

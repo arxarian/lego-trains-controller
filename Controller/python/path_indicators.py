@@ -10,6 +10,8 @@ from multi_path_indicators import MultiPathIndicators
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
+DEFAULT_ACTIVE_PATH = "A"
+
 @QmlElement
 class PathIndicators(QAbstractListModel):
 
@@ -17,9 +19,8 @@ class PathIndicators(QAbstractListModel):
     class Role(IntEnum):
         ObjectRole = Qt.ItemDataRole.UserRole
 
-    def __init__(self, data: list=None, parent=None) -> None:
+    def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        self._data = data or [] # TODO - why? Is it needed?
         self._items = []
         self._path_id_active = ""
         self._multi_path_indicators = MultiPathIndicators(parent=self)
@@ -48,22 +49,18 @@ class PathIndicators(QAbstractListModel):
     def setModel(self, metaData):
         self._multi_path_indicators.setModel(metaData)
         self.beginInsertRows(QModelIndex(), 0, len(metaData))
-        for i, d in enumerate(metaData):
+        for d in metaData:
             self._items.append(PathIndicator(data=d, parent=self))
         self.endInsertRows()
-        self._data = [] # clear the original data, not needed anymore
 
     def path_id_active(self):
         return self._path_id_active
 
     def set_path_id_active(self, value):
-        value = value if value != "" else "A"   # set the default active path if empty
+        value = value if value != "" else DEFAULT_ACTIVE_PATH   # set the default active path if empty
 
-        print("set set_path_id_active", value)
         self._path_id_active = value
         self.path_id_active_changed.emit()
-        # TODO - invalidate filter
-        #self.invalidateFilter.emit()
 
     path_id_active_changed = Signal()
     path_id_active = Property(str, path_id_active, set_path_id_active, notify=path_id_active_changed)

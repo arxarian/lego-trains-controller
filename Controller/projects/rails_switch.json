@@ -1,0 +1,176 @@
+{
+    "rails": [
+        {
+            "id": 1,
+            "type": 2,
+            "rotator": {
+                "x": 0,
+                "y": 0,
+                "angle": 0
+            },
+            "x": 0,
+            "y": 0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 2
+                },
+                {
+                    "name": "end_curved",
+                    "connectedRailId": 4
+                },
+                {
+                    "name": "end_straight",
+                    "connectedRailId": 3
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 640.0,
+                "angle": 0.0
+            },
+            "x": -0.5,
+            "y": -640.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": -1
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 1
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 0.0,
+                "angle": 0.0
+            },
+            "x": -0.5,
+            "y": 1279.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 1
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 5
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 0.0,
+                "angle": -22.5
+            },
+            "x": 521.0,
+            "y": 1322.5,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 1
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 6
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 0.0,
+                "angle": 0.0
+            },
+            "x": -0.5,
+            "y": 1919.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 3
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 7
+                }
+            ],
+            "markers": [
+                {
+                    "index": 1,
+                    "color": "#008000"
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 0.0,
+                "angle": -22.5
+            },
+            "x": 765.9,
+            "y": 1913.8,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 4
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": -1
+                }
+            ],
+            "markers": [
+                {
+                    "index": 2,
+                    "color": "#ff0000"
+                },
+                {
+                    "index": 3,
+                    "color": "#ff0000"
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 0.0,
+                "angle": 0.0
+            },
+            "x": -0.5,
+            "y": 2559.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 5
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": -1
+                }
+            ]
+        }
+    ],
+    "settings": {
+        "canvas_x": -171.0,
+        "canvas_y": -321.0,
+        "canvas_zoom": 0.23
+    }
+}

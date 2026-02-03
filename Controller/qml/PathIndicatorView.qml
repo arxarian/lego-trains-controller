@@ -5,7 +5,7 @@ import TrainView
 Item {
     id: root
 
-    property var model  // TODO - why var and not Connectors?
+    property var model
 
     Shape {
         anchors.fill: parent
@@ -41,6 +41,7 @@ Item {
 
                 sourceComponent: {
                     return lineComponent
+                    // TODO - in case of different types of shape
                     //if (model.type === 0) return lineComponent
                     //if (model.type === 1) return curveComponent
                     //return null

@@ -13,8 +13,7 @@ Item {
 
             property MultiPathIndicator indicator: model.object
 
-            width: root.width
-            height: root.height
+            anchors.fill: parent
 
             PathIndicatorView {
                 anchors.fill: parent

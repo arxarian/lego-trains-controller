@@ -71,9 +71,8 @@ class Rail(QObject):
     # ✓   - x
     # ✓   - y
 
-    def __init__(self, type: RailType=RailType.Undefined, id: int=0, length: int=0, x: float=0,
-        y: float=0, rotator: Rotator=None, connectors: Connectors=None, markers: Markers=None,
-        path_indicators: PathIndicators=None, parent=None): # TODO - do I need to put path_indicators here?
+    def __init__(self, type: RailType=RailType.Undefined, id: int=0, x: float=0, y: float=0,
+    rotator: Rotator=None, connectors: Connectors=None, markers: Markers=None, parent=None):
 
         super().__init__(parent)
         self._id = Rail.generate_id(id)             # int
@@ -87,7 +86,7 @@ class Rail(QObject):
         # QAbstractListModels
         self._markers = markers if markers is not None else Markers(parent=self)
         self._connectors = connectors if connectors is not None else Connectors(parent=self)
-        self._path_indicators = path_indicators if path_indicators is not None else PathIndicators(parent=self)
+        self._path_indicators = PathIndicators(parent=self)
 
         self._paths = {}                            # dictionary
 
@@ -119,8 +118,8 @@ class Rail(QObject):
             **({"markers": self._markers.save_data()} if self._markers.save_data() else {})}
 
     def load_data(data, parent):
-        return Rail(type=data.get("type", 0), id=data.get("id", 0), x=data.get("x", 0), y=data.get("y", 0),
-            rotator=Rotator.load_data(data.get("rotator", {}), parent),
+        return Rail(type=data.get("type", RailType.Undefined), id=data.get("id", 0), x=data.get("x", 0),
+            y=data.get("y", 0), rotator=Rotator.load_data(data.get("rotator", {}), parent),
             connectors=Connectors.load_data(data.get("connectors", []), parent),
             markers=Markers.load_data(data.get("markers", []), parent), parent=parent)
 
