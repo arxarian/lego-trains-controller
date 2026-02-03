@@ -47,6 +47,19 @@ ColumnLayout {
         }
     }
 
+    RowLayout {
+        id: activeRails
+        TextField {
+            id: textFieldRails
+            text: "2,1B,4,6"
+            Layout.fillWidth: true
+        }
+        Button {
+            text: "Plan"
+            onClicked: planner.updatePaths(textFieldRails.displayText)
+        }
+    }
+
     ButtonGroup { id: group }
 
     GridLayout {

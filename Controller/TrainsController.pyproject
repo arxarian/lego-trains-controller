@@ -32,6 +32,7 @@
         "python/path_indicators.py",
         "python/path_indicators_filter.py",
         "python/path_indicator.py",
+        "python/planner.py",
         "python/multi_path_indicators.py",
         "python/multi_path_indicator.py",
         "qml/Main.qml",

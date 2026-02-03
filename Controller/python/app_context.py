@@ -8,6 +8,7 @@ from network import Network
 from project_storage import ProjectStorage
 from marker_types import MarkerTypes
 from rail_types import RailTypes
+from planner import Planner
 from path_indicators_filter import PathIndicatorsFilter
 
 class AppContext:
@@ -19,6 +20,7 @@ class AppContext:
         self.network = Network()
         self.markerTypes = MarkerTypes()
         self.railTypes = RailTypes()
+        self.planner = Planner(self.projectStorage.currentProject.rails)
 
         self.projectStorage.currentProject_changed.connect(self.updateProjectProperties)
         self.updateProjectProperties()
@@ -28,12 +30,14 @@ class AppContext:
         self.setContextProperty("network", self.network)
         self.setContextProperty("markerTypes", self.markerTypes)
         self.setContextProperty("railTypes", self.railTypes)
+        self.setContextProperty("planner", self.planner)
 
     def setContextProperty(self, name: str, object: QObject):
         self.context.setContextProperty(name, object)
 
     @Slot()
     def updateProjectProperties(self):
+            self.planner.updateRailsModel(self.projectStorage.currentProject.rails)
             self.setContextProperty("project", self.projectStorage.currentProject)
             self.setContextProperty("settings", self.projectStorage.currentProject.settings)
             self.setContextProperty("connectorRegister", self.projectStorage.currentProject.connectorRegister)

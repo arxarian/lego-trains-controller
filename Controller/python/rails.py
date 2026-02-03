@@ -23,6 +23,9 @@ class Rails(QAbstractListModel):
         connectorRegister.appendRail.connect(self.append)
         connectorRegister.connectRails.connect(self.connectRails)
 
+    def items(self):
+        return self._items
+
     def rowCount(self, parent=QModelIndex()):
         return len(self._items)
 
@@ -80,13 +83,15 @@ class Rails(QAbstractListModel):
             self.set_loading(False)
 
     @Slot(int, result=Rail)
-    def findRailData(self, id) -> Rail:
-        for rail in self._items:
-            if rail.id == id:
-                return rail
+    def findRailData(self, id: int) -> Rail:
+        # TODO - use try-except?
+        # TODO - use dict if too many data?
+        rail = next((r for r in self._items if r.id == int(id)), None)
 
-        print("rail", id, "not found")
-        return None
+        if rail is None:
+            print(f"Rail {id} not found")
+
+        return rail
 
     def connectRails(self, connector_0: ConnectorEvent, connector_1: ConnectorEvent):
             rail_0 = self.findRailData(connector_0.railId)

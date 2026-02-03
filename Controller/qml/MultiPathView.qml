@@ -18,6 +18,7 @@ Item {
 
             PathIndicatorView {
                 anchors.fill: parent
+                visible: root.model.path_id_active === item.indicator.path_id
                 model: PathIndicatorsFilter {
                     id: filter
                     sourceModel: root.model // TODO - it's a bit confusing to use the same model as above
