@@ -9,6 +9,7 @@ from PySide6.QtQml import QmlElement
 from connectors import Connectors
 from markers import Markers
 from rotator import Rotator
+from path_indicators import PathIndicators
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -70,9 +71,8 @@ class Rail(QObject):
     # ✓   - x
     # ✓   - y
 
-    def __init__(self, type: RailType=RailType.Undefined, id: int=0, length: int=0, x: float=0,
-        y: float=0, rotator: Rotator=None, connectors: Connectors=None, markers: Markers=None,
-        parent=None):
+    def __init__(self, type: RailType=RailType.Undefined, id: int=0, x: float=0, y: float=0,
+    rotator: Rotator=None, connectors: Connectors=None, markers: Markers=None, parent=None):
 
         super().__init__(parent)
         self._id = Rail.generate_id(id)             # int
@@ -82,8 +82,11 @@ class Rail(QObject):
         self._x = x                                 # float
         self._y = y                                 # float
         self._rotator = rotator if rotator is not None else Rotator(parent=self)    # Rotator/QObject
-        self._markers = markers if markers is not None else Markers(parent=self)    # QAbstractListModel
-        self._connectors = connectors if connectors is not None else Connectors(parent=self)    # QAbstractListModel
+
+        # QAbstractListModels
+        self._markers = markers if markers is not None else Markers(parent=self)
+        self._connectors = connectors if connectors is not None else Connectors(parent=self)
+        self._path_indicators = PathIndicators(parent=self)
 
         self._paths = {}                            # dictionary
 
@@ -104,6 +107,9 @@ class Rail(QObject):
                     if key == "markers":
                         self._markers.setModel(value)
                         continue
+                    if key == "path_indicators":
+                        self._path_indicators.setModel(value)
+                        continue
                     setattr(self, key, value)
 
     def save_data(self):  # TODO - why to save rotator? Is it needed?
@@ -112,8 +118,8 @@ class Rail(QObject):
             **({"markers": self._markers.save_data()} if self._markers.save_data() else {})}
 
     def load_data(data, parent):
-        return Rail(type=data.get("type", 0), id=data.get("id", 0), x=data.get("x", 0), y=data.get("y", 0),
-            rotator=Rotator.load_data(data.get("rotator", {}), parent),
+        return Rail(type=data.get("type", RailType.Undefined), id=data.get("id", 0), x=data.get("x", 0),
+            y=data.get("y", 0), rotator=Rotator.load_data(data.get("rotator", {}), parent),
             connectors=Connectors.load_data(data.get("connectors", []), parent),
             markers=Markers.load_data(data.get("markers", []), parent), parent=parent)
 
@@ -153,6 +159,11 @@ class Rail(QObject):
         return self._markers
 
     markers = Property(QObject, markers, constant=True)
+
+    def path_indicators(self):
+        return self._path_indicators
+
+    path_indicators = Property(QObject, path_indicators, constant=True)
 
     def type(self):
         return self._type

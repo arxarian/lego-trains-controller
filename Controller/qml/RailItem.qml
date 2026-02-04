@@ -2,11 +2,10 @@ import QtQuick
 import TrainView
 
 SelectableItem {
-
     id: root
 
     /*required*/ property Rail railData // TODO - required is not working for some reason
-    property alias connectors: connectors
+    property alias connectors: connectors   // TODO - is it necessary?
 
     x: root.railData ? root.railData.x : 0
     y: root.railData ? root.railData.y : 0
@@ -174,5 +173,10 @@ SelectableItem {
             mouse.accepted = false
             console.log("rail id", root.railData.id)
         }
+    }
+
+    MultiPathView {
+        anchors.fill: parent
+        model: root.railData.path_indicators
     }
 }
