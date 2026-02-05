@@ -3,7 +3,7 @@ from __future__ import annotations
 from PySide6.QtCore import QSortFilterProxyModel, Qt, Property, Signal
 from PySide6.QtQml import QmlElement
 
-from path_indicators import PathIndicators
+from python.models.path_indicators import PathIndicators
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1

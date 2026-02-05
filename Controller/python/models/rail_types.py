@@ -7,7 +7,7 @@ import json
 from enum import IntEnum
 from PySide6.QtCore import QAbstractListModel, Slot, QEnum, Qt, QModelIndex, QByteArray, Signal, Property
 
-from rail_type import RailType
+from python.items.rail_type import RailType
 
 class RailTypes(QAbstractListModel):
 

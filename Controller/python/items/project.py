@@ -2,10 +2,10 @@
 
 from PySide6.QtCore import QObject, Signal, Property
 
-from rail import Rail
-from rails import Rails
-from settings import Settings
-from connectorregister import ConnectorRegister
+from python.settings import Settings
+from python.items.rail import Rail
+from python.items.connectorregister import ConnectorRegister
+from python.models.rails import Rails
 
 class Project(QObject):
     def __init__(self, name: str="", data: dict=None, parent=None):

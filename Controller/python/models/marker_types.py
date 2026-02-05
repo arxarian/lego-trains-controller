@@ -8,7 +8,7 @@ from enum import IntEnum
 from PySide6.QtCore import (QAbstractListModel, Slot, Qt, QEnum, QModelIndex, QByteArray,
     Signal, Property, QObject)
 
-from marker_type import MarkerType
+from python.items.marker_type import MarkerType
 
 class MarkerTypes(QAbstractListModel):
 

@@ -1,6 +1,4 @@
-import sys, os
-
-sys.path.insert(0,"python") # include python folder
+import sys
 
 import resources.rails_rc
 
@@ -10,12 +8,12 @@ from qasync import QEventLoop
 from pathlib import Path
 import asyncio
 
-from app_context import AppContext
+from python.app_context import AppContext
 
 def importPaths(engine: QQmlApplicationEngine):
     engine.addImportPath(Path(__file__).parent)
-    engine.addImportPath(os.path.join(Path(__file__).parent, "qml"))
-    engine.addImportPath(os.path.join(Path(__file__).parent, "resources"))
+    engine.addImportPath("qml")
+    engine.addImportPath("resources")
 
 if __name__ == '__main__':
     app = QGuiApplication(sys.argv)
@@ -28,7 +26,7 @@ if __name__ == '__main__':
     importPaths(engine)
     context = AppContext(engine)
 
-    engine.loadFromModule("qml", "Main")
+    engine.load(str("qml/Main.qml"))
 
     if not engine.rootObjects():
         sys.exit(-1)

@@ -5,9 +5,9 @@ from PySide6.QtCore import QAbstractListModel, Slot, Signal, Property, QObject
 from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
 from PySide6.QtQuick import QQuickItem
 
-from rail import Rail
-from connectors import Connectors
-from connectorregister import ConnectorEvent, ConnectorRegister
+from python.items.rail import Rail
+from python.items.connectorregister import ConnectorEvent, ConnectorRegister
+from python.models.connectors import Connectors
 
 class Rails(QAbstractListModel):
 

@@ -5,7 +5,7 @@ from PySide6.QtCore import QAbstractListModel, Slot, Property, Signal
 from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
 
 from bleak import BleakScanner, BleakClient
-from device import Device
+from python.items.device import Device
 
 import asyncio
 

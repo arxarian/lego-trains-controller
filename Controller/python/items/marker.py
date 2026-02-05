@@ -4,7 +4,7 @@ from PySide6.QtCore import QObject, Signal, Property, Slot
 from PySide6.QtQml import QmlElement
 from PySide6.QtGui import QColor
 
-from rotator import Rotator
+from python.items.rotator import Rotator
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
