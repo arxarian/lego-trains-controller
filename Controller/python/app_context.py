@@ -3,13 +3,13 @@
 from PySide6.QtCore import QObject, Slot
 from PySide6.QtQml import QQmlApplicationEngine
 
-from devices import Devices
-from network import Network
-from project_storage import ProjectStorage
-from marker_types import MarkerTypes
-from rail_types import RailTypes
-from planner import Planner
-from path_indicators_filter import PathIndicatorsFilter
+from python.models.devices import Devices
+from python.network import Network
+from python.models.project_storage import ProjectStorage
+from python.models.marker_types import MarkerTypes
+from python.models.rail_types import RailTypes
+from python.planner import Planner
+from python.models.path_indicators_filter import PathIndicatorsFilter
 
 class AppContext:
     def __init__(self, engine: QQmlApplicationEngine):

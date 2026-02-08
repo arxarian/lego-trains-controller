@@ -5,7 +5,7 @@ from pathlib import Path
 
 from PySide6.QtCore import QObject, Slot, Property, Signal
 
-from project import Project
+from python.items.project import Project
 
 DEFAULT_NAME="rails"      # a default projet name for now
 

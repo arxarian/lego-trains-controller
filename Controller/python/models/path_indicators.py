@@ -4,8 +4,8 @@ from enum import IntEnum
 from PySide6.QtCore import QAbstractListModel, Slot, QEnum, Qt, QModelIndex, QByteArray, Property, QObject, Signal
 from PySide6.QtQml import QmlElement
 
-from path_indicator import PathIndicator
-from multi_path_indicators import MultiPathIndicators
+from python.items.path_indicator import PathIndicator
+from python.models.multi_path_indicators import MultiPathIndicators
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1

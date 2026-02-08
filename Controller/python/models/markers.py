@@ -5,7 +5,7 @@ from PySide6.QtCore import QAbstractListModel, Slot, QEnum, Qt, QModelIndex, QBy
 from PySide6.QtQml import QmlElement
 from PySide6.QtGui import QColor
 
-from marker import Marker
+from python.items.marker import Marker
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1

@@ -6,10 +6,10 @@ from enum import IntEnum
 from PySide6.QtCore import QObject, Property, Signal, QEnum
 from PySide6.QtQml import QmlElement
 
-from connectors import Connectors
-from markers import Markers
-from rotator import Rotator
-from path_indicators import PathIndicators
+from python.items.rotator import Rotator
+from python.models.connectors import Connectors
+from python.models.markers import Markers
+from python.models.path_indicators import PathIndicators
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1

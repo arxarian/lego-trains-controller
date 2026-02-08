@@ -4,7 +4,7 @@ from __future__ import annotations
 from enum import IntEnum
 from PySide6.QtCore import QAbstractListModel, QModelIndex, Slot, QByteArray, QEnum, Qt
 
-from multi_path_indicator import MultiPathIndicator
+from python.items.multi_path_indicator import MultiPathIndicator
 
 DEFAULT_PATH = "A"
 

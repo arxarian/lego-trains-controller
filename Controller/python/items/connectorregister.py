@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from PySide6.QtCore import QObject, Slot, Signal, Qt
 from PySide6.QtQml import QmlElement
-from rail import RailType
 from dataclasses import dataclass
+
+from python.items.rail import RailType
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1

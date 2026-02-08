@@ -4,7 +4,7 @@ from enum import IntEnum
 from PySide6.QtCore import QAbstractListModel, QObject, Slot
 from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
 
-from connector import Connector, State
+from python.items.connector import Connector, State
 
 class Connectors(QAbstractListModel):
 

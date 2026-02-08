@@ -3,7 +3,8 @@ from __future__ import annotations
 from enum import IntEnum
 from PySide6.QtCore import QObject, Property, Signal, QEnum
 from PySide6.QtQml import QmlElement
-from rotator import Rotator
+
+from python.items.rotator import Rotator
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
