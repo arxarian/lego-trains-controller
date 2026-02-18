@@ -1,42 +1,23 @@
 from __future__ import annotations
 
-from enum import IntEnum
-from PySide6.QtCore import QAbstractListModel, Slot, QEnum, Qt, QModelIndex, QByteArray
+from PySide6.QtCore import Slot, QModelIndex
 from PySide6.QtQml import QmlElement
 from PySide6.QtGui import QColor
 
 from python.items.marker import Marker
+from python.models.object_based_model import ObjectBasedModel
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
 @QmlElement
-class Markers(QAbstractListModel):
+class Markers(ObjectBasedModel[Marker]):
 
-    @QEnum
-    class Role(IntEnum):
-        ObjectRole = Qt.ItemDataRole.UserRole
+    _item_class = Marker
 
     def __init__(self, data: list=None, parent=None) -> None:
         super().__init__(parent)
         self._data = data or []
-        self._items = []
-
-    @Slot(QModelIndex, result=int)
-    def rowCount(self, parent=QModelIndex()):
-        return len(self._items)
-
-    def data(self, index: QModelIndex, role: int):
-        row = index.row()
-        if row < self.rowCount():
-            if role == Markers.Role.ObjectRole:
-                return self._items[row]
-        return None
-
-    def roleNames(self):
-        roles = super().roleNames()
-        roles[Markers.Role.ObjectRole] = QByteArray(b"object")
-        return roles
 
     def resolveColor(self, index):
         color = next((d["color"] for d in self._data if d["index"] == index), None)

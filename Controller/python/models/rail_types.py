@@ -4,39 +4,20 @@ from __future__ import annotations
 
 import json
 
-from enum import IntEnum
-from PySide6.QtCore import QAbstractListModel, Slot, QEnum, Qt, QModelIndex, QByteArray, Signal, Property
+from PySide6.QtCore import QModelIndex, Signal, Property
 
 from python.items.rail_type import RailType
+from python.models.object_based_model import ObjectBasedModel
 
-class RailTypes(QAbstractListModel):
+class RailTypes(ObjectBasedModel[RailType]):
 
-    @QEnum
-    class Role(IntEnum):
-        ObjectRole = Qt.ItemDataRole.UserRole
+    _item_class = RailType
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self._railsActive = True
-        self._items = []
 
         self.load_data()
-
-    @Slot(QModelIndex, result=int)
-    def rowCount(self, parent=QModelIndex()):
-        return len(self._items)
-
-    def data(self, index: QModelIndex, role: int):
-        row = index.row()
-        if row < self.rowCount():
-            if role == RailTypes.Role.ObjectRole:
-                return self._items[row]
-        return None
-
-    def roleNames(self):
-        roles = super().roleNames()
-        roles[RailTypes.Role.ObjectRole] = QByteArray(b"object")
-        return roles
 
     def load_data(self):
         with open("resources/rail_types.json") as json_data:

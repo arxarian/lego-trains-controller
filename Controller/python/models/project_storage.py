@@ -45,7 +45,7 @@ class ProjectStorage(QObject):
 
     @Slot(QObject)
     def saveProject(self, project: Project):
-        data = project.data()
+        data = project.save_data()
 
         path = self.base_path.joinpath(project.name + ".json")
         with path.open("w", encoding="utf-8") as f:

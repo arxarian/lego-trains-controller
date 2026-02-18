@@ -1,55 +1,37 @@
 from __future__ import annotations
 
-from enum import IntEnum
-from PySide6.QtCore import QAbstractListModel, Slot, Property, Signal
-from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
+from PySide6.QtCore import Slot, Property, Signal, QModelIndex
+
+from python.models.object_based_model import ObjectBasedModel
 
 from bleak import BleakScanner, BleakClient
 from python.items.device import Device
 
 import asyncio
 
-class Devices(QAbstractListModel):
+class Devices(ObjectBasedModel[Device]):
 
-    @QEnum
-    class DeviceRole(IntEnum):
-        ObjectRole = Qt.ItemDataRole.UserRole
+    _item_class = Device
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        self._devices = []
         self._discovered = []
-
-    def rowCount(self, parent=QModelIndex()):
-        return len(self._devices)
-
-    def data(self, index: QModelIndex, role: int):
-        row = index.row()
-        if row < self.rowCount():
-            if role == Devices.DeviceRole.ObjectRole:
-                return self._devices[row]
-        return None
-
-    def roleNames(self):
-        roles = super().roleNames()
-        roles[Devices.DeviceRole.ObjectRole] = QByteArray(b"object")
-        return roles
 
     def append(self, device):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-        self._devices.append(device)
+        self._items.append(device)
         device.disconnected.connect(self.device_disconnected)
         self.endInsertRows()
 
     def remove(self, device):
-        index = self._devices.index(device)
+        index = self._items.index(device)
         if index > -1:
             self.beginRemoveRows(QModelIndex(), index, index)
-            self._devices.remove(device)
+            self._items.remove(device)
             self.endRemoveRows()
 
     def device_disconnected(self, device):
-        if device in self._devices:
+        if device in self._items:
             self.remove(device)
             print("Disconnected")
         else:

@@ -4,40 +4,20 @@ from __future__ import annotations
 
 import json
 
-from enum import IntEnum
-from PySide6.QtCore import (QAbstractListModel, Slot, Qt, QEnum, QModelIndex, QByteArray,
-    Signal, Property, QObject)
+from PySide6.QtCore import QModelIndex, Signal, Property
 
 from python.items.marker_type import MarkerType
+from python.models.object_based_model import ObjectBasedModel
 
-class MarkerTypes(QAbstractListModel):
+class MarkerTypes(ObjectBasedModel[MarkerType]):
 
-    @QEnum
-    class Role(IntEnum):
-        ObjectRole = Qt.ItemDataRole.UserRole
+    _item_class = MarkerType
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        self._items = []
         self._markersActive = False
 
         self.load_data()
-
-    @Slot(QModelIndex, result=int)
-    def rowCount(self, parent=QModelIndex()):
-        return len(self._items)
-
-    def data(self, index: QModelIndex, role: int):
-        row = index.row()
-        if row < self.rowCount():
-            if role == MarkerTypes.Role.ObjectRole:
-                return self._items[row]
-        return None
-
-    def roleNames(self):
-        roles = super().roleNames()
-        roles[MarkerTypes.Role.ObjectRole] = QByteArray(b"object")
-        return roles
 
     def load_data(self):
         with open("resources/marker_types.json") as json_data:
@@ -46,12 +26,6 @@ class MarkerTypes(QAbstractListModel):
             self.beginInsertRows(QModelIndex(), 0, len(data))
             self._items = [MarkerType(data=d, parent=self) for d in data]
             self.endInsertRows()
-
-    @Slot(int, result=QObject)
-    def get(self, index: int):
-        if index < 0 or index >= self.rowCount():
-            return None
-        return self._items[index]
 
     def markersActive(self):
         return self._markersActive

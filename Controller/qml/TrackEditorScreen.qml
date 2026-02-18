@@ -30,7 +30,7 @@ Item {
         }
 
         onClicked: {
-            if (rails.rowCount() === 0) {
+            if (rails.count() === 0) {
                 connectorRegister.addEvent(Globals.selectedRail)
             }
         }

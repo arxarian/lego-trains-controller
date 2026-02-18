@@ -1,37 +1,18 @@
 from __future__ import annotations
 
-from enum import IntEnum
-from PySide6.QtCore import QAbstractListModel, QObject, Slot
-from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
+from PySide6.QtCore import QObject, Slot, QModelIndex
 
 from python.items.connector import Connector, State
+from python.models.object_based_model import ObjectBasedModel
 
-class Connectors(QAbstractListModel):
+class Connectors(ObjectBasedModel[Connector]):
 
-    @QEnum
-    class Role(IntEnum):
-        ObjectRole = Qt.ItemDataRole.UserRole
+    _item_class = Connector
 
     def __init__(self, data: list=None, parent=None) -> None:
         super().__init__(parent)
         data = data or []
         self._items = [Connector.load_data(d, self) for d in data]
-
-    @Slot(QModelIndex, result=int)
-    def rowCount(self, parent=QModelIndex()):
-        return len(self._items)
-
-    def data(self, index: QModelIndex, role: int):
-        row = index.row()
-        if row < self.rowCount():
-            if role == Connectors.Role.ObjectRole:
-                return self._items[row]
-        return None
-
-    def roleNames(self):
-        roles = super().roleNames()
-        roles[Connectors.Role.ObjectRole] = QByteArray(b"object")
-        return roles
 
     def setModel(self, metaData):
         if len(self._items) > 0:
@@ -61,10 +42,6 @@ class Connectors(QAbstractListModel):
         return Connectors(data=data, parent=parent)
 
     @Slot(result=int)
-    def count(self):
-        return self.rowCount()
-
-    @Slot(result=int)
     def activeCount(self):
         return sum(1 for item in self._items if item.connected())
 
@@ -87,12 +64,6 @@ class Connectors(QAbstractListModel):
         for connector in self._items:
             if connector.connected():
                 return connector
-        return None
-
-    @Slot(int, result=QObject)
-    def get(self, index):
-        if 0 <= index < len(self._items):
-            return self._items[index]
         return None
 
     @Slot(int, result=QObject)

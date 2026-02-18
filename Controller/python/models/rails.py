@@ -1,45 +1,24 @@
 from __future__ import annotations
 
-from enum import IntEnum
-from PySide6.QtCore import QAbstractListModel, Slot, Signal, Property, QObject
-from PySide6.QtCore import QEnum, Qt, QModelIndex, QByteArray
+from PySide6.QtCore import Slot, Signal, Property, QObject, QModelIndex
 from PySide6.QtQuick import QQuickItem
 
 from python.items.rail import Rail
-from python.items.connectorregister import ConnectorEvent, ConnectorRegister
+from python.connectorregister import ConnectorEvent, ConnectorRegister
 from python.models.connectors import Connectors
+from python.models.object_based_model import ObjectBasedModel
 
-class Rails(QAbstractListModel):
+class Rails(ObjectBasedModel[Rail]):
 
-    @QEnum
-    class Role(IntEnum):
-        ObjectRole = Qt.ItemDataRole.UserRole
+    _item_class = Rail
 
     def __init__(self, connectorRegister: ConnectorRegister, parent=None) -> None:
         super().__init__(parent)
-        self._items = []
         self._registeredRails = {}      # id -> item
         self._loading = False
         connectorRegister.appendRail.connect(self.append)
         connectorRegister.connectRails.connect(self.connectRails)
 
-    def items(self):
-        return self._items
-
-    def rowCount(self, parent=QModelIndex()):
-        return len(self._items)
-
-    def data(self, index: QModelIndex, role: int):
-        row = index.row()
-        if row < self.rowCount():
-            if role == Rails.Role.ObjectRole:
-                return self._items[row]
-        return None
-
-    def roleNames(self):
-        roles = super().roleNames()
-        roles[Rails.Role.ObjectRole] = QByteArray(b"object")
-        return roles
 
     def loading(self):
         return self._loading
@@ -59,7 +38,7 @@ class Rails(QAbstractListModel):
         self.resetModel()
 
         self.beginResetModel()
-        self._items = data
+        self._items = [Rail.load_data(d, self) for d in data]
         self.endResetModel()
         print("loaded, size", len(self._items))
 
@@ -134,12 +113,6 @@ class Rails(QAbstractListModel):
                 if connector.connectedRailId == railId:
                     siblings.append(rail.id)
         return siblings
-
-    @Slot(int, result=QObject)
-    def get(self, index):
-        if 0 <= index < len(self._items):
-            return self._items[index]
-        return None
 
     @Slot(int, result=QObject)
     def getById(self, id: int):
