@@ -3,8 +3,7 @@
 from PySide6.QtCore import QObject, Signal, Property
 
 from python.settings import Settings
-from python.items.rail import Rail
-from python.items.connectorregister import ConnectorRegister
+from python.connectorregister import ConnectorRegister
 from python.models.rails import Rails
 
 class Project(QObject):
@@ -16,13 +15,13 @@ class Project(QObject):
         self._settings = Settings(parent=self)
 
         if data:
-            self._rails.load_data([Rail.load_data(d, self._rails) for d in data.get("rails", [])])
+            self._rails.load_data(data.get("rails", []))
             self._settings.deleteLater()
             self._settings = Settings.load_data(data.get("settings", {}), self)
 
         self.set_name(name)
 
-    def data(self) -> dict:
+    def save_data(self) -> dict:
         return {
             "rails": self._rails.save_data(),
             "settings": self._settings.save_data()

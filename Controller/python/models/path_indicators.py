@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from enum import IntEnum
-from PySide6.QtCore import QAbstractListModel, Slot, QEnum, Qt, QModelIndex, QByteArray, Property, QObject, Signal
+from PySide6.QtCore import Property, QObject, Signal, QModelIndex
 from PySide6.QtQml import QmlElement
 
 from python.items.path_indicator import PathIndicator
 from python.models.multi_path_indicators import MultiPathIndicators
+from python.models.object_based_model import ObjectBasedModel
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -13,15 +13,12 @@ QML_IMPORT_MAJOR_VERSION = 1
 DEFAULT_ACTIVE_PATH = "A"
 
 @QmlElement
-class PathIndicators(QAbstractListModel):
+class PathIndicators(ObjectBasedModel[PathIndicator]):
 
-    @QEnum
-    class Role(IntEnum):
-        ObjectRole = Qt.ItemDataRole.UserRole
+    _item_class = PathIndicator
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        self._items = []
         self._path_id_active = ""
         self._multi_path_indicators = MultiPathIndicators(parent=self)
 
@@ -30,21 +27,6 @@ class PathIndicators(QAbstractListModel):
 
     multiPathIndicators = Property(QObject, multiPathIndicators, constant=True)
 
-    @Slot(QModelIndex, result=int)
-    def rowCount(self, parent=QModelIndex()):
-        return len(self._items)
-
-    def data(self, index: QModelIndex, role: int):
-        row = index.row()
-        if row < self.rowCount():
-            if role == PathIndicators.Role.ObjectRole:
-                return self._items[row]
-        return None
-
-    def roleNames(self):
-        roles = super().roleNames()
-        roles[PathIndicators.Role.ObjectRole] = QByteArray(b"object")
-        return roles
 
     def setModel(self, metaData):
         self._multi_path_indicators.setModel(metaData)
