@@ -38,9 +38,6 @@ class Markers(ObjectBasedModel[Marker]):
         ]
         return data
 
-    def load_data(data, parent):
-        return Markers(data=data, parent=parent)
-
     @Slot(result=int)
     def activeCount(self, path_id = None):
         if path_id == None:

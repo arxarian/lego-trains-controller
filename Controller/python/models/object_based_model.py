@@ -42,6 +42,21 @@ class ObjectBasedModel(QAbstractListModel, Generic[T]):
         roles[ObjectBasedModel.Role.ObjectRole] = QByteArray(b"object")
         return roles
 
+    def save_data(self) -> list:
+        return [item.save_data() for item in self._items]
+
+    # TODO - add load_metadata?
+
+    @classmethod    # TODO - is there any meanful use?
+    def load_data(cls, data, parent):
+        return cls(data=data, parent=parent)
+
+    def setModel(self, metaData: list):
+        self.beginInsertRows(QModelIndex(), 0, len(metaData))
+        for d in metaData:
+            self._items.append(self._item_class(data=d, parent=self))
+        self.endInsertRows()
+
     @Slot(result=int)
     def count(self):
         return self.rowCount()

@@ -21,10 +21,7 @@ class Connectors(ObjectBasedModel[Connector]):
                 self._items[i].load_metadata(d)
         else:
             # create a new model
-            self.beginInsertRows(QModelIndex(), 0, len(metaData))
-            for d in metaData:
-                self._items.append(Connector(d, self))
-            self.endInsertRows()
+            super().setModel(metaData)
 
     def connectTo(self, toRailId, connectorIndex):
         self._items[connectorIndex].set_connectedRailId(toRailId)
@@ -33,13 +30,6 @@ class Connectors(ObjectBasedModel[Connector]):
         for connector in self._items:
             if connector.connectedRailId == fromRailId:
                 connector.set_connectedRailId(State.NotConnected)
-
-    def save_data(self):
-        data = [connector.save_data() for connector in self._items]
-        return data
-
-    def load_data(data, parent):
-        return Connectors(data=data, parent=parent)
 
     @Slot(result=int)
     def activeCount(self):

@@ -19,7 +19,6 @@ class Rails(ObjectBasedModel[Rail]):
         connectorRegister.appendRail.connect(self.append)
         connectorRegister.connectRails.connect(self.connectRails)
 
-
     def loading(self):
         return self._loading
 
@@ -29,9 +28,6 @@ class Rails(ObjectBasedModel[Rail]):
 
     loading_changed = Signal()
     loading = Property(bool, loading, set_loading, notify=loading_changed)
-
-    def save_data(self) -> list:
-        return [item.save_data() for item in self._items]
 
     def load_data(self, data: list):
         self.set_loading(True)

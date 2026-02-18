@@ -27,13 +27,9 @@ class PathIndicators(ObjectBasedModel[PathIndicator]):
 
     multiPathIndicators = Property(QObject, multiPathIndicators, constant=True)
 
-
     def setModel(self, metaData):
         self._multi_path_indicators.setModel(metaData)
-        self.beginInsertRows(QModelIndex(), 0, len(metaData))
-        for d in metaData:
-            self._items.append(PathIndicator(data=d, parent=self))
-        self.endInsertRows()
+        super().setModel(metaData)
 
     def path_id_active(self):
         return self._path_id_active
