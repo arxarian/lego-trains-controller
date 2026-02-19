@@ -46,4 +46,5 @@ class Markers(ObjectBasedModel[Marker]):
         if path_id == None:
             return sum(1 for item in self._items if item.visible)
         else:
-            return sum(1 for item in self._items if item.visible and item.path_id == path_id)
+            return sum(1 for item in self._items if item.visible and
+                (item.path_id == path_id or item.path_id == None))
