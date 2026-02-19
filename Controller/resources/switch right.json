@@ -15,7 +15,7 @@
             "next": 0 }
     ],
     "markers": [
-        {"rotator": { "x": 669.5, "y": 0, "angle": 0 }, "distance": 0, "path_id": "A"},
+        {"rotator": { "x": 669.5, "y": 0, "angle": 0 }, "distance": 0, "path_id": ""},
         {"rotator": { "x": 669.5, "y": 960, "angle": 0 }, "distance": 24, "path_id": "A"},
         {"rotator": { "x": 669.5, "y": 1120, "angle": 0 }, "distance": 28, "path_id": "A"},
         {"rotator": { "x": 669.5, "y": 1279, "angle": 0 }, "distance": 32, "path_id": "A"},
