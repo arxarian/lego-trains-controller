@@ -1,0 +1,14 @@
+[project]
+name = "TrainsController"
+version = "0.1.0"
+dependencies = [
+    "bleak",
+    "networkx",
+    "pydot",
+    "qasync",
+    "webcolors"
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
