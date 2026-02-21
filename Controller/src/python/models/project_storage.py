@@ -9,6 +9,17 @@ from python.items.project import Project
 
 DEFAULT_NAME="rails"      # a default projet name for now
 
+def loadDataFromFile(file: Path) -> str:
+    if not file.exists():
+        raise FileNotFoundError(f"'{file}' not found")
+    with file.open("r", encoding="utf-8") as f:
+        return json.load(f)
+    return None
+
+def saveDataToFile(file: str, data: str):
+    with file.open("w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
+
 class ProjectStorage(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -34,22 +45,15 @@ class ProjectStorage(QObject):
             return
 
         file = self.base_path.joinpath(name + ".json")
-
-        if not file.exists():
-            raise FileNotFoundError(f"Project '{name}' not found")
-
-        with file.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-            self.set_currentProject(Project(name, data, self))
-            print("project loaded")
+        data = loadDataFromFile(file)
+        self.set_currentProject(Project(name, data, self))
+        print("project loaded")
 
     @Slot(QObject)
     def saveProject(self, project: Project):
         data = project.save_data()
-
         path = self.base_path.joinpath(project.name + ".json")
-        with path.open("w", encoding="utf-8") as f:
-            json.dump(data, f, indent=4, ensure_ascii=False)
+        saveDataToFile(path, data)
         print("project saved")
 
     @Slot(result=list)

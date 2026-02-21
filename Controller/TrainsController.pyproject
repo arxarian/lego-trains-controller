@@ -54,6 +54,6 @@
         "src/qml/RunScreen.qml",
         "src/qml/PathIndicatorView.qml",
         "src/qml/MultiPathView.qml",
-        "tests/main.py"
+        "tests/test_general.py"
     ]
 }
