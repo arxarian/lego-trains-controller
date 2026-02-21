@@ -28,7 +28,7 @@ class Network(QObject):
         self.graph.add_node(node_0, marker=marker)
 
     def createGraph(self):
-        for rail in self.rails._items:
+        for rail in self.rails:
             activeConnectors = rail.connectors.activeCount()
             paths = rail._paths
 
@@ -82,15 +82,15 @@ class Network(QObject):
                     self.addEdge(node, lastNode, True, weight=path["length"] - lastDistance)
 
     @Slot(QObject)
-    def generate(self, rails):
+    def generate(self, railsList):
         print("Network: Generating...")
 
         self.graph = nx.Graph()
-        self.rails = rails
+        self.rails = railsList
 
         self.createGraph()
 
-        nx.nx_pydot.write_dot(self.graph, "debug_graph.dot")
+        #nx.nx_pydot.write_dot(self.graph, "out_graph.dot")
 
         print("Network: Done")
-
+        return self.graph

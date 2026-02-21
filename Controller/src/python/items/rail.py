@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 import webcolors
 from enum import IntEnum
+from pathlib import Path
+from importlib import resources
 from PySide6.QtCore import QObject, Property, Signal, QEnum
 from PySide6.QtQml import QmlElement
 
@@ -97,7 +99,7 @@ class Rail(QObject):
             print("undefined rail type")
             return
 
-        with open("resources/" + RailSource[self._type]) as json_data:
+        with resources.open_text("resources", RailSource[self._type]) as json_data:
             data = json.load(json_data)
             for key, value in data.items():
                 if hasattr(self, key):
@@ -117,7 +119,7 @@ class Rail(QObject):
             "x": round(self._x, 1), "y": round(self._y, 1), "connectors": self._connectors.save_data(),
             **({"markers": self._markers.save_data()} if self._markers.save_data() else {})}
 
-    def load_data(data, parent):
+    def load_data(data, parent=None):
         return Rail(type=data.get("type", RailType.Undefined), id=data.get("id", 0), x=data.get("x", 0),
             y=data.get("y", 0), rotator=Rotator.load_data(data.get("rotator", {}), parent),
             connectors=Connectors.load_data(data.get("connectors", []), parent),

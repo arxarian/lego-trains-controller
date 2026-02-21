@@ -1,0 +1,817 @@
+{
+    "rails": [
+        {
+            "id": 3,
+            "type": 1,
+            "rotator": {
+                "x": 267.0,
+                "y": 658.0,
+                "angle": 0.0
+            },
+            "x": -107.0,
+            "y": -1298.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 4
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 45
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "type": 1,
+            "rotator": {
+                "x": 267.0,
+                "y": 658.0,
+                "angle": -22.5
+            },
+            "x": -226.5,
+            "y": -1895.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 20
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 3
+                }
+            ]
+        },
+        {
+            "id": 13,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 0.0,
+                "angle": 180.0
+            },
+            "x": -3120.8,
+            "y": 643.8,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 24
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 14
+                }
+            ],
+            "markers": [
+                {
+                    "index": 3,
+                    "color": "#ffff00"
+                }
+            ]
+        },
+        {
+            "id": 14,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 0.0,
+                "angle": 180.0
+            },
+            "x": -3120.8,
+            "y": 3.8,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 13
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 15
+                }
+            ],
+            "markers": [
+                {
+                    "index": 0,
+                    "color": "#008000"
+                }
+            ]
+        },
+        {
+            "id": 15,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 202.5
+            },
+            "x": -3108.3,
+            "y": -697.2,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 14
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 16
+                }
+            ]
+        },
+        {
+            "id": 16,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 225.0
+            },
+            "x": -2990.3,
+            "y": -1294.5,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 15
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 17
+                }
+            ]
+        },
+        {
+            "id": 17,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 247.5
+            },
+            "x": -2652.6,
+            "y": -1801.2,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 16
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 18
+                }
+            ]
+        },
+        {
+            "id": 18,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 270.0
+            },
+            "x": -2146.8,
+            "y": -2140.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 17
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 19
+                }
+            ],
+            "markers": [
+                {
+                    "index": 3,
+                    "color": "#008000"
+                }
+            ]
+        },
+        {
+            "id": 19,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 292.5
+            },
+            "x": -1549.8,
+            "y": -2259.5,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 18
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 20
+                }
+            ],
+            "markers": [
+                {
+                    "index": 0,
+                    "color": "#ff0000"
+                }
+            ]
+        },
+        {
+            "id": 20,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 315.0
+            },
+            "x": -952.5,
+            "y": -2141.5,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 19
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 4
+                }
+            ]
+        },
+        {
+            "id": 22,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 640.0,
+                "angle": 180.0
+            },
+            "x": -0.0,
+            "y": -640.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 23
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 45
+                }
+            ]
+        },
+        {
+            "id": 23,
+            "type": 2,
+            "rotator": {
+                "x": 159.5,
+                "y": 0.0,
+                "angle": 360.0
+            },
+            "x": 0.5,
+            "y": 640.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 22
+                },
+                {
+                    "name": "end_curved",
+                    "connectedRailId": 38
+                },
+                {
+                    "name": "end_straight",
+                    "connectedRailId": 25
+                }
+            ]
+        },
+        {
+            "id": 24,
+            "type": 3,
+            "rotator": {
+                "x": 669.5,
+                "y": 0.0,
+                "angle": 360.0
+            },
+            "x": -3630.3,
+            "y": 643.8,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 13
+                },
+                {
+                    "name": "end_curved",
+                    "connectedRailId": 33
+                },
+                {
+                    "name": "end_straight",
+                    "connectedRailId": 32
+                }
+            ]
+        },
+        {
+            "id": 25,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 382.5
+            },
+            "x": 12.5,
+            "y": 1858.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 23
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 26
+                }
+            ],
+            "markers": [
+                {
+                    "index": 1,
+                    "color": "#ff0000"
+                },
+                {
+                    "index": 2,
+                    "color": "#008000"
+                }
+            ]
+        },
+        {
+            "id": 26,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 405.0
+            },
+            "x": -105.6,
+            "y": 2455.3,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 25
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 27
+                }
+            ]
+        },
+        {
+            "id": 27,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 427.5
+            },
+            "x": -443.2,
+            "y": 2961.9,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 26
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 28
+                }
+            ]
+        },
+        {
+            "id": 28,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 450.0
+            },
+            "x": -949.0,
+            "y": 3300.8,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 27
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 29
+                }
+            ]
+        },
+        {
+            "id": 29,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 472.5
+            },
+            "x": -1546.0,
+            "y": 3420.3,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 28
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 30
+                }
+            ]
+        },
+        {
+            "id": 30,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 495.0
+            },
+            "x": -2143.3,
+            "y": 3302.2,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 29
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 31
+                }
+            ]
+        },
+        {
+            "id": 31,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 517.5
+            },
+            "x": -2650.0,
+            "y": 2964.6,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 30
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 32
+                }
+            ]
+        },
+        {
+            "id": 32,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 540.0
+            },
+            "x": -2988.8,
+            "y": 2458.8,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 31
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 24
+                }
+            ],
+            "markers": [
+                {
+                    "index": 2,
+                    "color": "#ff0000"
+                },
+                {
+                    "index": 3,
+                    "color": "#ffff00"
+                }
+            ]
+        },
+        {
+            "id": 33,
+            "type": 1,
+            "rotator": {
+                "x": 267.0,
+                "y": 658.0,
+                "angle": 202.5
+            },
+            "x": -3749.3,
+            "y": 1308.3,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 34
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 24
+                }
+            ],
+            "markers": [
+                {
+                    "index": 2,
+                    "color": "#ffff00"
+                },
+                {
+                    "index": 3,
+                    "color": "#ff0000"
+                }
+            ]
+        },
+        {
+            "id": 34,
+            "type": 1,
+            "rotator": {
+                "x": 267.0,
+                "y": 658.0,
+                "angle": 180.0
+            },
+            "x": -3867.4,
+            "y": 1905.6,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 35
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 33
+                }
+            ]
+        },
+        {
+            "id": 35,
+            "type": 1,
+            "rotator": {
+                "x": 267.0,
+                "y": 658.0,
+                "angle": 157.5
+            },
+            "x": -3747.9,
+            "y": 2502.6,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 36
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 34
+                }
+            ]
+        },
+        {
+            "id": 36,
+            "type": 1,
+            "rotator": {
+                "x": 267.0,
+                "y": 658.0,
+                "angle": 135.0
+            },
+            "x": -3409.0,
+            "y": 3008.4,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 37
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 35
+                }
+            ]
+        },
+        {
+            "id": 37,
+            "type": 1,
+            "rotator": {
+                "x": 267.0,
+                "y": 658.0,
+                "angle": 112.5
+            },
+            "x": -2902.4,
+            "y": 3346.1,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 43
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 36
+                }
+            ]
+        },
+        {
+            "id": 38,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 360.0
+            },
+            "x": 534.0,
+            "y": 1901.5,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 23
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 39
+                }
+            ],
+            "markers": [
+                {
+                    "index": 1,
+                    "color": "#008000"
+                },
+                {
+                    "index": 2,
+                    "color": "#ff0000"
+                }
+            ]
+        },
+        {
+            "id": 39,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 382.5
+            },
+            "x": 653.5,
+            "y": 2498.5,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 38
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 40
+                }
+            ]
+        },
+        {
+            "id": 40,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 405.0
+            },
+            "x": 535.4,
+            "y": 3095.8,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 39
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 41
+                }
+            ]
+        },
+        {
+            "id": 41,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 427.5
+            },
+            "x": 197.8,
+            "y": 3602.4,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 40
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 42
+                }
+            ]
+        },
+        {
+            "id": 42,
+            "type": 1,
+            "rotator": {
+                "x": 147.5,
+                "y": 61.0,
+                "angle": 450.0
+            },
+            "x": -308.0,
+            "y": 3941.3,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 41
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 44
+                }
+            ]
+        },
+        {
+            "id": 43,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 640.0,
+                "angle": 90.0
+            },
+            "x": -2198.1,
+            "y": 3482.1,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 44
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 37
+                }
+            ],
+            "markers": [
+                {
+                    "index": 1,
+                    "color": "#0000ff"
+                }
+            ]
+        },
+        {
+            "id": 44,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 640.0,
+                "angle": 90.0
+            },
+            "x": -1558.1,
+            "y": 3482.1,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 42
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 43
+                }
+            ],
+            "markers": [
+                {
+                    "index": 4,
+                    "color": "#008000"
+                }
+            ]
+        },
+        {
+            "id": 45,
+            "type": 0,
+            "rotator": {
+                "x": 160.0,
+                "y": 0.0,
+                "angle": 0.0
+            },
+            "x": 0.0,
+            "y": -640.0,
+            "connectors": [
+                {
+                    "name": "start",
+                    "connectedRailId": 3
+                },
+                {
+                    "name": "end",
+                    "connectedRailId": 22
+                }
+            ],
+            "markers": [
+                {
+                    "index": 2,
+                    "color": "#008000"
+                },
+                {
+                    "index": 3,
+                    "color": "#0000ff"
+                }
+            ]
+        }
+    ],
+    "settings": {
+        "canvas_x": 205.0,
+        "canvas_y": 61.0,
+        "canvas_zoom": 0.17
+    }
+}
