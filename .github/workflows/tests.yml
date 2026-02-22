@@ -1,0 +1,32 @@
+name: Run PySide Tests
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13' # Or your version
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # This installs PySide6 and test tools from your pyproject.toml
+          pip install .[test]
+
+      - name: Run tests with Xvfb (Virtual Display)
+        run: |
+          # We use xvfb-run so Qt thinks there is a monitor attached
+          sudo apt-get install -y libegl1
+          xvfb-run pytest
