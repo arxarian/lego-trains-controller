@@ -6,8 +6,8 @@ import python.network as net
 import python.models.project_storage as project
 from python.items.rail import Rail
 
-IN_GRAPH = Path(__file__).resolve().parent / "in_graph.dot"
-OUT_GRAPH = Path(__file__).resolve().parent / "out_graph.dot"
+IN_GRAPH = "tests/in_graph.dot"
+OUT_GRAPH = "tests/out_graph.dot"
 
 def test_load_file():
     data = project.loadDataFromFile(Path("tests/rails_big.json"))

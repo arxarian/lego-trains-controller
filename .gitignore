@@ -1,4 +1,5 @@
 *.user
 *.pyc
 *.autosave
-*.dot
+
+Controller/tests/out_graph.dot
