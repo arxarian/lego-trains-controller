@@ -26,9 +26,13 @@ jobs:
           cd Controller/
           pip install .[test]
 
-      - name: Run tests with Xvfb (Virtual Display)
+      - name: Run Pytest
+        shell: pwsh
         run: |
-          # We use xvfb-run so Qt thinks there is a monitor attached
-          sudo apt-get install -y libegl1
-          cd Controller/
-          xvfb-run pytest
+          # Move into the Controller directory and run the tests
+          cd Controller
+          pytest
+        env:
+          # This tells Qt to run in "offscreen" mode. 
+          # It prevents errors related to the lack of a physical monitor in the cloud.
+          QT_QPA_PLATFORM: offscreen
