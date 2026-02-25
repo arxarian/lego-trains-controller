@@ -26,7 +26,7 @@ if __name__ == '__main__':
     importPaths(engine)
     context = AppContext(engine)
 
-    engine.load(str("qml/Main.qml"))
+    engine.load(str("src/qml/Main.qml"))
 
     if not engine.rootObjects():
         sys.exit(-1)

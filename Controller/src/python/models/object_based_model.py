@@ -23,6 +23,7 @@ class ObjectBasedModel(QAbstractListModel, Generic[T]):
 
         self._items: List[T] = []
 
+    @Slot(result=list)
     def items(self):
         return self._items
 

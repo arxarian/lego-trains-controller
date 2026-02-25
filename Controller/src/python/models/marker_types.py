@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from importlib import resources
 
 from PySide6.QtCore import QModelIndex, Signal, Property
 
@@ -20,7 +21,7 @@ class MarkerTypes(ObjectBasedModel[MarkerType]):
         self.load_data()
 
     def load_data(self):
-        with open("resources/marker_types.json") as json_data:
+        with resources.open_text("resources", "marker_types.json") as json_data:
             data = json.load(json_data)
 
             self.beginInsertRows(QModelIndex(), 0, len(data))

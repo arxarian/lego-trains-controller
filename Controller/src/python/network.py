@@ -81,7 +81,7 @@ class Network(QObject):
 
                     self.addEdge(node, lastNode, True, weight=path["length"] - lastDistance)
 
-    @Slot(QObject)
+    @Slot(list)
     def generate(self, railsList):
         print("Network: Generating...")
 

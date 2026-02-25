@@ -24,7 +24,7 @@ class ProjectStorage(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.projects = []
-        self.base_path = Path("projects")
+        self.base_path = Path("src/projects")
         self.base_path.mkdir(parents=True, exist_ok=True)
         self._currentProject = Project(DEFAULT_NAME, parent=self)
 
