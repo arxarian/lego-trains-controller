@@ -28,3 +28,10 @@ def test_generate_graph():
 
     assert filecmp.cmp(IN_GRAPH, OUT_GRAPH, shallow=False)
 
+    # check if only nodes with A are marked as markers
+    for node in graph.nodes():
+        print(node, graph.nodes[node].get("marker"), "A" in node)
+        if not graph.nodes[node].get("marker", False):
+            assert "A" not in node
+        else:
+            assert "A" in node
