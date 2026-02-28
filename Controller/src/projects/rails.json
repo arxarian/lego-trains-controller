@@ -130,6 +130,12 @@
                     "name": "end",
                     "connectedRailId": 7
                 }
+            ],
+            "markers": [
+                {
+                    "index": 2,
+                    "color": "#ffff00"
+                }
             ]
         },
         {
@@ -150,12 +156,6 @@
                 {
                     "name": "end",
                     "connectedRailId": 8
-                }
-            ],
-            "markers": [
-                {
-                    "index": 0,
-                    "color": "#ffff00"
                 }
             ]
         },
@@ -452,8 +452,8 @@
         }
     ],
     "settings": {
-        "canvas_x": 275.0,
-        "canvas_y": 89.0,
-        "canvas_zoom": 0.11
+        "canvas_x": 121.0,
+        "canvas_y": -130.0,
+        "canvas_zoom": 0.25
     }
 }

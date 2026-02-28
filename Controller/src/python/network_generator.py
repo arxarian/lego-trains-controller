@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import networkx as nx
 
-from PySide6.QtCore import QObject, Slot
-
 from python.items.rail import RailType
 
 def createNodeName(id0, id1=None):
@@ -12,10 +10,9 @@ def createNodeName(id0, id1=None):
     a, b = sorted((str(id0), str(id1)))
     return f"{a}-{b}"
 
-class Network(QObject):
+class NetworkGenerator():
 
-    def __init__(self, parent=None) -> None:
-        super().__init__(parent)
+    def __init__(self) -> None:
         self.graph = None
         self.rails = None
 
@@ -141,8 +138,7 @@ class Network(QObject):
         # Finally, keep only the important nodes and edges between them.
         self.graph = H.subgraph(important).copy()
 
-    @Slot(list)
-    def generate(self, railsList, simplify=True):
+    def generate(self, railsList, simplify=True):# -> nx.Graph:
         print("Network: Generating...")
 
         self.graph = nx.Graph()

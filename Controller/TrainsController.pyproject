@@ -1,6 +1,7 @@
 {
     "files": [
         "pyproject.toml",
+        "tests/test_general.py",
         "src/main.py",
         "src/projects/rails.json",
         "src/resources/rails_rc.py",
@@ -15,7 +16,7 @@
         "src/python/planner.py",
         "src/python/settings.py",
         "src/python/examples/communication_example.py",
-        "src/python/network.py",
+        "src/python/network_generator.py",
         "src/python/models/devices.py",
         "src/python/models/rails.py",
         "src/python/models/connectors.py",
@@ -54,6 +55,6 @@
         "src/qml/RunScreen.qml",
         "src/qml/PathIndicatorView.qml",
         "src/qml/MultiPathView.qml",
-        "tests/test_general.py"
+        "src/python/network_manager.py"
     ]
 }

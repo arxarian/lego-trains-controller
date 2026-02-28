@@ -2,7 +2,7 @@ import networkx as nx
 from pathlib import Path
 import filecmp
 
-import python.network as net
+import python.network_generator as net
 import python.models.project_storage as project
 from python.items.rail import Rail
 
@@ -21,7 +21,7 @@ def test_generate_graph():
     rails = [Rail.load_data(d) for d in raw_rails]
     assert len(rails) > 0
 
-    network = net.Network()
+    network = net.NetworkGenerator()
     # Full graph (no simplification) for exact dot comparison
     graph = network.generate(rails, simplify=False)
 
@@ -45,7 +45,7 @@ def test_generate_graph_simplified():
     rails = [Rail.load_data(d) for d in raw_rails]
     assert len(rails) > 0
 
-    network = net.Network()
+    network = net.NetworkGenerator()
     graph = network.generate(rails, simplify=True)
 
     for node in graph.nodes():
