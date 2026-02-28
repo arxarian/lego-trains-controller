@@ -100,44 +100,44 @@ class Network(QObject):
 
     def simplify_graph(self):
         """
-        Keep only important nodes (markers and switch-adjacent). From each important
-        node, walk along edges through non-important nodes, summing edge weights;
-        when we hit another important node, add a single edge with the merged length.
+        Keep only important nodes (markers and switch-adjacent) and merge chains of
+        non-important nodes between them. Uses NetworkX' degree / neighbors API
+        instead of custom traversal logic.
         """
         G = self.graph
         important = {n for n in G if self._is_important_node(n)}
         if not important:
             return
 
-        H = nx.Graph()
-        for n in important:
-            H.add_node(n, **dict(G.nodes[n]))
+        # Work on a copy so we don't mutate the original while iterating.
+        H = G.copy()
 
-        def walk_and_merge(from_important, node, weight_so_far, visited):
+        # For every non-important node with degree 2, merge its two incident edges
+        # into a single edge between its neighbors, summing the weights.
+        for node in list(H.nodes()):
             if node in important:
-                if node != from_important:
-                    w = H.edges[from_important, node].get("weight", float("inf")) if H.has_edge(from_important, node) else float("inf")
-                    if weight_so_far < w:
-                        H.add_edge(from_important, node, weight=weight_so_far)
-                return
-            if node in visited:
-                return
-            visited.add(node)
-            for _, v, data in G.edges(node, data=True):
-                w = data.get("weight", 1)
-                walk_and_merge(from_important, v, weight_so_far + w, visited)
-            visited.discard(node)
+                continue
 
-        for u in important:
-            for _, v, data in G.edges(u, data=True):
-                w = data.get("weight", 1)
-                if v in important:
-                    if not H.has_edge(u, v) or H.edges[u, v]["weight"] > w:
-                        H.add_edge(u, v, weight=w)
+            deg = H.degree(node)
+            if deg == 2:
+                u, v = list(H.neighbors(node))
+                w1 = H.edges[node, u].get("weight", 1)
+                w2 = H.edges[node, v].get("weight", 1)
+                new_w = w1 + w2
+
+                if H.has_edge(u, v):
+                    # Keep the shorter merged edge if there are multiple paths.
+                    existing_w = H.edges[u, v].get("weight", float("inf"))
+                    if new_w < existing_w:
+                        H.edges[u, v]["weight"] = new_w
                 else:
-                    walk_and_merge(u, v, w, set())
+                    H.add_edge(u, v, weight=new_w)
 
-        self.graph = H
+            # In all cases, drop the non-important node itself (degree 0/1/2/...).
+            H.remove_node(node)
+
+        # Finally, keep only the important nodes and edges between them.
+        self.graph = H.subgraph(important).copy()
 
     @Slot(list)
     def generate(self, railsList, simplify=True):
