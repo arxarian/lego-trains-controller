@@ -53,18 +53,19 @@ class Network(QObject):
             for from_connector in rail.connectors._items:
                 from_name = from_connector.name
                 path = next(path for path in paths if path["from"] == from_name)
+                path_id = path["path_id"]
                 to_connector = rail.connectors.getByName(path["to"])
 
                 both_connected = from_connector.connected() and to_connector.connected()
                 either_connected = from_connector.connected() or to_connector.connected()
 
-                if rail.markers.activeCount(path["path_id"]) == 0:
+                if rail.markers.activeCount(path_id) == 0:
                     if both_connected:
                         from_node = createNodeName(rail.id, from_connector.connectedRailId)
                         to_node = createNodeName(rail.id, to_connector.connectedRailId)
                         self.addEdge(from_node, to_node, marker=False, weight=path["length"], at_switch=at_switch)
                     elif either_connected:
-                        from_node = createNodeName(f"{rail.id}{path['path_id']}")
+                        from_node = createNodeName(f"{rail.id}{path_id}")
                         to_node = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
                         self.addEdge(from_node, to_node, marker=False, weight=path["length"], at_switch=at_switch)
                 else:
@@ -77,7 +78,7 @@ class Network(QObject):
                         node = createNodeName(rail.id, from_connector.connectedRailId)
                         lastNode = createNodeName(rail.id, to_connector.connectedRailId)
                     elif either_connected:
-                        node = createNodeName(f"{rail.id}{path['path_id']}")
+                        node = createNodeName(f"{rail.id}{path_id}")
                         lastNode = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
                         if dir is True: # swap when going forward
                             node, lastNode = lastNode, node
@@ -86,7 +87,7 @@ class Network(QObject):
                     visible_markers = (m for m in markers if m.visible)
 
                     for marker in visible_markers:
-                        to_node = f"{rail.id}{path['path_id']}{marker.distance}"
+                        to_node = f"{rail.id}{path_id}{marker.distance}"
                         self.addEdge(node, to_node, marker=True, weight=marker.distance - lastDistance, at_switch=at_switch)
                         node = to_node
                         lastDistance = marker.distance
@@ -150,7 +151,7 @@ class Network(QObject):
         if simplify:
             self.simplify_graph()
 
-        #nx.nx_pydot.write_dot(self.graph, "out_graph.dot")
+        #nx.nx_pydot.write_dot(self.graph, "src/out_graph.dot")
 
         print("Network: Done")
         return self.graph
