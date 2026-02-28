@@ -31,11 +31,10 @@ def test_generate_graph():
 
     # check if only nodes with A are marked as markers
     for node in graph.nodes():
-        print(node, graph.nodes[node].get("marker"), "A" in node)
         if not graph.nodes[node].get("marker", False):
-            assert "A" not in node
+            assert "-" in node
         else:
-            assert "A" in node
+            assert "A" in node or "B" in node
 
 def test_generate_graph_simplified():
     """Simplified graph contains only marker and switch-adjacent nodes."""

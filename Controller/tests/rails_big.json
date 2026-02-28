@@ -278,6 +278,16 @@
                     "name": "end_straight",
                     "connectedRailId": 25
                 }
+            ],
+            "markers": [
+                {
+                    "index": 0,
+                    "color": "#008000"
+                },
+                {
+                    "index": 1,
+                    "color": "#0000ff"
+                }
             ]
         },
         {
@@ -302,6 +312,12 @@
                 {
                     "name": "end_straight",
                     "connectedRailId": 32
+                }
+            ],
+            "markers": [
+                {
+                    "index": 1,
+                    "color": "#000000"
                 }
             ]
         },

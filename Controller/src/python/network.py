@@ -35,8 +35,9 @@ class Network(QObject):
         if marker:
             self.graph.nodes[to_node]["marker"] = marker or self.graph.nodes[to_node].get("marker", False)
 
-        if at_switch:
+        if at_switch and "-" in from_node:
             self.graph.nodes[from_node]["at_switch"] = True
+        if at_switch and "-" in to_node:
             self.graph.nodes[to_node]["at_switch"] = True
 
     def createGraph(self):
@@ -84,7 +85,7 @@ class Network(QObject):
                             node, lastNode = lastNode, node
 
                     markers = rail.markers._items if dir else reversed(rail.markers._items)
-                    visible_markers = (m for m in markers if m.visible)
+                    visible_markers = (m for m in markers if m.visible and m.path_id in (None, "", path_id))
 
                     for marker in visible_markers:
                         to_node = f"{rail.id}{path_id}{marker.distance}"
