@@ -23,7 +23,7 @@ class NetworkGenerator():
         if self.hasEdge(from_node, to_node):
             return
 
-        self.graph.add_edge(from_node, to_node, weight=weight, rail_id=rail_id)
+        self.graph.add_edge(from_node, to_node, weight=weight, segment_data=rail_id)
 
         if marker and not self.graph.nodes[to_node].get("marker", True):
             print("inconsitency at node ", to_node)
@@ -102,18 +102,17 @@ class NetworkGenerator():
         return data.get("marker") or data.get("at_switch")
 
     def simplify_graph(self):
-        def processArrays(arr1, arr2):
-            def convertToArray(arr):
-                if isinstance(arr, int):
-                    return [arr]
+        def processRailsdata(ids1, weight1, ids2, weight2):
+            def convertToArray(ids, weight):
+                if isinstance(ids, int):
+                    return [f"{ids}:{weight}"]
                 else:
-                    return arr
+                    return ids
 
             r = []
-            r.extend(convertToArray(arr1))
-            r.extend(convertToArray(arr2))
-            #return sorted(set(r))
-            return set(r)
+            r.extend(convertToArray(ids1, weight1))
+            r.extend(convertToArray(ids2, weight2))
+            return r
 
         """
         Keep only important nodes (markers and switch-adjacent) and merge chains of
@@ -139,11 +138,11 @@ class NetworkGenerator():
                 u, v = list(H.neighbors(node))
                 w1 = H.edges[node, u].get("weight", 1)
                 w2 = H.edges[node, v].get("weight", 1)
-                rail_id1 = H.edges[node, u].get("rail_id", -1)
-                rail_id2 = H.edges[node, v].get("rail_id", -1)
+                segment_data1 = H.edges[node, u].get("segment_data", -1)
+                segment_data2 = H.edges[node, v].get("segment_data", -1)
 
                 new_w = w1 + w2
-                ids = processArrays(rail_id1, rail_id2)
+                segment_data = processRailsdata(segment_data1, w1, segment_data2, w2)
 
                 if H.has_edge(u, v):
                     # Keep the shorter merged edge if there are multiple paths.
@@ -151,7 +150,7 @@ class NetworkGenerator():
                     if new_w < existing_w:
                         H.edges[u, v]["weight"] = new_w
                 else:
-                    H.add_edge(u, v, weight=new_w, rail_id=ids)
+                    H.add_edge(u, v, weight=new_w, segment_data=segment_data)
 
             # In all cases, drop the non-important node itself (degree 0/1/2/...).
             H.remove_node(node)
