@@ -16,6 +16,12 @@ class NetworkManager(QObject):
     def updateRailsModel(self, rails):
         self._rails = rails
 
+    def segmments(self):
+        if self._graph is None:
+            return []
+
+        #
+
     @Slot()
     def generate(self):
         self._graph = self._generator.generate(self._rails.items(), True)

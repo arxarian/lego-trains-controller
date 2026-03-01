@@ -19,11 +19,11 @@ class NetworkGenerator():
     def hasEdge(self, from_node, to_node):
         return self.graph.has_edge(from_node, to_node)
 
-    def addEdge(self, from_node, to_node, marker, weight, at_switch=False):
+    def addEdge(self, from_node, to_node, marker, weight, rail_id, at_switch=False):
         if self.hasEdge(from_node, to_node):
             return
 
-        self.graph.add_edge(from_node, to_node, weight=weight)
+        self.graph.add_edge(from_node, to_node, weight=weight, rail_id=rail_id)
 
         if marker and not self.graph.nodes[to_node].get("marker", True):
             print("inconsitency at node ", to_node)
@@ -61,11 +61,13 @@ class NetworkGenerator():
                     if both_connected:
                         from_node = createNodeName(rail.id, from_connector.connectedRailId)
                         to_node = createNodeName(rail.id, to_connector.connectedRailId)
-                        self.addEdge(from_node, to_node, marker=False, weight=path["length"], at_switch=at_switch)
+                        self.addEdge(from_node, to_node, marker=False, weight=path["length"],
+                            rail_id=rail.id, at_switch=at_switch)
                     elif either_connected:
                         from_node = createNodeName(f"{rail.id}{path_id}")
                         to_node = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
-                        self.addEdge(from_node, to_node, marker=False, weight=path["length"], at_switch=at_switch)
+                        self.addEdge(from_node, to_node, marker=False, weight=path["length"],
+                            rail_id=rail.id, at_switch=at_switch)
                 else:
                     node = None
                     lastNode = None
@@ -86,11 +88,13 @@ class NetworkGenerator():
 
                     for marker in visible_markers:
                         to_node = f"{rail.id}{path_id}{marker.distance}"
-                        self.addEdge(node, to_node, marker=True, weight=marker.distance - lastDistance, at_switch=at_switch)
+                        self.addEdge(node, to_node, marker=True, weight=marker.distance - lastDistance,
+                            rail_id=rail.id, at_switch=at_switch)
                         node = to_node
                         lastDistance = marker.distance
 
-                    self.addEdge(node, lastNode, marker=False, weight=path["length"] - lastDistance, at_switch=at_switch)
+                    self.addEdge(node, lastNode, marker=False, weight=path["length"] - lastDistance,
+                        rail_id=rail.id, at_switch=at_switch)
 
     def _is_important_node(self, node):
         """Node is important if it's a marker (for localization) or at a switch (path splitting)."""

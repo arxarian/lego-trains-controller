@@ -2,4 +2,4 @@
 *.pyc
 *.autosave
 
-Controller/tests/out_graph.dot
+out_graph.dot

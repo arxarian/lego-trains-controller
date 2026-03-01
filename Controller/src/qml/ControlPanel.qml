@@ -56,7 +56,7 @@ ColumnLayout {
         }
         Button {
             text: "Plan"
-            onClicked: planner.updatePaths(textFieldRails.displayText)
+            onClicked: planner.plan(textFieldRails.displayText)
         }
     }
 

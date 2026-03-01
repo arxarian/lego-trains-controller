@@ -18,7 +18,7 @@ class Planner(QObject):
         pass
 
     @Slot(str)  # TODO - debug function more or less
-    def updatePaths(self, paths):
+    def plan(self, paths):
         paths = paths.split(",")
         planned_paths = {}
         for path in paths:
