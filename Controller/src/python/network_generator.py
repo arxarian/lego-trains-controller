@@ -143,6 +143,7 @@ class NetworkGenerator():
 
                 new_w = w1 + w2
                 segment_data = processRailsdata(segment_data1, w1, segment_data2, w2)
+                #print("node", node, "neighbors", u, v, "new weight", new_w, "weigts", w1, w2, segment_data)
 
                 if H.has_edge(u, v):
                     # Keep the shorter merged edge if there are multiple paths.
@@ -168,7 +169,10 @@ class NetworkGenerator():
         if simplify:
             self.simplify_graph()
 
-        #nx.nx_pydot.write_dot(self.graph, "src/out_graph.dot")
+        # TODO - simplify segments (take switches into consideration)
+
+        nx.nx_pydot.write_dot(self.graph, "src/out_graph.dot")
 
         print("Network: Done")
+        #print("segments", self.graph.edges())
         return self.graph

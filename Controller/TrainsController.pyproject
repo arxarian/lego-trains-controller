@@ -2,6 +2,8 @@
     "files": [
         "pyproject.toml",
         "tests/test_general.py",
+        "tests/test_network_generator.py",
+        "tests/test_network_manager.py",
         "src/main.py",
         "src/projects/rails.json",
         "src/resources/rails_rc.py",

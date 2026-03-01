@@ -12,19 +12,25 @@ class NetworkManager(QObject):
         self._generator = NetworkGenerator()
         self._rails = rails
         self._graph = None
+        self._segments = {} # lookup table
 
     def updateRailsModel(self, rails):
         self._rails = rails
 
-    def segmments(self):
-        if self._graph is None:
-            return []
-
-        #
+    def segments(self):
+        return self._segments
 
     @Slot()
     def generate(self):
+        self._segments = {}
         self._graph = self._generator.generate(self._rails.items(), True)
+
+        edges = self._graph.edges(data=True)
+
+        for edge in edges:
+            a, b = sorted(edge[0:2])
+            id = f"{a}:{b}"
+            self._segments[id] = edge
 
     def graph(self):
         return self._graph
