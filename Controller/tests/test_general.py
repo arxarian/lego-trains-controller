@@ -10,11 +10,11 @@ IN_GRAPH = "tests/in_graph.dot"
 OUT_GRAPH = "tests/out_graph.dot"
 
 def test_load_file():
-    data = project.loadDataFromFile(Path("tests/rails_big.json"))
+    data = project.loadDataFromFile(Path("tests/tracks/rails_big.json"))
     assert data and len(data) > 0
 
 def test_generate_graph():
-    data = project.loadDataFromFile(Path("tests/rails_big.json"))
+    data = project.loadDataFromFile(Path("tests/tracks/rails_big.json"))
     assert data and len(data) > 0
 
     raw_rails = data.get("rails", [])
@@ -38,7 +38,7 @@ def test_generate_graph():
 
 def test_generate_graph_simplified():
     """Simplified graph contains only marker and switch-adjacent nodes."""
-    data = project.loadDataFromFile(Path("tests/rails_big.json"))
+    data = project.loadDataFromFile(Path("tests/tracks/rails.json"))
     assert data and len(data) > 0
 
     raw_rails = data.get("rails", [])

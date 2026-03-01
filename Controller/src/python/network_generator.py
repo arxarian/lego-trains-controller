@@ -102,6 +102,19 @@ class NetworkGenerator():
         return data.get("marker") or data.get("at_switch")
 
     def simplify_graph(self):
+        def processArrays(arr1, arr2):
+            def convertToArray(arr):
+                if isinstance(arr, int):
+                    return [arr]
+                else:
+                    return arr
+
+            r = []
+            r.extend(convertToArray(arr1))
+            r.extend(convertToArray(arr2))
+            #return sorted(set(r))
+            return set(r)
+
         """
         Keep only important nodes (markers and switch-adjacent) and merge chains of
         non-important nodes between them. Uses NetworkX' degree / neighbors API
@@ -126,7 +139,11 @@ class NetworkGenerator():
                 u, v = list(H.neighbors(node))
                 w1 = H.edges[node, u].get("weight", 1)
                 w2 = H.edges[node, v].get("weight", 1)
+                rail_id1 = H.edges[node, u].get("rail_id", -1)
+                rail_id2 = H.edges[node, v].get("rail_id", -1)
+
                 new_w = w1 + w2
+                ids = processArrays(rail_id1, rail_id2)
 
                 if H.has_edge(u, v):
                     # Keep the shorter merged edge if there are multiple paths.
@@ -134,7 +151,7 @@ class NetworkGenerator():
                     if new_w < existing_w:
                         H.edges[u, v]["weight"] = new_w
                 else:
-                    H.add_edge(u, v, weight=new_w)
+                    H.add_edge(u, v, weight=new_w, rail_id=ids)
 
             # In all cases, drop the non-important node itself (degree 0/1/2/...).
             H.remove_node(node)
