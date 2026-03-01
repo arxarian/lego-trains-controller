@@ -89,6 +89,7 @@ class Rail(QObject):
         self._markers = markers if markers is not None else Markers(parent=self)
         self._connectors = connectors if connectors is not None else Connectors(parent=self)
         self._path_indicators = PathIndicators(parent=self)
+        self._reserved = False  # reserved by train
 
         self._paths = {}                            # dictionary
 
@@ -141,6 +142,16 @@ class Rail(QObject):
 
     id_changed = Signal()
     id = Property(int, id, set_id, notify=id_changed)
+
+    def reserved(self):
+        return self._reserved
+
+    def set_reserved(self, value):
+        self._reserved = value
+        self.reserved_changed.emit()
+
+    reserved_changed = Signal()
+    reserved = Property(bool, reserved, set_reserved, notify=reserved_changed)
 
     def source(self):
         return self._source

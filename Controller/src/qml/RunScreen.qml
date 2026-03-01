@@ -45,6 +45,8 @@ Item {
                 onClicked: {
                     projectStorage.loadProject("rails")    // DEBUG - remove
                     network.generate()
+                    network.reserve("3A16:6A8")
+
                 }
             }
 

@@ -21,4 +21,5 @@ def test_generate_segments():
 
     net_manager = net.NetworkManager(mock_rails)
     net_manager.generate()
+    net_manager.reserve("3A16:6A8")
 
