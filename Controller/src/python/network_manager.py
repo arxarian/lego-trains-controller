@@ -30,8 +30,7 @@ class NetworkManager(QObject):
         print(segment[2]["segment_data"])
 
         for rail_data in segment[2]["segment_data"]:
-            rail_id = rail_data.split(":")[0]
-            print("rail_id", rail_id)
+            rail_id = rail_data["rail_id"]
             self._rails.findRailData(rail_id).set_reserved(True)
 
     @Slot()
