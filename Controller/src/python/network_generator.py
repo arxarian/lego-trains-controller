@@ -19,11 +19,13 @@ class NetworkGenerator():
     def hasEdge(self, from_node, to_node):
         return self.graph.has_edge(from_node, to_node)
 
-    def addEdge(self, from_node, to_node, marker, weight, rail_id, dir, at_switch=False):
+    def addEdge(self, from_node, to_node, marker, rail_id, rail_from, rail_to, at_switch=False):
         if self.hasEdge(from_node, to_node):
             return
 
-        self.graph.add_edge(from_node, to_node, weight=weight, segment_data={"rail_id":rail_id, "dir":dir})
+        weight = rail_to - rail_from
+        self.graph.add_edge(from_node, to_node, weight=weight,
+            segment_data=[{"rail_id": rail_id, "from": rail_from, "to": rail_to}])
 
         if marker and not self.graph.nodes[to_node].get("marker", True):
             print("inconsitency at node ", to_node)
@@ -53,26 +55,27 @@ class NetworkGenerator():
                 path = next(path for path in paths if path["from"] == from_name)
                 path_id = path["path_id"]
                 to_connector = rail.connectors.getByName(path["to"])
-                dir = from_connector.dir # forward vs reverse
 
                 both_connected = from_connector.connected() and to_connector.connected()
                 either_connected = from_connector.connected() or to_connector.connected()
 
+                length = path["length"]
                 if rail.markers.activeCount(path_id) == 0:
                     if both_connected:
                         from_node = createNodeName(rail.id, from_connector.connectedRailId)
                         to_node = createNodeName(rail.id, to_connector.connectedRailId)
-                        self.addEdge(from_node, to_node, marker=False, weight=path["length"],
-                            rail_id=rail.id, dir=dir, at_switch=at_switch)
+                        self.addEdge(from_node, to_node, marker=False,
+                            rail_id=rail.id, rail_from=0, rail_to=length, at_switch=at_switch)
                     elif either_connected:
                         from_node = createNodeName(f"{rail.id}{path_id}")
                         to_node = createNodeName(rail.id, rail.connectors.getFirstConnected().connectedRailId)
-                        self.addEdge(from_node, to_node, marker=False, weight=path["length"],
-                            rail_id=rail.id, dir=dir, at_switch=at_switch)
+                        self.addEdge(from_node, to_node, marker=False, rail_id=rail.id,
+                            rail_from=0, rail_to=length, at_switch=at_switch)
                 else:
                     node = None
                     lastNode = None
                     lastDistance = 0
+                    dir = from_connector.dir # forward vs reverse
 
                     if both_connected:
                         node = createNodeName(rail.id, from_connector.connectedRailId)
@@ -88,13 +91,15 @@ class NetworkGenerator():
 
                     for marker in visible_markers:
                         to_node = f"{rail.id}{path_id}{marker.distance}"
-                        self.addEdge(node, to_node, marker=True, weight=marker.distance - lastDistance,
-                            rail_id=rail.id, dir=dir, at_switch=at_switch)
+                        seg_from, seg_to = min(lastDistance, marker.distance), max(lastDistance, marker.distance)
+                        self.addEdge(node, to_node, marker=True, rail_id=rail.id,
+                            rail_from=seg_from, rail_to=seg_to, at_switch=at_switch)
                         node = to_node
                         lastDistance = marker.distance
 
-                    self.addEdge(node, lastNode, marker=False, weight=path["length"] - lastDistance,
-                        rail_id=rail.id, dir=dir, at_switch=at_switch)
+                    seg_from, seg_to = min(lastDistance, length), max(lastDistance, length)
+                    self.addEdge(node, lastNode, marker=False, rail_id=rail.id,
+                        rail_from=seg_from, rail_to=seg_to, at_switch=at_switch)
 
     def _is_important_node(self, node):
         """Node is important if it's a marker (for localization) or at a switch (path splitting)."""
@@ -102,17 +107,17 @@ class NetworkGenerator():
         return data.get("marker") or data.get("at_switch")
 
     def simplify_graph(self):
-        def processRailsdata(ids1, weight1, ids2, weight2):
-            def convertToArray(ids, weight):
-                if isinstance(ids, dict):
-                    ids["weight"] = weight
-                    return [ids]
+        def process_rails_data(seg_data1, w1, seg_data2, w2):
+            def to_list(seg_data, weight):
+                if isinstance(seg_data, dict):
+                    seg_data["weight"] = weight
+                    return [seg_data]
                 else:
-                    return ids
+                    return seg_data
 
             r = []
-            r.extend(convertToArray(ids1, weight1))
-            r.extend(convertToArray(ids2, weight2))
+            r.extend(to_list(seg_data1, w1))
+            r.extend(to_list(seg_data2, w2))
             return r
 
         """
@@ -143,8 +148,7 @@ class NetworkGenerator():
                 segment_data2 = H.edges[node, v].get("segment_data", {})
 
                 new_w = w1 + w2
-                segment_data = processRailsdata(segment_data1, w1, segment_data2, w2)
-                #print("node", node, "neighbors", u, v, "new weight", new_w, "weigts", w1, w2, segment_data)
+                segment_data = process_rails_data(segment_data1, w1, segment_data2, w2)
 
                 if H.has_edge(u, v):
                     # Keep the shorter merged edge if there are multiple paths.
@@ -175,5 +179,4 @@ class NetworkGenerator():
         nx.nx_pydot.write_dot(self.graph, "src/out_graph.dot")
 
         print("Network: Done")
-        #print("segments", self.graph.edges())
         return self.graph
