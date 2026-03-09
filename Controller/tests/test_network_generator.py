@@ -6,8 +6,8 @@ import python.network_generator as net
 import python.models.project_storage as project
 from python.items.rail import Rail
 
-IN_GRAPH = "tests/data/in_graph.dot"
-OUT_GRAPH = "tests/data/out_graph.dot"
+EXPECTED_GRAPH = "tests/data/expected_graph.dot"
+ACTUAL_GRAPH = "tests/data/actual_graph.dot"
 TEST_TRACK = "tests/tracks/rails_big.json"
 
 def test_generate_graph():
@@ -22,9 +22,9 @@ def test_generate_graph():
     # Full graph (no simplification) for exact dot comparison
     graph = network.generate(rails, simplify=False)
 
-    nx.nx_pydot.write_dot(graph, OUT_GRAPH)
+    nx.nx_pydot.write_dot(graph, ACTUAL_GRAPH)
 
-    assert filecmp.cmp(IN_GRAPH, OUT_GRAPH, shallow=False)
+    assert filecmp.cmp(EXPECTED_GRAPH, ACTUAL_GRAPH, shallow=False)
 
     # check if only nodes with A are marked as markers
     for node in graph.nodes():

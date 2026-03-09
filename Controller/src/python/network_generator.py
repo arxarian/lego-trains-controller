@@ -176,7 +176,7 @@ class NetworkGenerator():
 
         # TODO - simplify segments (take switches into consideration)
 
-        nx.nx_pydot.write_dot(self.graph, "src/out_graph.dot")
+        # nx.nx_pydot.write_dot(self.graph, "src/graph.dot")
 
         print("Network: Done")
         return self.graph
