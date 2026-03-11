@@ -4,7 +4,7 @@ from PySide6.QtCore import QObject, Slot
 from PySide6.QtQml import QQmlApplicationEngine
 
 from python.models.devices import Devices
-from python.network import Network
+from python.network_manager import NetworkManager
 from python.models.project_storage import ProjectStorage
 from python.models.marker_types import MarkerTypes
 from python.models.rail_types import RailTypes
@@ -17,10 +17,10 @@ class AppContext:
 
         self.projectStorage = ProjectStorage()
         self.devices = Devices()
-        self.network = Network()
         self.markerTypes = MarkerTypes()
         self.railTypes = RailTypes()
-        self.planner = Planner(self.projectStorage.currentProject.rails)
+        self.network = NetworkManager(self.projectStorage.currentProject.rails)
+        self.planner = Planner(self.projectStorage.currentProject.rails, self.network)
 
         self.projectStorage.currentProject_changed.connect(self.updateProjectProperties)
         self.updateProjectProperties()
@@ -38,6 +38,7 @@ class AppContext:
     @Slot()
     def updateProjectProperties(self):
             self.planner.updateRailsModel(self.projectStorage.currentProject.rails)
+            self.network.updateRailsModel(self.projectStorage.currentProject.rails)
             self.setContextProperty("project", self.projectStorage.currentProject)
             self.setContextProperty("settings", self.projectStorage.currentProject.settings)
             self.setContextProperty("connectorRegister", self.projectStorage.currentProject.connectorRegister)

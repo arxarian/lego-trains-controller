@@ -36,7 +36,7 @@ Item {
                 text: "Generate big graph"
                 onClicked: {
                     projectStorage.loadProject("rails_big")    // DEBUG - remove
-                    network.generate(rails.items())
+                    network.generate()
                 }
             }
 
@@ -44,7 +44,9 @@ Item {
                 text: "Generate small graph"
                 onClicked: {
                     projectStorage.loadProject("rails")    // DEBUG - remove
-                    network.generate(rails.items())
+                    network.generate()
+                    planner.reserve("3A16:6A8")
+
                 }
             }
 

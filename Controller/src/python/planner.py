@@ -5,15 +5,20 @@ from PySide6.QtCore import QObject, Slot
 import re
 
 class Planner(QObject):
-    def __init__(self, rails, parent=None):
+    def __init__(self, rails, network, parent=None):
         super().__init__(parent)
         self._rails = rails
+        self._network = network
 
     def updateRailsModel(self, rails):
             self._rails = rails
 
     @Slot(str)
-    def updatePaths(self, paths):
+    def reserve(self, segment_id):
+        self._network.reserve(segment_id)
+
+    @Slot(str)  # TODO - debug function more or less
+    def plan(self, paths):
         paths = paths.split(",")
         planned_paths = {}
         for path in paths:

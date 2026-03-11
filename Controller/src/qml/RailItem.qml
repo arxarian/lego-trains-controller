@@ -10,6 +10,8 @@ SelectableItem {
     x: root.railData ? root.railData.x : 0
     y: root.railData ? root.railData.y : 0
 
+    opacity: root.railData.reserved ? 0.5 : 1
+
     width: image.sourceSize.width
     height: image.sourceSize.height
     propagateComposedEvents: true
