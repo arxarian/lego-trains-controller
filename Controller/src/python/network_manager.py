@@ -1,8 +1,6 @@
 # This Python file uses the following encoding: utf-8
 from __future__ import annotations
 
-#import networkx as nx
-
 from PySide6.QtCore import QObject, Slot
 from python.network_generator import NetworkGenerator
 
@@ -26,8 +24,6 @@ class NetworkManager(QObject):
     @Slot(str)
     def reserve(self, segment_id):
         segment = self._segments[segment_id]
-
-        print(segment[2]["segment_data"])
 
         for rail_data in segment[2]["segment_data"]:
             rail_id = rail_data["rail_id"]
