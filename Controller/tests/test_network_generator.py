@@ -43,7 +43,6 @@ def test_generate_graph_simplified():
     assert len(rails) > 0
 
     network = net.NetworkGenerator()
-    network.generate(rails, simplify=True) # debug
     graph = network.generate(rails, simplify=True)
 
     for node in graph.nodes():

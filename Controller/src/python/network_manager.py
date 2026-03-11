@@ -21,13 +21,18 @@ class NetworkManager(QObject):
     def segments(self):
         return self._segments
 
-    @Slot(str)
-    def reserve(self, segment_id):
+    def reserve(self, segment_id) -> bool:
+        if segment_id not in self._segments:
+            print(f"segment {segment_id} not found")
+            return False
+
         segment = self._segments[segment_id]
 
         for rail_data in segment[2]["segment_data"]:
             rail_id = rail_data["rail_id"]
             self._rails.findRailData(rail_id).set_reserved(True)
+
+        return True
 
     @Slot()
     def generate(self):

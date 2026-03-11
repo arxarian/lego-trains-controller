@@ -21,5 +21,9 @@ def test_generate_segments():
 
     net_manager = net.NetworkManager(mock_rails)
     net_manager.generate()
-    net_manager.reserve("3A16:6A8")
+
+    assert len(net_manager.segments()) == 5
+
+    assert net_manager.reserve("3A16:6A8")  # test existing segment
+    assert not net_manager.reserve("XXX")   # test non-existing segment
 
