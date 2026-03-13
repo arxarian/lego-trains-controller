@@ -20,17 +20,17 @@ class PathIndicators(ObjectBasedModel[PathIndicator]):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self._path_id_active = ""
-        self._multi_path_indicators = MultiPathIndicators(parent=self)
+        self._multi_path_indicators = MultiPathIndicators(parent=self)  # TODO - should it be here? Reservation_indicators don't use it
 
     def multiPathIndicators(self):
         return self._multi_path_indicators
 
     multiPathIndicators = Property(QObject, multiPathIndicators, constant=True)
 
-
     def setModel(self, metaData):
+        self.clear()
         self._multi_path_indicators.setModel(metaData)
-        self.beginInsertRows(QModelIndex(), 0, len(metaData))
+        self.beginInsertRows(QModelIndex(), 0, len(metaData) - 1)
         for d in metaData:
             self._items.append(PathIndicator(data=d, parent=self))
         self.endInsertRows()

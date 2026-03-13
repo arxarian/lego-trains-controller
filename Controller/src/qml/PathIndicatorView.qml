@@ -6,6 +6,8 @@ Item {
     id: root
 
     property var model
+    property color strokeColor: "red"
+    property int strokeWidth: 10
 
     Shape {
         anchors.fill: parent
@@ -16,8 +18,8 @@ Item {
             id: shapePath
 
             fillColor: "transparent"
-            strokeColor: "red"
-            strokeWidth: 10
+            strokeColor: root.strokeColor
+            strokeWidth: root.strokeWidth
 
             capStyle: ShapePath.RoundCap
             joinStyle: ShapePath.RoundJoin

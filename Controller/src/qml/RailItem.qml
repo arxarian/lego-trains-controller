@@ -10,8 +10,6 @@ SelectableItem {
     x: root.railData ? root.railData.x : 0
     y: root.railData ? root.railData.y : 0
 
-    opacity: root.railData.reserved ? 0.5 : 1
-
     width: image.sourceSize.width
     height: image.sourceSize.height
     propagateComposedEvents: true
@@ -158,6 +156,7 @@ SelectableItem {
     }
 
     Text {
+        z: 1
         visible: Globals.railIdVisible
         anchors.centerIn: parent
         font.pixelSize: 150
@@ -180,5 +179,13 @@ SelectableItem {
     MultiPathView {
         anchors.fill: parent
         model: root.railData.path_indicators
+    }
+
+    PathIndicatorView {
+        anchors.fill: parent
+        visible: root.railData.reservation_indicators.count > 0
+        model: root.railData.reservation_indicators
+        strokeColor: "blue"
+        strokeWidth: 30
     }
 }

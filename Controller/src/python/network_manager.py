@@ -29,8 +29,8 @@ class NetworkManager(QObject):
         segment = self._segments[segment_id]
 
         for rail_data in segment[2]["segment_data"]:
-            rail_id = rail_data["rail_id"]
-            self._rails.findRailData(rail_id).set_reserved(True)
+            rail = self._rails.findRailData(rail_data["rail_id"])
+            rail.reserve_segment(rail_data["path_id"], rail_data["from"], rail_data["to"])
 
         return True
 

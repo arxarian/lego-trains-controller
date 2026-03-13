@@ -25,13 +25,13 @@
         {"rotator": { "x": 681, "y": 1322.5, "angle": -22.5 }, "distance": 35, "path_id": "B"}
     ],
     "path_indicators": [
-        {"x": 159.5, "y": 0, "path_id": "" },
-        {"x": 159.5, "y": 960, "path_id": "A" },
-        {"x": 159.5, "y": 1120, "path_id": "A" },
-        {"x": 159.5, "y": 1279, "path_id": "A" },
-        {"x": 422, "y": 867, "path_id": "B" },
-        {"x": 525, "y": 1024, "path_id": "B" },
-        {"x": 615, "y": 1185, "path_id": "B" },
-        {"x": 681, "y": 1322.5, "path_id": "B" }
+        {"x": 159.5, "y": 0, "path_id": "", "distance": 0 },
+        {"x": 159.5, "y": 960, "path_id": "A", "distance": 24 },
+        {"x": 159.5, "y": 1120, "path_id": "A", "distance": 28 },
+        {"x": 159.5, "y": 1279, "path_id": "A", "distance": 32 },
+        {"x": 422, "y": 867, "path_id": "B", "distance": 23 },
+        {"x": 525, "y": 1024, "path_id": "B", "distance": 27 },
+        {"x": 615, "y": 1185, "path_id": "B", "distance": 31 },
+        {"x": 681, "y": 1322.5, "path_id": "B", "distance": 35 }
     ]
 }

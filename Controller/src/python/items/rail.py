@@ -89,6 +89,7 @@ class Rail(QObject):
         self._markers = markers if markers is not None else Markers(parent=self)
         self._connectors = connectors if connectors is not None else Connectors(parent=self)
         self._path_indicators = PathIndicators(parent=self)
+        self._reservation_indicators = PathIndicators(parent=self)
         self._reserved = False  # reserved by train
 
         self._paths = {}                            # dictionary
@@ -178,6 +179,11 @@ class Rail(QObject):
 
     path_indicators = Property(QObject, path_indicators, constant=True)
 
+    def reservation_indicators(self):
+        return self._reservation_indicators
+
+    reservation_indicators = Property(QObject, reservation_indicators, constant=True)
+
     def type(self):
         return self._type
 
@@ -227,6 +233,11 @@ class Rail(QObject):
 
     paths_changed = Signal()
     paths = Property(list, paths, set_paths, notify=paths_changed)
+
+    def reserve_segment(self, path_id, from_d, to_d):
+        pts = [{"x": p.x, "y": p.y} for p in self._path_indicators._items
+               if p.path_id in ("", path_id) and from_d <= p.distance <= to_d]
+        self._reservation_indicators.set_points(pts)
 
     def connectTo(self, fromRailId, fromIndex):
         self._connectors.connectTo(fromRailId, fromIndex)
