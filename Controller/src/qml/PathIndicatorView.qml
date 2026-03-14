@@ -55,8 +55,10 @@ Item {
                 if (index === 0) pathMove.path = root.model.data(root.model.index(0, 0), PathIndicators.Role.ObjectRole)
                 else if (object.item) shapePath.pathElements.push(object.item)
             }
-            // handle model changes/removals
-            onObjectRemoved: (index, object) => {}
+            onObjectRemoved: (index, object) => {
+                pathMove.path = null
+                shapePath.pathElements.length = 0
+            }
         }
 
         Component {

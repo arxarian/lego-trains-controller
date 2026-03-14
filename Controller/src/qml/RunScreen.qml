@@ -45,8 +45,6 @@ Item {
                 onClicked: {
                     projectStorage.loadProject("rails")    // DEBUG - remove
                     network.generate()
-                    planner.reserve("3A16:6A8")
-
                 }
             }
 
@@ -59,12 +57,12 @@ Item {
             Layout.fillWidth: true
             Layout.margins: 10
 
-            model: devices
+            model: trains
             orientation: Qt.Horizontal
 
             delegate: TrainControlPanel {
                 height: trainView.height
-                width: 100
+                width: 150
             }
         }
     }

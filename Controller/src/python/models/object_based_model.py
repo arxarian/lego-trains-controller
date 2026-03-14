@@ -59,6 +59,21 @@ class ObjectBasedModel(QAbstractListModel, Generic[T]):
     count_changed = Signal()
     count = Property(int, lambda self: self.rowCount(), notify=count_changed)
 
+    def append(self, item):
+        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+        self._items.append(item)
+        self.endInsertRows()
+
+    def remove(self, item):
+        index = self._items.index(item)
+        if index < 0 or index >= self.count():
+            print(f"cannot remove {item}, not in the list")
+            return
+
+        self.beginRemoveRows(QModelIndex(), index, index)
+        self._items.remove(item)
+        self.endRemoveRows()
+
     @Slot(int, result=QObject)
     def get(self, index):
         if 0 <= index < len(self._items):

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PySide6.QtCore import Slot, Property, Signal, QModelIndex
+from PySide6.QtCore import Slot, Property, Signal, QModelIndex, QObject
 
 from python.models.object_based_model import ObjectBasedModel
 
@@ -17,11 +17,14 @@ class Devices(ObjectBasedModel[Device]):
         super().__init__(parent)
         self._discovered = []
 
+    device_connected = Signal(QObject)
+
     def append(self, device):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self._items.append(device)
         device.disconnected.connect(self.device_disconnected)
         self.endInsertRows()
+        self.device_connected.emit(device)
 
     def remove(self, device):
         index = self._items.index(device)

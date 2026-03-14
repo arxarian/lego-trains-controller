@@ -16,6 +16,7 @@ class MultiPathIndicators(ObjectBasedModel[MultiPathIndicator]):
         super().__init__(parent)
 
     def setModel(self, metaData):
+        self.clear()
         path_ids = set()
         for d in metaData:
             if "path_id" in d and d["path_id"] != None and d["path_id"] != "":  # add only named paths

@@ -239,6 +239,9 @@ class Rail(QObject):
                if p.path_id in ("", path_id) and from_d <= p.distance <= to_d]
         self._reservation_indicators.setModel(pts)
 
+    def unreserve_segment(self, path_id, from_d, to_d):
+        self._reservation_indicators.clear()
+
     def connectTo(self, fromRailId, fromIndex):
         self._connectors.connectTo(fromRailId, fromIndex)
 
