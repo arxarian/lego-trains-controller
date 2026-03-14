@@ -15,6 +15,7 @@ class PathIndicator(QObject):
         self._x = 0             # set in load_metadata
         self._y = 0             # set in load_metadata
         self._path_id = ""      # set in load_metadata, can be empty => applies for all paths
+        self._distance = 0.0    # distance along the path (in track units)
 
         # TODO - lineType: line or curve
         #      - pointType: start/end point vs control point
@@ -58,3 +59,13 @@ class PathIndicator(QObject):
 
     path_id_changed = Signal()
     path_id = Property(str, path_id, set_path_id, notify=path_id_changed)
+
+    def distance(self):
+        return self._distance
+
+    def set_distance(self, value):
+        self._distance = value
+        self.distance_changed.emit()
+
+    distance_changed = Signal()
+    distance = Property(float, distance, set_distance, notify=distance_changed)
