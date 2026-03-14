@@ -10,6 +10,7 @@ from python.models.marker_types import MarkerTypes
 from python.models.rail_types import RailTypes
 from python.planner import Planner
 from python.models.path_indicators_filter import PathIndicatorsFilter
+from python.models.trains import Trains
 
 class AppContext:
     def __init__(self, engine: QQmlApplicationEngine):
@@ -21,7 +22,9 @@ class AppContext:
         self.railTypes = RailTypes()
         self.network = NetworkManager(self.projectStorage.currentProject.rails)
         self.planner = Planner(self.projectStorage.currentProject.rails, self.network)
+        self.trains = Trains(self.network)
 
+        self.devices.device_connected.connect(self.trains.add_train)
         self.projectStorage.currentProject_changed.connect(self.updateProjectProperties)
         self.updateProjectProperties()
 
@@ -31,6 +34,7 @@ class AppContext:
         self.setContextProperty("markerTypes", self.markerTypes)
         self.setContextProperty("railTypes", self.railTypes)
         self.setContextProperty("planner", self.planner)
+        self.setContextProperty("trains", self.trains)
 
     def setContextProperty(self, name: str, object: QObject):
         self.context.setContextProperty(name, object)

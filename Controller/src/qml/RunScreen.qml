@@ -59,12 +59,12 @@ Item {
             Layout.fillWidth: true
             Layout.margins: 10
 
-            model: devices
+            model: trains
             orientation: Qt.Horizontal
 
             delegate: TrainControlPanel {
                 height: trainView.height
-                width: 100
+                width: 150
             }
         }
     }
