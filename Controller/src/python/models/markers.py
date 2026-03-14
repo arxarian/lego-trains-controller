@@ -24,7 +24,7 @@ class Markers(ObjectBasedModel[Marker]):
         return None if color is None else QColor(color)
 
     def setModel(self, metaData):
-        self.beginInsertRows(QModelIndex(), 0, len(metaData))
+        self.beginInsertRows(QModelIndex(), 0, len(metaData) - 1)
         for i, d in enumerate(metaData):
             self._items.append(Marker(data=d, index=i, color=self.resolveColor(i) , parent=self))
         self.endInsertRows()

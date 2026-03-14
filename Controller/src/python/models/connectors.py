@@ -21,7 +21,7 @@ class Connectors(ObjectBasedModel[Connector]):
                 self._items[i].load_metadata(d)
         else:
             # create a new model
-            self.beginInsertRows(QModelIndex(), 0, len(metaData))
+            self.beginInsertRows(QModelIndex(), 0, len(metaData) - 1)
             for d in metaData:
                 self._items.append(Connector(d, self))
             self.endInsertRows()

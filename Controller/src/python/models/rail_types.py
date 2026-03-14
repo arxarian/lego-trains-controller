@@ -24,7 +24,7 @@ class RailTypes(ObjectBasedModel[RailType]):
         with resources.open_text("resources", "rail_types.json") as json_data:
             data = json.load(json_data)
 
-            self.beginInsertRows(QModelIndex(), 0, len(data))
+            self.beginInsertRows(QModelIndex(), 0, len(data) - 1)
             self._items = [RailType(data=d, parent=self) for d in data]
             self.endInsertRows()
 

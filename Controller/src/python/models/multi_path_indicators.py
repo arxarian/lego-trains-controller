@@ -23,7 +23,7 @@ class MultiPathIndicators(ObjectBasedModel[MultiPathIndicator]):
         if len(path_ids) == 0:
             path_ids.add(DEFAULT_PATH)
 
-        self.beginInsertRows(QModelIndex(), 0, len(path_ids))
+        self.beginInsertRows(QModelIndex(), 0, len(path_ids) - 1)
         for id in path_ids:
             self._items.append(MultiPathIndicator(id=id, parent=self))
         self.endInsertRows()
