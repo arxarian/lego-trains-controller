@@ -60,6 +60,24 @@ ColumnLayout {
         }
     }
 
+    RowLayout {
+        id: reserveRails
+        TextField {
+            id: textFieldReserveRails
+            text: "3A16:6A8"
+            Layout.fillWidth: true
+        }
+        Button {
+            text: "Reserve"
+            onClicked: planner.reserve(textFieldReserveRails.displayText)
+        }
+
+        Button {
+            text: "Unreserve"
+            onClicked: planner.unreserve(textFieldReserveRails.displayText)
+        }
+    }
+
     ButtonGroup { id: group }
 
     GridLayout {

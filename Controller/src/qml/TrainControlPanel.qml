@@ -6,7 +6,8 @@ import TrainView
 Item {
     id: root
 
-    property Device device: model.object
+    property Train train: model.object
+    property var device: root.train.device
 
     GroupBox {
         title: root.device.name
@@ -70,6 +71,19 @@ Item {
                 Layout.preferredHeight: 50
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignHCenter
+            }
+
+            Text {
+                text: "Segment:"
+                font.bold: true
+                Layout.alignment: Qt.AlignHCenter
+            }
+
+            Text {
+                text: root.train.current_segment_id || "unknown"
+                wrapMode: Text.WrapAnywhere
+                horizontalAlignment: Text.AlignHCenter
+                Layout.fillWidth: true
             }
         }
     }
