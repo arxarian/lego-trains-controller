@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 from __future__ import annotations
 
-from PySide6.QtCore import QObject, Slot
+from PySide6.QtCore import QObject, Slot, Property, Signal
 from python.network_generator import NetworkGenerator
 
 class NetworkManager(QObject):
@@ -12,6 +12,7 @@ class NetworkManager(QObject):
         self._graph = None
         self._segments = {} # lookup table
         self._color_map = {} # color hex -> node_id
+        self._has_graph = False
 
     def updateRailsModel(self, rails):
         self._rails = rails
@@ -90,3 +91,14 @@ class NetworkManager(QObject):
             self._segments[id] = edge
 
         self.build_color_map()
+        self.set_has_graph(True)
+
+    def has_graph(self):
+        return self._has_graph
+
+    def set_has_graph(self, value):
+        self._has_graph = value
+        self.has_graph_changed.emit()
+
+    has_graph_changed = Signal()
+    has_graph = Property(bool, has_graph, set_has_graph, notify=has_graph_changed)

@@ -16,7 +16,9 @@ class Trains(ObjectBasedModel[Train]):
     def add_train(self, device):
         train = Train(device=device, network=self._network, parent=self)
         device.disconnected.connect(lambda d: self.remove_by_device(d))
-        self.append(train)
+        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+        self._items.append(train)
+        self.endInsertRows()
         return train
 
     def remove_by_device(self, device):

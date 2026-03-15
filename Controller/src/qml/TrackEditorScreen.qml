@@ -44,6 +44,16 @@ Item {
         z: 1
     }
 
+    Button {
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.margins: 5
+        z: 1
+        text: simulator.is_running ? "⏹ Stop Simulation" : "▶ Simulate"
+        enabled: network.has_graph
+        onClicked: simulator.is_running ? simulator.stop() : simulator.start()
+    }
+
     WheelHandler {
         id: wheel
         onWheel: (event) => {
