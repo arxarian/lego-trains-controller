@@ -7,7 +7,7 @@ Item {
     id: root
 
     property Train train: model.object
-    property Device device: root.train.device
+    property var device: root.train.device
 
     GroupBox {
         title: root.device.name
