@@ -66,7 +66,7 @@ class ObjectBasedModel(QAbstractListModel, Generic[T]):
 
     def remove(self, item):
         index = self._items.index(item)
-        if index < 0 or index >= self.count():
+        if index < 0 or index >= self.count:
             print(f"cannot remove {item}, not in the list")
             return
 

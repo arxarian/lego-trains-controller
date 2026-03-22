@@ -17,6 +17,10 @@ class Planner(QObject):
     def reserve(self, segment_id):
         self._network.reserve(segment_id)
 
+    @Slot(str)
+    def unreserve(self, segment_id):
+        self._network.unreserve(segment_id)
+
     @Slot(str)  # TODO - debug function more or less
     def plan(self, paths):
         paths = paths.split(",")
