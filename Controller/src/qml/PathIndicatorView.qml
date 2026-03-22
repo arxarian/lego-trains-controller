@@ -8,6 +8,37 @@ Item {
     property var model
     property color strokeColor: "red"
     property int strokeWidth: 10
+    property var _createdElements: []
+
+    function rebuildPath() {
+        for (var i = 0; i < root._createdElements.length; i++)
+            root._createdElements[i].destroy()
+        root._createdElements = []
+
+        var count = root.model ? root.model.rowCount() : 0
+        if (count === 0) {
+            shapePath.startX = 0
+            shapePath.startY = 0
+            shapePath.pathElements = []
+            return
+        }
+
+        var first = root.model.data(root.model.index(0, 0), PathIndicators.Role.ObjectRole)
+        shapePath.startX = Qt.binding(function() { return first.x })
+        shapePath.startY = Qt.binding(function() { return first.y })
+
+        var elements = []
+        for (var i = 1; i < count; i++) {
+            var item = root.model.data(root.model.index(i, 0), PathIndicators.Role.ObjectRole)
+            var pl = lineComponent.createObject(root, {
+                "x": Qt.binding((function(obj) { return function() { return obj.x } })(item)),
+                "y": Qt.binding((function(obj) { return function() { return obj.y } })(item))
+            })
+            elements.push(pl)
+        }
+        root._createdElements = elements
+        shapePath.pathElements = elements
+    }
 
     Shape {
         anchors.fill: parent
@@ -24,59 +55,24 @@ Item {
             capStyle: ShapePath.RoundCap
             joinStyle: ShapePath.RoundJoin
 
-             // Binding to the first element of your model
-            PathMove {
-                id: pathMove
-
-                property PathIndicator path: null
-
-                x: path ? path.x : 0
-                y: path ? path.y : 0
-            }
+            startX: 0
+            startY: 0
         }
+    }
 
-        Instantiator {
-            model: root.model
+    Connections {
+        target: root.model
+        function onRowsInserted() { root.rebuildPath() }
+        function onRowsRemoved() { root.rebuildPath() }
+    }
 
-            delegate: Loader {
-                property PathIndicator path: model.object
+    Component {
+        id: lineComponent
+        PathLine { }
+    }
 
-                sourceComponent: {
-                    return lineComponent
-                    // TODO - in case of different types of shape
-                    //if (model.type === 0) return lineComponent
-                    //if (model.type === 1) return curveComponent
-                    //return null
-                }
-            }
-
-            // add generated PathElements into the ShapePath
-            onObjectAdded: (index, object) => {
-                if (index === 0) pathMove.path = root.model.data(root.model.index(0, 0), PathIndicators.Role.ObjectRole)
-                else if (object.item) shapePath.pathElements.push(object.item)
-            }
-            onObjectRemoved: (index, object) => {
-                pathMove.path = null
-                shapePath.pathElements.length = 0
-            }
-        }
-
-        Component {
-            id: lineComponent
-            PathLine {
-                x: path.x
-                y: path.y
-            }
-        }
-
-        Component {
-            id: curveComponent
-            PathQuad {
-                x: path.x
-                y: path.y
-                controlX: path.c_x
-                controlY: path.c_y
-            }
-        }
+    Component {
+        id: curveComponent
+        PathQuad { }
     }
 }
