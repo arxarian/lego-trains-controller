@@ -5,7 +5,7 @@ import webcolors
 from enum import IntEnum
 from pathlib import Path
 from importlib import resources
-from PySide6.QtCore import QObject, Property, Signal, QEnum
+from PySide6.QtCore import QObject, Property, Signal, Slot, QEnum
 from PySide6.QtQml import QmlElement
 
 from python.items.rotator import Rotator
@@ -95,6 +95,8 @@ class Rail(QObject):
         self._paths = {}                            # dictionary
 
         self.load_metadata()
+        self._markers.rail = self
+        self._markers.updateEnabledStates()
 
     def load_metadata(self):
         if self._type == RailType.Undefined:
@@ -244,6 +246,14 @@ class Rail(QObject):
 
     def connectTo(self, fromRailId, fromIndex):
         self._connectors.connectTo(fromRailId, fromIndex)
+        self._markers.updateEnabledStates()
 
     def disconnectFrom(self, fromRailId):
         self._connectors.disconnectFrom(fromRailId)
+        self._markers.updateEnabledStates()
+
+    @Slot(result=QObject)
+    def setNextConnector(self):
+        connector = self._connectors.setNextConnector()
+        self._markers.updateEnabledStates()
+        return connector
