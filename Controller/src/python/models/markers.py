@@ -18,6 +18,7 @@ class Markers(ObjectBasedModel[Marker]):
     def __init__(self, data: list=None, parent=None) -> None:
         super().__init__(parent)
         self._data = data or []
+        self.rail = None
 
     def resolveColor(self, index):
         color = next((d["color"] for d in self._data if d["index"] == index), None)
@@ -47,7 +48,29 @@ class Markers(ObjectBasedModel[Marker]):
             return True
         return pid1 == pid2
 
+    def getConnectionDisabledDistances(self):
+        if not self.rail:
+            return set()
+
+        disabled = set()
+        conn_to_distance = {}
+
+        for path in self.rail._paths:
+            from_conn = next((c for c in self.rail._connectors._items if c._name == path["from"]), None)
+            if from_conn and from_conn._dir == "forward":
+                conn_to_distance[path["from"]] = 0
+                conn_to_distance[path["to"]] = path["length"]
+
+        for connector in self.rail._connectors._items:
+            if connector.connected() and self.rail._id > connector._connectedRailId:
+                distance = conn_to_distance.get(connector._name)
+                if distance is not None:
+                    disabled.add(distance)
+
+        return disabled
+
     def updateEnabledStates(self):
+        disabled_at_connection = self.getConnectionDisabledDistances()
         visible_markers = [m for m in self._items if m.visible]
         for marker in self._items:
             if marker.visible:
@@ -57,7 +80,8 @@ class Markers(ObjectBasedModel[Marker]):
                 and self._path_ids_compatible(marker.path_id, v.path_id)
                 for v in visible_markers
             )
-            marker.set_enabled(not blocked)
+            at_connection = marker.distance in disabled_at_connection
+            marker.set_enabled(not blocked and not at_connection)
 
     @Slot(result=int)
     def activeCount(self, path_id = None):

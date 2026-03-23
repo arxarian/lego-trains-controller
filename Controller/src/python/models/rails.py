@@ -99,7 +99,7 @@ class Rails(ObjectBasedModel[Rail]):
             # if the dir is the same, set the next connector so for example when placing curved track,
             # the rotation is preserved
             if fromDir == toDir:
-                toRail.connectors.setNextConnector()
+                toRail.setNextConnector()
 
         self.endInsertRows()
 

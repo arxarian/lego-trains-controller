@@ -100,7 +100,7 @@ SelectableItem {
             const siblingId = rails.findsiblingsOf(root.railData.id)[0] // return the first sibling
             const siblingData = rails.findRailData(siblingId)
             const fromConnector = siblingData.connectors.findFromConnector(root.railData.id)
-            const toConnector = root.railData.connectors.setNextConnector()
+            const toConnector = root.railData.setNextConnector()
 
             const siblingItem = rails.findRailItem(siblingId)
             snapToRotationPoint(fromConnector, toConnector, siblingItem, toConnector.rotator.angle)
