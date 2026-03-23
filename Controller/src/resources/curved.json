@@ -12,9 +12,21 @@
     ],
     "markers": [
         {"rotator": {"x": 147.5, "y": 61, "angle": -22.5}, "distance": 0},
+        {"rotator": {"x": 162.81, "y": 97.96, "angle": -22.5}, "distance": 1},
+
+        {"rotator": {"x": 186.39, "y": 166.72, "angle": -16.875}, "distance": 3},
         {"rotator": {"x": 198, "y": 205, "angle": -16.875}, "distance": 4},
+        {"rotator": {"x": 209.61, "y": 243.28, "angle": -16.875}, "distance": 5},
+
+        {"rotator": {"x": 227.2, "y": 314.77, "angle": -11.25}, "distance": 7},
         {"rotator": {"x": 235, "y": 354, "angle": -11.25}, "distance": 8},
+        {"rotator": {"x": 242.8, "y": 393.23, "angle": -11.25}, "distance": 9},
+
+        {"rotator": {"x": 254.08, "y": 465.19, "angle": -5.625}, "distance": 11},
         {"rotator": {"x": 258, "y": 505, "angle": -5.625}, "distance": 12},
+        {"rotator": {"x": 261.92, "y": 544.81, "angle": -5.625}, "distance": 13},
+
+        {"rotator": {"x": 267, "y": 618, "angle": 0}, "distance": 15},
         {"rotator": {"x": 267, "y": 658, "angle": 0}, "distance": 16}
     ],
     "path_indicators": [

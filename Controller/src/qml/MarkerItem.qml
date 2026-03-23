@@ -38,10 +38,10 @@ Item {
         Rectangle {
             id: markerPoint
 
-            property real size: 50
+            property real size: 30
 
             anchors.centerIn: parent
-            visible: (markerTypes ? markerTypes.markersActive : true) && !item.marker.visible
+            visible: (markerTypes ? markerTypes.markersActive : true) && !item.marker.visible && item.marker.enabled
 
             radius: markerPoint.size
             width: markerPoint.size

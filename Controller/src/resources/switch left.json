@@ -16,12 +16,32 @@
     ],
     "markers": [
         {"rotator": { "x": 159.5, "y": 0, "angle": 0 }, "distance": 0, "path_id": ""},
+        {"rotator": { "x": 159.5, "y": 40, "angle": 0 }, "distance": 1, "path_id": ""},
+
+        {"rotator": { "x": 159.5, "y": 920, "angle": 0 }, "distance": 23, "path_id": "A"},
         {"rotator": { "x": 159.5, "y": 960, "angle": 0 }, "distance": 24, "path_id": "A"},
+        {"rotator": { "x": 159.5, "y": 1000, "angle": 0 }, "distance": 25, "path_id": "A"},
+
+        {"rotator": { "x": 159.5, "y": 1080, "angle": 0 }, "distance": 27, "path_id": "A"},
         {"rotator": { "x": 159.5, "y": 1120, "angle": 0 }, "distance": 28, "path_id": "A"},
+        {"rotator": { "x": 159.5, "y": 1160, "angle": 0 }, "distance": 29, "path_id": "A"},
+
+        {"rotator": { "x": 159.5, "y": 1239, "angle": 0 }, "distance": 31, "path_id": "A"},
         {"rotator": { "x": 159.5, "y": 1279, "angle": 0 }, "distance": 32, "path_id": "A"},
+
+        {"rotator": { "x": 399.78, "y": 833.74, "angle": -33.75 }, "distance": 22, "path_id": "B"},
         {"rotator": { "x": 422, "y": 867, "angle": -33.75 }, "distance": 23, "path_id": "B"},
+        {"rotator": { "x": 444.22, "y": 900.26, "angle": -33.75 }, "distance": 24, "path_id": "B"},
+
+        {"rotator": { "x": 502.78, "y": 990.74, "angle": -33.75 }, "distance": 26, "path_id": "B"},
         {"rotator": { "x": 525, "y": 1024, "angle": -33.75 }, "distance": 27, "path_id": "B"},
+        {"rotator": { "x": 547.22, "y": 1057.26, "angle": -33.75 }, "distance": 28, "path_id": "B"},
+
+        {"rotator": { "x": 596.14, "y": 1149.72, "angle": -28.125 }, "distance": 30, "path_id": "B"},
         {"rotator": { "x": 615, "y": 1185, "angle": -28.125 }, "distance": 31, "path_id": "B"},
+        {"rotator": { "x": 633.86, "y": 1220.28, "angle": -28.125 }, "distance": 32, "path_id": "B"},
+
+        {"rotator": { "x": 665.69, "y": 1285.54, "angle": -22.5 }, "distance": 34, "path_id": "B"},
         {"rotator": { "x": 681, "y": 1322.5, "angle": -22.5 }, "distance": 35, "path_id": "B"}
     ],
     "path_indicators": [

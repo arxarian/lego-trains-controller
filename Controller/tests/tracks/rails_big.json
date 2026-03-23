@@ -64,7 +64,7 @@
             ],
             "markers": [
                 {
-                    "index": 3,
+                    "index": 9,
                     "color": "#ffff00"
                 }
             ]
@@ -181,7 +181,7 @@
             ],
             "markers": [
                 {
-                    "index": 3,
+                    "index": 9,
                     "color": "#008000"
                 }
             ]
@@ -285,7 +285,7 @@
                     "color": "#008000"
                 },
                 {
-                    "index": 1,
+                    "index": 3,
                     "color": "#0000ff"
                 }
             ]
@@ -316,7 +316,7 @@
             ],
             "markers": [
                 {
-                    "index": 1,
+                    "index": 3,
                     "color": "#000000"
                 }
             ]
@@ -343,11 +343,11 @@
             ],
             "markers": [
                 {
-                    "index": 1,
+                    "index": 3,
                     "color": "#ff0000"
                 },
                 {
-                    "index": 2,
+                    "index": 6,
                     "color": "#008000"
                 }
             ]
@@ -500,11 +500,11 @@
             ],
             "markers": [
                 {
-                    "index": 2,
+                    "index": 6,
                     "color": "#ff0000"
                 },
                 {
-                    "index": 3,
+                    "index": 9,
                     "color": "#ffff00"
                 }
             ]
@@ -531,11 +531,11 @@
             ],
             "markers": [
                 {
-                    "index": 2,
+                    "index": 6,
                     "color": "#ffff00"
                 },
                 {
-                    "index": 3,
+                    "index": 9,
                     "color": "#ff0000"
                 }
             ]
@@ -646,11 +646,11 @@
             ],
             "markers": [
                 {
-                    "index": 1,
+                    "index": 3,
                     "color": "#008000"
                 },
                 {
-                    "index": 2,
+                    "index": 6,
                     "color": "#ff0000"
                 }
             ]
@@ -761,7 +761,7 @@
             ],
             "markers": [
                 {
-                    "index": 1,
+                    "index": 3,
                     "color": "#0000ff"
                 }
             ]
@@ -788,7 +788,7 @@
             ],
             "markers": [
                 {
-                    "index": 4,
+                    "index": 12,
                     "color": "#008000"
                 }
             ]
@@ -815,11 +815,11 @@
             ],
             "markers": [
                 {
-                    "index": 2,
+                    "index": 6,
                     "color": "#008000"
                 },
                 {
-                    "index": 3,
+                    "index": 9,
                     "color": "#0000ff"
                 }
             ]
