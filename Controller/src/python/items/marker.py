@@ -17,6 +17,7 @@ class Marker(QObject):
         self._visible = False if color is None else True
         self._index = index
         self._color = color
+        self._enabled = True
         self._rotator = None    # set in load_metadata
         self._distance = 0      # set in load_metadata
         self._path_id = None    # set in load_metadata
@@ -49,6 +50,10 @@ class Marker(QObject):
     def set_visible(self, value):
         self._visible = value
         self.visible_changed.emit()
+        from python.models.markers import Markers
+        parent = self.parent()
+        if isinstance(parent, Markers):
+            parent.updateEnabledStates()
 
     visible_changed = Signal()
     visible = Property(bool, visible, set_visible, notify=visible_changed)
@@ -97,3 +102,14 @@ class Marker(QObject):
 
     path_id_changed = Signal()
     path_id = Property(str, path_id, set_path_id, notify=path_id_changed)
+
+    def enabled(self):
+        return self._enabled
+
+    def set_enabled(self, value):
+        if self._enabled != value:
+            self._enabled = value
+            self.enabled_changed.emit()
+
+    enabled_changed = Signal()
+    enabled = Property(bool, enabled, set_enabled, notify=enabled_changed)

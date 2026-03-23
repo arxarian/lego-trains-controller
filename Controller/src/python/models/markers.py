@@ -29,6 +29,7 @@ class Markers(ObjectBasedModel[Marker]):
             self._items.append(Marker(data=d, index=i, color=self.resolveColor(i) , parent=self))
         self.endInsertRows()
         self._data = [] # clear the original data, not needed anymore
+        self.updateEnabledStates()
 
     def save_data(self):
         data = [
@@ -40,6 +41,23 @@ class Markers(ObjectBasedModel[Marker]):
 
     def load_data(data, parent):
         return Markers(data=data, parent=parent)
+
+    def _path_ids_compatible(self, pid1, pid2):
+        if pid1 in (None, "") or pid2 in (None, ""):
+            return True
+        return pid1 == pid2
+
+    def updateEnabledStates(self):
+        visible_markers = [m for m in self._items if m.visible]
+        for marker in self._items:
+            if marker.visible:
+                continue
+            blocked = any(
+                abs(v.distance - marker.distance) == 1
+                and self._path_ids_compatible(marker.path_id, v.path_id)
+                for v in visible_markers
+            )
+            marker.set_enabled(not blocked)
 
     @Slot(result=int)
     def activeCount(self, path_id = None):
