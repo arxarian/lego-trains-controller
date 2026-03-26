@@ -1,0 +1,182 @@
+---
+description: Core project specification for the LEGO Trains Controller. Defines goals, architecture, domain model, conventions, and current state. Reference this before every task.
+alwaysApply: true
+---
+
+# LEGO Trains Controller — Project Specification
+
+## Project Goal
+
+Build a desktop application that creates a **virtual digital twin of a real LEGO train track** and controls **multiple trains simultaneously** in real-time. Trains have color sensors and communicate over Bluetooth. Colored bricks ("markers") placed on track pieces serve as localization beacons. The app provides **route planning, path reservation, and collision avoidance** inspired by real railway interlocking systems.
+
+## Domain Model
+
+### Track Pieces (Rails)
+
+Physical LEGO track pieces. Each has typed geometry, connectors, markers, and paths.
+
+| RailType | Connectors | Paths | Behavior |
+|---|---|---|---|
+| `Straight` | 2 (`start`, `end`) | 1 | Bidirectional |
+| `Curved` | 2 (`start`, `end`) | 1 | Bidirectional |
+| `SwitchLeft` | 3 | 2 | From one side: 2 possible directions; from other two sides: 1 direction each |
+| `SwitchRight` | 3 | 2 | Mirror of SwitchLeft |
+
+More rail types will be added in the future. Rail geometry is defined in JSON files under `Controller/src/resources/` (e.g. `straight.json`, `curved.json`, `switch left.json`, `switch right.json`). Each JSON defines connectors, paths (with `from`/`to` connector names, `length`, `path_id`), markers (with `distance` along path), and `path_indicators` (visual polyline points for rendering).
+
+### Connectors
+
+Named attachment points on a rail. Each connector stores `connectedRailId` (the rail on the other side, or -1), `dir` (forward/reverse), and cycles through connection options via `next`. `ConnectorRegister` tracks global connection events.
+
+### Markers
+
+Colored LEGO bricks placed at specific positions (`distance`) along a rail's path. Each marker has `color`, `visible`, `enabled`, `path_id`, and positional data. Markers that are `visible` and have a `color` become **graph nodes** — they are the only way a train can determine its position. Marker placement rules prevent markers at connector joints and adjacent overlapping. Available colors: red, green, blue, yellow, white (defined in `marker_types.json`).
+
+### Graph (NetworkX)
+
+The track is converted into an **undirected NetworkX graph** by `NetworkGenerator`:
+- **Nodes**: connection points between rails (`"railA_id-railB_id"`), dangling endpoints (`"rail_id + path_id"`), and marker nodes (`"rail_id + path_id + distance"`).
+- **Edges**: carry `weight` (distance) and `segment_data` (list of `{rail_id, path_id, from, to}` sub-segments).
+- **Simplification**: `simplify_graph()` removes degree-2 non-important nodes, keeping only **marker nodes** (for localization) and **switch-adjacent nodes** (for branching).
+
+### Segments
+
+After graph generation, each edge becomes a **segment** identified by `"sorted_node_a:sorted_node_b"`. Segments are the unit of **reservation** — a train reserves the segment it currently occupies and unreserves the previous one.
+
+### Trains
+
+Each connected LEGO hub becomes a `Train`. A train holds a reference to its `Device`, the `NetworkManager`, its current segment ID, current node ID, and direction. When the color sensor detects a marker color, the train resolves its position via `color_map` → node → segment, unreserves the old segment, and reserves the new one.
+
+### Devices (BLE Communication)
+
+- **Protocol**: Pybricks GATT characteristic `c5f50002-8280-46da-89f4-6d8051e4aeef`
+- **Host → Hub**: `0x06` + 3-byte command + optional data. Commands: `fwd` (forward + 2-byte speed), `rev` (reverse + 2-byte speed), `bye` (disconnect), `sht` (shutdown), `vol` (request voltage)
+- **Hub → Host**: `0x01` prefix + payload. Payloads: `rdy` (ready for command), `clr` + color name (sensor reading), `vol` + 2-byte voltage, `int` (initialized)
+- Hub firmware is MicroPython (Pybricks) in `TrainHub/main.py`
+
+### Planner (Route Planning)
+
+Currently a stub/debug tool. The goal is to implement **real railway-style route planning**:
+- Shortest-path computation over the graph (Dijkstra/A*)
+- **Route reservation / interlocking**: reserve all segments along a planned route before a train moves
+- **Conflict detection**: prevent two trains from reserving overlapping segments
+- **Scheduled stops**: trains stop at designated marker waypoints for a configurable duration (seconds)
+- Switch state management for route selection at junctions
+
+### Simulator
+
+`Simulator` creates a `FakeDevice` and walks a circuit of marker colors to test train localization and reservation without physical hardware.
+
+## Tech Stack
+
+| Component | Technology |
+|---|---|
+| Language | Python 3.13 |
+| UI Framework | PySide6 (Qt 6) with QML |
+| Async | asyncio + qasync (QEventLoop) |
+| BLE | bleak |
+| Graph | networkx |
+| Graph export | pydot (for DOT files in tests) |
+| Color names | webcolors |
+| Hub firmware | Pybricks (MicroPython, CityHub) |
+| Testing | pytest |
+| CI | GitHub Actions (windows-latest, Python 3.13) |
+
+## Project Structure
+
+```
+trains/
+├── Controller/                        # Desktop application
+│   ├── pyproject.toml                 # Dependencies & pytest config
+│   ├── src/
+│   │   ├── main.py                    # Entry point (QML engine + asyncio loop)
+│   │   ├── python/
+│   │   │   ├── app_context.py         # Wires all services, exposes to QML context
+│   │   │   ├── network_generator.py   # Rail list → NetworkX graph
+│   │   │   ├── network_manager.py     # Graph wrapper: segments, color map, reserve/unreserve
+│   │   │   ├── planner.py             # Route planning (stub)
+│   │   │   ├── simulator.py           # Offline simulation with FakeDevice
+│   │   │   ├── items/                 # Domain objects (QObject subclasses)
+│   │   │   │   ├── rail.py            # Rail, RailType enum
+│   │   │   │   ├── connector.py       # Single connector
+│   │   │   │   ├── marker.py          # Single marker
+│   │   │   │   ├── train.py           # Train (device + network state)
+│   │   │   │   ├── device.py          # BLE device (real hub)
+│   │   │   │   ├── fake_device.py     # Simulated device
+│   │   │   │   ├── rotator.py         # Rotation/position helper
+│   │   │   │   ├── project.py         # Project container
+│   │   │   │   └── path_indicator.py  # Visual path point
+│   │   │   └── models/                # QAbstractListModel wrappers
+│   │   │       ├── rails.py
+│   │   │       ├── connectors.py
+│   │   │       ├── markers.py
+│   │   │       ├── trains.py
+│   │   │       ├── devices.py
+│   │   │       ├── path_indicators.py
+│   │   │       ├── connector_register.py
+│   │   │       ├── project_storage.py
+│   │   │       ├── marker_types.py
+│   │   │       ├── rail_types.py
+│   │   │       ├── path_indicators_filter.py
+│   │   │       └── object_based_model.py  # Generic list model base
+│   │   ├── qml/                       # Qt Quick UI
+│   │   │   ├── Main.qml               # Top-level: Run vs Edit mode
+│   │   │   ├── RunScreen.qml          # Runtime view (trains, graph, controls)
+│   │   │   ├── TrackEditorScreen.qml  # Track editor
+│   │   │   └── (component QML files)
+│   │   ├── resources/                 # Rail JSON defs, marker/rail type catalogs
+│   │   └── projects/                  # Saved track layouts (JSON)
+│   └── tests/                         # pytest: graph generation, segment counts
+├── TrainHub/                          # LEGO hub firmware (MicroPython)
+│   ├── main.py                        # Motor + sensor + BLE communication loop
+│   ├── colors.py                      # HSV → Pybricks Color mapping
+│   └── tests.py                       # Experimental sensor tests
+└── RailwaysGraphics/                  # SVG assets
+```
+
+## Architecture Pattern
+
+- **Items** (`items/`): Domain objects inheriting `QObject` with Qt Properties and Signals. These are the core data types.
+- **Models** (`models/`): `QAbstractListModel` subclasses (via `ObjectBasedModel[T]`) wrapping lists of items for QML consumption. Each model exposes items via `ObjectRole`.
+- **AppContext**: Creates and wires all services, exposes them as QML context properties.
+- **QML**: Declarative UI binds to Python models/properties. Two main screens: `TrackEditorScreen` (build track) and `RunScreen` (control trains).
+
+## Coding Conventions
+
+- All domain objects inherit `QObject` and use PySide6 `Property`, `Signal`, `Slot`, `@QmlElement`
+- Models follow the `ObjectBasedModel[T]` pattern with `ObjectRole` for QML
+- Rail type definitions are data-driven via JSON, not hardcoded geometry
+- Graph node IDs follow the naming convention: `createNodeName(id0, id1)` → `"min-max"` for connections, `"rail_id + path_id"` for dangling, `"rail_id + path_id + distance"` for markers
+- Segment IDs: `"sorted_a:sorted_b"` where a, b are node IDs
+- File encoding comment `# This Python file uses the following encoding: utf-8` used in some files
+- QML imports registered as `TrainView 1.0`
+- Tests use expected DOT graph files for comparison
+
+## Known Issues & TODOs
+
+1. **Switch routing**: `find_segment_by_entry_node` picks the first neighbor when multiple exist — needs direction + switch state logic
+2. **Planner**: Currently a debug tool — needs real shortest-path routing, multi-train conflict resolution, and scheduled stops
+3. **Graph simplification**: Needs to properly handle switches (noted TODO in `network_generator.py`)
+4. **`qmldir`**: References `TrackPiece.qml` which doesn't exist
+5. **`PathIndicatorsFilter`**: Imported in `app_context.py` but not registered on engine context
+6. **CI**: `pip install .[test]` but `pyproject.toml` has no `[project.optional-dependencies]` test group
+7. **`ProjectStorage.saveDataToFile`**: Parameter type annotation inconsistency with actual usage
+8. **Device disconnect**: No robust handling on client side
+
+## Key Design Decisions
+
+- **Markers are the only localization mechanism**: Trains can only know their position when they cross a colored marker. Between markers, position is unknown.
+- **Undirected graph**: The track graph is undirected because trains can travel in both directions on any segment.
+- **Segment-based reservation**: The reservation unit is a graph edge (segment), not individual rails. One segment may span multiple rail pieces.
+- **Color uniqueness**: Each marker color must map to exactly one graph node (currently no enforcement — duplicate colors will cause incorrect localization).
+- **Hub independence**: Hub firmware is standalone Pybricks code that only sends color readings and receives motor commands — all intelligence is in the Controller app.
+
+## Future Features (from requirements)
+
+- More rail types beyond the current four
+- Full route planning with Dijkstra/A* over the graph
+- Railway-style interlocking and route reservation across multiple segments
+- Scheduled stops at waypoint markers with configurable duration (seconds)
+- Switch state control (setting turnout direction from the app)
+- Multi-train conflict detection and resolution
+- Track editor improvements (full visual track building in the app)
