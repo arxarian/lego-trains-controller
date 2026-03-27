@@ -151,6 +151,7 @@ trains/
 - File encoding comment `# This Python file uses the following encoding: utf-8` used in some files
 - QML imports registered as `TrainView 1.0`
 - Tests use expected DOT graph files for comparison
+- When adding or removing QML or Python source files, update `Controller/TrainsController.pyproject` to keep the file list in sync
 
 ## Known Issues & TODOs
 

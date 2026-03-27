@@ -1,14 +1,13 @@
 import QtQuick
 import TrainView
 
-Item
-{
+Item {
     id: root
 
     property int railId: -1
     property var model  // TODO - why var and not Connectors?
 
-    visible: railTypes ? railTypes.railsActive : false
+    visible: Globals.editMode && (railTypes ? railTypes.railsActive : false)
 
     Repeater {
         model: root.model

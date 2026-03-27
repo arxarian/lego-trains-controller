@@ -10,8 +10,6 @@ ColumnLayout {
     spacing: 0
 
     Row {
-        id: projectButtons
-
         Button {
             text: "Save"
             onClicked: projectStorage.saveProject(project)
@@ -22,59 +20,20 @@ ColumnLayout {
             onClicked: projectStorage.loadProject(project.name)
         }
 
-        CheckBox {
-            text: "Grid"
-            checked: Globals.gridVisible
-            onClicked: Globals.gridVisible = checked
-        }
-
-        CheckBox {
-            text: "Track Frame"
-            checked: Globals.trackFrameVisible
-            onClicked: Globals.trackFrameVisible = checked
-        }
-
-        CheckBox {
-            text: "Rotation Points"
-            checked: Globals.rotationPointsVisible
-            onClicked: Globals.rotationPointsVisible = checked
-        }
-
-        CheckBox {
-            text: "Rails Ids"
-            checked: Globals.railIdVisible
-            onClicked: Globals.railIdVisible = checked
-        }
-    }
-
-    RowLayout {
-        id: activeRails
-        TextField {
-            id: textFieldRails
-            text: "2,1B,4,6"
-            Layout.fillWidth: true
-        }
         Button {
-            text: "Plan"
-            onClicked: planner.plan(textFieldRails.displayText)
-        }
-    }
-
-    RowLayout {
-        id: reserveRails
-        TextField {
-            id: textFieldReserveRails
-            text: "3A16:6A8"
-            Layout.fillWidth: true
-        }
-        Button {
-            text: "Reserve"
-            onClicked: planner.reserve(textFieldReserveRails.displayText)
+            text: "Generate big graph"
+            onClicked: {
+                projectStorage.loadProject("rails_big")
+                network.generate()
+            }
         }
 
         Button {
-            text: "Unreserve"
-            onClicked: planner.unreserve(textFieldReserveRails.displayText)
+            text: "Generate small graph"
+            onClicked: {
+                projectStorage.loadProject("rails")
+                network.generate()
+            }
         }
     }
 
@@ -92,11 +51,13 @@ ColumnLayout {
 
             Button {
                 id: railItem
+
                 property RailType rail: model.object
 
-                checked: Globals.selectedRail === index  // just for the init
+                checked: Globals.selectedRail === index
                 checkable: true
                 text: railItem.rail.name
+
                 onClicked: {
                     Globals.selectedMarker = -1
                     Globals.selectedRail = index
@@ -120,6 +81,7 @@ ColumnLayout {
 
             Button {
                 id: markerItem
+
                 property MarkerType marker: model.object
 
                 checkable: true

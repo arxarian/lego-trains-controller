@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 
 Item {
     id: root
@@ -28,34 +27,16 @@ Item {
             settings.canvas_x = mouse.x - mouseArea.offsetX + mouseArea.startX
             settings.canvas_y = mouse.y - mouseArea.offsetY + mouseArea.startY
         }
-
         onClicked: {
-            if (rails.count === 0) {
+            if (Globals.editMode && rails.count === 0) {
                 connectorRegister.addEvent(Globals.selectedRail)
             }
         }
     }
 
-    ControlPanel {
-        anchors.top: parent.top
-        anchors.topMargin: 5
-        anchors.right: parent.right
-        anchors.rightMargin: 5
-        z: 1
-    }
-
-    Button {
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.margins: 5
-        z: 1
-        text: simulator.is_running ? "⏹ Stop Simulation" : "▶ Simulate"
-        enabled: network.has_graph
-        onClicked: simulator.is_running ? simulator.stop() : simulator.start()
-    }
-
     WheelHandler {
         id: wheel
+
         onWheel: (event) => {
             if (event.angleDelta.y > 0) {
                 settings.canvas_zoom = Math.min(maximalScale, area.scale + scaleFactor)
@@ -67,6 +48,7 @@ Item {
 
     Item {
         id: area
+
         x: settings ? settings.canvas_x : 0
         y: settings ? settings.canvas_y : 0
         height: parent.height
@@ -93,6 +75,7 @@ Item {
             cellWidth: grid.size
             interactive: false
             model: 4096
+
             delegate: Rectangle {
                 width: grid.cellWidth
                 height: grid.cellHeight

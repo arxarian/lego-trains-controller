@@ -4,6 +4,7 @@ import QtQuick
 import TrainView
 
 QtObject {
+    property bool editMode: false
     property bool gridVisible: false
     property bool trackFrameVisible: false
     property bool rotationPointsVisible: false
