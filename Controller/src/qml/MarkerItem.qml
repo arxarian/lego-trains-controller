@@ -17,7 +17,7 @@ Item {
         anchors.centerIn: parent
         width: 160
         height: 80
-        enabled: item.marker.visible
+        enabled: Globals.editMode && item.marker.visible
         rotation: item.marker.rotator.angle
 
         Rectangle {
@@ -41,7 +41,7 @@ Item {
             property real size: 30
 
             anchors.centerIn: parent
-            visible: (markerTypes ? markerTypes.markersActive : true) && !item.marker.visible && item.marker.enabled
+            visible: Globals.editMode && (markerTypes ? markerTypes.markersActive : true) && !item.marker.visible && item.marker.enabled
 
             radius: markerPoint.size
             width: markerPoint.size

@@ -4,4 +4,3 @@ singleton Globals   1.0 Globals.qml
 
 Main                1.0 Main.qml
 DiscoverDevices     1.0 DiscoverDevices.qml
-TrackPiece          1.0 TrackPiece.qml

@@ -5,7 +5,7 @@ Item {
 
     readonly property bool selected: root.activeFocus
     property bool propagateComposedEvents: false
-    property bool enabled: true
+    property bool enabled: Globals.editMode
 
     property var rotateAction: function () {
         console.warn("no rotate action defined")
@@ -19,15 +19,15 @@ Item {
 
     focus: true
 
-    Keys.onPressed: (event)=> {
-                        if (event.key === Qt.Key_Delete) {
-                            root.deleteAction()
-                            event.accepted = true
-                        } else if (event.key === Qt.Key_R) {
-                            root.rotateAction()
-                            event.accepted = true
-                        }
-                    }
+    Keys.onPressed: (event) => {
+        if (event.key === Qt.Key_Delete) {
+            root.deleteAction()
+            event.accepted = true
+        } else if (event.key === Qt.Key_R) {
+            root.rotateAction()
+            event.accepted = true
+        }
+    }
 
     SelectedMarker {
         anchors.fill: parent
