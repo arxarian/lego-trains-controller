@@ -12,4 +12,6 @@ QtObject {
 
     property int selectedRail: Rail.Straight   // TODO - fix RailType registration
     property int selectedMarker: -1
+
+    property Item globalArea: null
 }

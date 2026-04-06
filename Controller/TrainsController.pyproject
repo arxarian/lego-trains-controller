@@ -62,6 +62,7 @@
         "src/qml/RunPanel.qml",
         "src/qml/PathIndicatorView.qml",
         "src/qml/MultiPathView.qml",
-        "src/python/network_manager.py"
+        "src/python/network_manager.py",
+        "src/qml/TrainItem.qml"
     ]
 }

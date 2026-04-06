@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QObject, Signal, Property, Slot
+from PySide6.QtCore import QObject, Signal, Property, Slot, QPointF
 from PySide6.QtQml import QmlElement
 from PySide6.QtGui import QColor
 
@@ -21,6 +21,7 @@ class Marker(QObject):
         self._rotator = None    # set in load_metadata
         self._distance = 0      # set in load_metadata
         self._path_id = None    # set in load_metadata
+        self._position = QPointF()
 
         self.load_metadata(data)
 
@@ -43,6 +44,16 @@ class Marker(QObject):
     def remove(self):
         self.set_color(None)
         self.set_visible(False)
+
+    def position(self):
+        return self._position
+
+    def set_position(self, value):
+        self._position = value
+        self.position_changed.emit()
+
+    position_changed = Signal()
+    position = Property(QPointF, position, set_position, notify=position_changed)
 
     def visible(self):
         return self._visible

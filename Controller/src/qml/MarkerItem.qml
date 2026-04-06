@@ -39,6 +39,11 @@ Item {
             id: markerPoint
 
             property real size: 30
+            readonly property real centerOffset: size / 2
+
+            function updatePosition() {
+                item.marker.position = mapToItem(Globals.globalArea, centerOffset, centerOffset)
+            }
 
             anchors.centerIn: parent
             visible: Globals.editMode && (markerTypes ? markerTypes.markersActive : true) && !item.marker.visible && item.marker.enabled
@@ -48,6 +53,9 @@ Item {
             height: markerPoint.size
 
             color: "#88FF00FF"
+
+            onXChanged: updatePosition()
+            onYChanged: updatePosition()
 
             MouseArea {
                 anchors.fill: parent
