@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QObject, Property, Signal
+from PySide6.QtCore import QObject, Property, Signal, QPointF
 from PySide6.QtQml import QmlElement
 
 QML_IMPORT_NAME = "TrainView"
@@ -16,6 +16,7 @@ class Train(QObject):
         self._current_segment_id = ""
         self._current_node_id = ""
         self._direction = "forward"
+        self._position = QPointF()
 
         device.color_changed.connect(self.on_color_changed)
 
@@ -39,7 +40,7 @@ class Train(QObject):
         self._network.unreserve(self._current_segment_id)
         self._network.reserve(new_segment_id)
 
-        self._current_node_id = node_id
+        self.set_current_node_id(node_id)
         self.set_current_segment_id(new_segment_id)
         print(f"Train '{self._device.name}': entered segment {new_segment_id} via node {node_id}")
 
@@ -47,6 +48,34 @@ class Train(QObject):
         return self._device
 
     device = Property(QObject, device, constant=True)
+
+    def position(self):
+        return self._position
+
+    def set_position(self, value):
+        self._position = value
+        self.position_changed.emit()
+
+    def update_position(self):
+        marker = self._network.find_node_marker(self._current_node_id)
+        if marker:
+            self.set_position(marker._position)
+        else:
+            print("marker {marker} not found")
+
+    position_changed = Signal()
+    position = Property(QPointF, position, set_position, notify=position_changed)
+
+    def current_node_id(self):
+        return self._current_node_id
+
+    def set_current_node_id(self, value):
+        self._current_node_id = value
+        self.current_node_id_changed.emit()
+        self.update_position()
+
+    current_node_id_changed = Signal()
+    current_node_id = Property(str, current_node_id, set_current_node_id, notify=current_node_id_changed)
 
     def current_segment_id(self):
         return self._current_segment_id

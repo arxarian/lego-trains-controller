@@ -10,6 +10,7 @@ class NetworkManager(QObject):
         self._generator = NetworkGenerator()
         self._rails = rails
         self._graph = None
+        self._nodeMarkerMap = {}
         self._segments = {} # lookup table
         self._color_map = {} # color hex -> node_id
         self._has_graph = False
@@ -63,6 +64,9 @@ class NetworkManager(QObject):
                             self._color_map[color_key] = node_id
         print(f"Network: Color map built with {len(self._color_map)} entries: {self._color_map}")
 
+    def find_node_marker(self, node_id: str):
+        return self._nodeMarkerMap.get(node_id)
+
     def find_node_by_color(self, color_key: str):
         """color_key should be a lowercase hex string e.g. '#ff0000'"""
         return self._color_map.get(color_key)
@@ -85,7 +89,7 @@ class NetworkManager(QObject):
     @Slot()
     def generate(self):
         self._segments = {}
-        self._graph = self._generator.generate(self._rails.items(), True)
+        self._graph, self._nodeMarkerMap = self._generator.generate(self._rails.items(), True)
 
         edges = self._graph.edges(data=True)
 

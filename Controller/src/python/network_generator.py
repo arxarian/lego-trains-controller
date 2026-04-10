@@ -15,9 +15,13 @@ class NetworkGenerator():
     def __init__(self) -> None:
         self.graph = None
         self.rails = None
+        self.nodeMarkerMap = None
 
     def hasEdge(self, from_node, to_node):
         return self.graph.has_edge(from_node, to_node)
+
+    def addMarker(self, node, marker):
+        self.nodeMarkerMap[node] = marker
 
     def addEdge(self, from_node, to_node, marker, rail_id, path_id, rail_from, rail_to, at_switch=False):
         if self.hasEdge(from_node, to_node):
@@ -94,12 +98,14 @@ class NetworkGenerator():
                         seg_from, seg_to = min(lastDistance, marker.distance), max(lastDistance, marker.distance)
                         self.addEdge(node, to_node, marker=True, rail_id=rail.id, path_id=path_id,
                             rail_from=seg_from, rail_to=seg_to, at_switch=at_switch)
+                        self.addMarker(to_node, marker)
                         node = to_node
                         lastDistance = marker.distance
 
                     seg_from, seg_to = min(lastDistance, length), max(lastDistance, length)
                     self.addEdge(node, lastNode, marker=False, rail_id=rail.id, path_id=path_id,
                         rail_from=seg_from, rail_to=seg_to, at_switch=at_switch)
+                    self.addMarker(lastNode, marker)
 
     def _is_important_node(self, node):
         """Node is important if it's a marker (for localization) or at a switch (path splitting)."""
@@ -169,6 +175,7 @@ class NetworkGenerator():
 
         self.graph = nx.Graph()
         self.rails = railsList
+        self.nodeMarkerMap = {}
 
         self.createGraph()
         if simplify:
@@ -179,4 +186,4 @@ class NetworkGenerator():
         # nx.nx_pydot.write_dot(self.graph, "src/graph.dot")
 
         print("Network: Done")
-        return self.graph
+        return self.graph, self.nodeMarkerMap

@@ -20,7 +20,9 @@ def test_generate_graph():
 
     network = net.NetworkGenerator()
     # Full graph (no simplification) for exact dot comparison
-    graph = network.generate(rails, simplify=False)
+    graph, nodeMarkerMap = network.generate(rails, simplify=False)
+
+    assert len(nodeMarkerMap) == 40
 
     nx.nx_pydot.write_dot(graph, ACTUAL_GRAPH)
 
@@ -43,7 +45,9 @@ def test_generate_graph_simplified():
     assert len(rails) > 0
 
     network = net.NetworkGenerator()
-    graph = network.generate(rails, simplify=True)
+    graph, nodeMarkerMap = network.generate(rails, simplify=True)
+
+    assert len(nodeMarkerMap) == 40
 
     for node in graph.nodes():
         data = graph.nodes[node]
@@ -51,6 +55,6 @@ def test_generate_graph_simplified():
             f"Simplified graph should only have important nodes, got {node!r} with {data}"
         )
     # Simplified graph should have fewer nodes than full graph
-    full_graph = network.generate(rails, simplify=False)
+    full_graph, nodeMarkerMap = network.generate(rails, simplify=False)
     assert graph.number_of_nodes() <= full_graph.number_of_nodes()
     assert graph.number_of_edges() <= full_graph.number_of_edges()

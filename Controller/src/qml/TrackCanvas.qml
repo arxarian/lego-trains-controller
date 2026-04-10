@@ -54,11 +54,20 @@ Item {
         height: parent.height
         width: parent.width
         scale: settings ? settings.canvas_zoom : 1
+        Component.onCompleted: Globals.globalArea = area
 
         Repeater {
             model: rails
             delegate: RailItem {
                 railData: model.object
+            }
+        }
+
+        // here goes the trains
+        Repeater {
+            model: trains
+            delegate: TrainItem {
+                trainData: model.object
             }
         }
 
