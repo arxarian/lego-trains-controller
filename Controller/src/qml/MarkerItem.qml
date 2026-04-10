@@ -42,7 +42,9 @@ Item {
             readonly property real centerOffset: size / 2
 
             function updatePosition() {
-                item.marker.position = mapToItem(Globals.globalArea, centerOffset, centerOffset)
+                if (Globals.globalArea) {
+                    item.marker.position = item.mapToItem(Globals.globalArea, 0, 0)
+                }
             }
 
             anchors.centerIn: parent
@@ -56,6 +58,13 @@ Item {
 
             onXChanged: updatePosition()
             onYChanged: updatePosition()
+
+            Connections {
+                target: Globals
+                function onGlobalAreaChanged() {
+                    markerPoint.updatePosition()
+                }
+            }
 
             MouseArea {
                 anchors.fill: parent
