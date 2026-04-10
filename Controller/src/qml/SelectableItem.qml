@@ -32,7 +32,7 @@ Item {
     SelectedMarker {
         anchors.fill: parent
         anchors.margins: -radius / 2
-        z: 10
+        z: Globals.selectedZ
         visible: root.selected
     }
 

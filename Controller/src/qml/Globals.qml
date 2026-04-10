@@ -14,4 +14,6 @@ QtObject {
     property int selectedMarker: -1
 
     property Item globalArea: null
+
+    property int selectedZ: 10
 }

@@ -63,6 +63,9 @@
         "src/qml/PathIndicatorView.qml",
         "src/qml/MultiPathView.qml",
         "src/python/network_manager.py",
-        "src/qml/TrainItem.qml"
+        "src/qml/TrainItem.qml",
+        "src/qml/MarkersLayer.qml",
+        "src/qml/RailsLayer.qml",
+        "src/qml/TrainsLayer.qml"
     ]
 }
