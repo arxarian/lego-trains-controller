@@ -1,4 +1,5 @@
 import QtQuick
+import TrainView
 
 Item {
     id: root
@@ -56,19 +57,18 @@ Item {
         scale: settings ? settings.canvas_zoom : 1
         Component.onCompleted: Globals.globalArea = area
 
-        Repeater {
+        RailsLayer {
             model: rails
-            delegate: RailItem {
-                railData: model.object
-            }
         }
 
-        // here goes the trains
-        Repeater {
+        MarkersLayer {
+            z: Globals.selectedZ + 1
+            model: rails
+        }
+
+        TrainsLayer {
+            z: Globals.selectedZ + 2
             model: trains
-            delegate: TrainItem {
-                trainData: model.object
-            }
         }
 
         GridView {

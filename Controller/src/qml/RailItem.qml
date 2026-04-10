@@ -139,12 +139,6 @@ SelectableItem {
         model: root.railData.connectors
     }
 
-    MarkerView {
-        id: markers
-        anchors.fill: parent
-        model: root.railData.markers
-    }
-
     Behavior on x {
         enabled: animation.enabled
         NumberAnimation { duration: animation.duration; easing.type: animation.type }
