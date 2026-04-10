@@ -33,8 +33,6 @@ class Train(QObject):
             print(f"Train: no marker node found for color {color_key}")
             return
 
-        self.set_current_node_id(node_id)
-
         new_segment_id = self._network.find_segment_by_entry_node(node_id, self._current_node_id)
         if new_segment_id is None:
             return
@@ -42,7 +40,7 @@ class Train(QObject):
         self._network.unreserve(self._current_segment_id)
         self._network.reserve(new_segment_id)
 
-        self._current_node_id = node_id
+        self.set_current_node_id(node_id)
         self.set_current_segment_id(new_segment_id)
         print(f"Train '{self._device.name}': entered segment {new_segment_id} via node {node_id}")
 
@@ -63,7 +61,7 @@ class Train(QObject):
         if marker:
             self.set_position(marker._position)
         else:
-            print("marker", marker, "not found")
+            print("marker {marker} not found")
 
     position_changed = Signal()
     position = Property(QPointF, position, set_position, notify=position_changed)
