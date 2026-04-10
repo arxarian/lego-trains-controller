@@ -58,18 +58,15 @@ Item {
         Component.onCompleted: Globals.globalArea = area
 
         RailsLayer {
-            anchors.fill: parent
             model: rails
         }
 
         MarkersLayer {
-            anchors.fill: parent
             z: Globals.selectedZ + 1
             model: rails
         }
 
         TrainsLayer {
-            anchors.fill: parent
             z: Globals.selectedZ + 2
             model: trains
         }
