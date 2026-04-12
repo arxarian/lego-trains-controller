@@ -16,6 +16,7 @@ class Simulator(QObject):
         self._fake_device = None
         self._train = None
         self._circuit = []
+        self._run_task = None
 
     def is_running(self):
         return self._is_running
@@ -90,7 +91,7 @@ class Simulator(QObject):
         self._fake_device.disconnected.connect(self.on_fake_device_disconnected)
 
         self.set_is_running(True)
-        asyncio.ensure_future(self.run_loop())
+        self._run_task = asyncio.ensure_future(self.run_loop())
 
     @Slot()
     def stop(self):
@@ -98,6 +99,10 @@ class Simulator(QObject):
             return
 
         self.set_is_running(False)
+
+        if self._run_task:
+            self._run_task.cancel()
+            self._run_task = None
 
         if self._train and self._train._current_segment_id:
             self._network.unreserve(self._train._current_segment_id)
