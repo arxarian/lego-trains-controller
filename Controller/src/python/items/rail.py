@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import webcolors
 from enum import IntEnum
-from pathlib import Path
 from importlib import resources
 from PySide6.QtCore import QObject, Property, Signal, Slot, QEnum
 from PySide6.QtQml import QmlElement
