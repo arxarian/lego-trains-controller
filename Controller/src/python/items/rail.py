@@ -131,7 +131,7 @@ class Rail(QObject):
     def toString(self):
         ret = "id " + str(self.id) + " markers "
         for m in self.markers._items:
-            if m.visible:
+            if m.taken:
                 ret = ret + webcolors.hex_to_name(m.color.name()) + " "
         return ret
 

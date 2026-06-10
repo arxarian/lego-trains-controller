@@ -91,7 +91,7 @@ class NetworkGenerator():
                             node, lastNode = lastNode, node
 
                     markers = rail.markers._items if dir == "forward" else reversed(rail.markers._items)
-                    visible_markers = (m for m in markers if m.visible and m.path_id in (None, "", path_id))
+                    visible_markers = (m for m in markers if m.taken and m.path_id in (None, "", path_id))
 
                     for marker in visible_markers:
                         to_node = f"{rail.id}{path_id}{marker.distance}"

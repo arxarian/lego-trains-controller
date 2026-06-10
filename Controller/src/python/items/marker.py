@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QObject, Signal, Property, Slot, QPointF
+from enum import IntEnum, auto
+from PySide6.QtCore import QObject, Signal, Property, Slot, QPointF, QEnum
 from PySide6.QtQml import QmlElement
 from PySide6.QtGui import QColor
 
@@ -9,12 +10,19 @@ from python.items.rotator import Rotator
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
+@QEnum
+class MarkerState(IntEnum):
+    Free = auto()
+    Taken = auto()
+    Blocked = auto()
+
 @QmlElement
 class Marker(QObject):
+    QEnum(MarkerState)
 
     def __init__(self, data: dict=None, color=None, index=-1, parent=None):
         super().__init__(parent)
-        self._visible = False if color is None else True
+        self._state = MarkerState.Free if color is None else MarkerState.Taken
         self._index = index
         self._color = color
         self._enabled = True
@@ -43,7 +51,7 @@ class Marker(QObject):
     @Slot()
     def remove(self):
         self.set_color(None)
-        self.set_visible(False)
+        self.set_state(MarkerState.Free) # TODO - call update state?
 
     def position(self):
         return self._position
@@ -55,19 +63,31 @@ class Marker(QObject):
     position_changed = Signal()
     position = Property(QPointF, position, set_position, notify=position_changed)
 
-    def visible(self):
-        return self._visible
+    def taken(self):
+        return self._state == MarkerState.Taken
 
-    def set_visible(self, value):
-        self._visible = value
-        self.visible_changed.emit()
-        from python.models.markers import Markers
-        parent = self.parent()
-        if isinstance(parent, Markers):
-            parent.updateEnabledStates()
+    taken_changed = Signal()
+    taken = Property(int, taken, notify=taken_changed)
 
-    visible_changed = Signal()
-    visible = Property(bool, visible, set_visible, notify=visible_changed)
+    @Slot(QColor)
+    def take(self, value):
+        self.set_color(value)
+        self.set_state(MarkerState.Taken)
+
+    def state(self):
+        return self._state
+
+    def set_state(self, value):
+        self._state = value
+        self.state_changed.emit()
+        self.taken_changed.emit()   # TODO - no guard
+
+        #parent = self.parent()
+        #parent.updateEnabledStates()
+        #parent.updateConnectedRailsEnabledStates()
+
+    state_changed = Signal()
+    state = Property(int, state, set_state, notify=state_changed)
 
     def color(self):
         return self._color
