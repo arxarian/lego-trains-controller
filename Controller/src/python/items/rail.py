@@ -95,7 +95,7 @@ class Rail(QObject):
 
         self.load_metadata()
         self._markers.rail = self
-        self._markers.updateEnabledStates()
+        #self._markers.updateStates()
 
     def load_metadata(self):
         if self._type == RailType.Undefined:
@@ -245,14 +245,14 @@ class Rail(QObject):
 
     def connectTo(self, fromRailId, fromIndex):
         self._connectors.connectTo(fromRailId, fromIndex)
-        self._markers.updateEnabledStates()
+        #self._markers.updateStates()
 
     def disconnectFrom(self, fromRailId):
         self._connectors.disconnectFrom(fromRailId)
-        self._markers.updateEnabledStates()
+        #self._markers.updateStates()
 
     @Slot(result=QObject)
     def setNextConnector(self):
         connector = self._connectors.setNextConnector()
-        self._markers.updateEnabledStates()
+        #self._markers.updateStates()
         return connector

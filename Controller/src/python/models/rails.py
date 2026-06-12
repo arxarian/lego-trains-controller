@@ -42,6 +42,9 @@ class Rails(ObjectBasedModel[Rail]):
         self.endResetModel()
         print("loaded, size", len(self._items))
 
+        #for rail in self._items:
+        #    rail._markers.updateStates()
+
     @Slot(QQuickItem, int)
     def registerRail(self, item, id):
         if not isinstance(item, QQuickItem):

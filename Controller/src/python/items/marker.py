@@ -12,6 +12,7 @@ QML_IMPORT_MAJOR_VERSION = 1
 
 @QEnum
 class MarkerState(IntEnum):
+    Undefined = auto()
     Free = auto()
     Taken = auto()
     Blocked = auto()
@@ -22,10 +23,9 @@ class Marker(QObject):
 
     def __init__(self, data: dict=None, color=None, index=-1, parent=None):
         super().__init__(parent)
-        self._state = MarkerState.Free if color is None else MarkerState.Taken
+        self._state = MarkerState.Taken if color else MarkerState.Free
         self._index = index
         self._color = color
-        self._enabled = True
         self._rotator = None    # set in load_metadata
         self._distance = 0      # set in load_metadata
         self._path_id = None    # set in load_metadata
@@ -51,7 +51,10 @@ class Marker(QObject):
     @Slot()
     def remove(self):
         self.set_color(None)
-        self.set_state(MarkerState.Free) # TODO - call update state?
+        self.set_state(MarkerState.Free)
+
+        parent = self.parent()
+        parent.updateStates()
 
     def position(self):
         return self._position
@@ -63,28 +66,46 @@ class Marker(QObject):
     position_changed = Signal()
     position = Property(QPointF, position, set_position, notify=position_changed)
 
+    def free(self):
+        return self._state == MarkerState.Free
+
+    free_changed = Signal()
+    free = Property(int, free, notify=free_changed)
+
     def taken(self):
         return self._state == MarkerState.Taken
 
     taken_changed = Signal()
     taken = Property(int, taken, notify=taken_changed)
 
+    def blocked(self):
+        return self._state == MarkerState.Blocked
+
+    blocked_changed = Signal()
+    blocked = Property(int, blocked, notify=blocked_changed)
+
     @Slot(QColor)
     def take(self, value):
         self.set_color(value)
         self.set_state(MarkerState.Taken)
 
+        parent = self.parent()
+        parent.updateStates()
+
     def state(self):
         return self._state
 
     def set_state(self, value):
-        self._state = value
-        self.state_changed.emit()
-        self.taken_changed.emit()   # TODO - no guard
+        if self._state != value:
+            self._state = value
+            self.state_changed.emit()
+            self.taken_changed.emit()   # TODO - no guard
+            self.free_changed.emit()    # TODO - no guard
+            self.blocked_changed.emit() # TODO - no guard
 
-        #parent = self.parent()
-        #parent.updateEnabledStates()
-        #parent.updateConnectedRailsEnabledStates()
+            #parent = self.parent()
+            #parent.updateStates()
+            #parent.updateConnectedRailsEnabledStates()
 
     state_changed = Signal()
     state = Property(int, state, set_state, notify=state_changed)
@@ -133,14 +154,3 @@ class Marker(QObject):
 
     path_id_changed = Signal()
     path_id = Property(str, path_id, set_path_id, notify=path_id_changed)
-
-    def enabled(self):
-        return self._enabled
-
-    def set_enabled(self, value):
-        if self._enabled != value:
-            self._enabled = value
-            self.enabled_changed.emit()
-
-    enabled_changed = Signal()
-    enabled = Property(bool, enabled, set_enabled, notify=enabled_changed)
