@@ -11,7 +11,7 @@
             "next": 0 }
     ],
     "markers": [
-        {"rotator": {"x": 160, "y": 0, "angle": 0}, "distance": 0},
+        {"rotator": {"x": 160, "y": 0, "angle": 0}, "distance": 0, "connector": "start"},
         {"rotator": {"x": 160, "y": 40, "angle": 0}, "distance": 1},
 
         {"rotator": {"x": 160, "y": 120, "angle": 0}, "distance": 3},
@@ -27,7 +27,7 @@
         {"rotator": {"x": 160, "y": 520, "angle": 0}, "distance": 13},
 
         {"rotator": {"x": 160, "y": 600, "angle": 0}, "distance": 15},
-        {"rotator": {"x": 160, "y": 640, "angle": 0}, "distance": 16}
+        {"rotator": {"x": 160, "y": 640, "angle": 0}, "distance": 16, "connector": "end"}
     ],
     "path_indicators": [
         {"x": 160, "y": 0, "distance": 0 },

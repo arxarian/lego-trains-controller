@@ -85,8 +85,8 @@ class Rail(QObject):
         self._rotator = rotator if rotator is not None else Rotator(parent=self)    # Rotator/QObject
 
         # QAbstractListModels
-        self._markers = markers if markers is not None else Markers(parent=self)
         self._connectors = connectors if connectors is not None else Connectors(parent=self)
+        self._markers = markers if markers is not None else Markers(connectors=self._connectors, parent=self)
         self._path_indicators = PathIndicators(parent=self)
         self._reservation_indicators = PathIndicators(parent=self)
         self._reserved = False  # reserved by train
@@ -95,6 +95,7 @@ class Rail(QObject):
 
         self.load_metadata()
         self._markers.rail = self
+        self._markers._connectors = self._connectors
         #self._markers.updateStates()
 
     def load_metadata(self):

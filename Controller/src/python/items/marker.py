@@ -30,6 +30,7 @@ class Marker(QObject):
         self._distance = 0      # set in load_metadata
         self._path_id = None    # set in load_metadata
         self._position = QPointF()
+        self._connector = None
 
         self.load_metadata(data)
 
@@ -154,3 +155,16 @@ class Marker(QObject):
 
     path_id_changed = Signal()
     path_id = Property(str, path_id, set_path_id, notify=path_id_changed)
+
+    def at_boundary(self):
+        return self._connector != None
+
+    def connector(self):
+        return self._connector
+
+    def set_connector(self, value):
+        self._connector = value
+        self.connector_changed.emit()
+
+    connector_changed = Signal()
+    connector = Property(str, connector, set_connector, notify=connector_changed)

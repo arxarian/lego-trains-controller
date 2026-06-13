@@ -7,6 +7,8 @@ from PySide6.QtGui import QColor
 from python.items.marker import Marker, MarkerState
 from python.models.object_based_model import ObjectBasedModel
 
+#import datetime
+
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
@@ -18,8 +20,9 @@ class Markers(ObjectBasedModel[Marker]):
     def __init__(self, data: list=None, parent=None) -> None:
         super().__init__(parent)
         self._data = data or []
-        self.rail = None
-        print("self._data", self._data)
+        self.rail = None    # TODO - add _
+        self._connectors = None
+        #print("self._data", self._data)
 
     def resolveColor(self, index):
         color = next((d["color"] for d in self._data if d["index"] == index), None)
@@ -31,8 +34,6 @@ class Markers(ObjectBasedModel[Marker]):
             self._items.append(Marker(data=d, index=i, color=self.resolveColor(i) , parent=self))
         self.endInsertRows()
         self._data = [] # clear the original data, not needed anymore
-
-        self.updateStates()
 
     def save_data(self):
         data = [
@@ -75,10 +76,6 @@ class Markers(ObjectBasedModel[Marker]):
         if connectedRail is None:
             return
 
-    # TODO - move it to marker itself, use real value instead of 0 and 16
-    def atBoundary(self, marker):
-        return (marker.distance == 16 or marker.distance == 0)
-
     def atProximity(self, marker1, marker2):
         return abs(marker1.distance - marker2.distance) == 1 # + add from connected if at boundary
 
@@ -89,7 +86,7 @@ class Markers(ObjectBasedModel[Marker]):
 
         # for all markers
         for marker in self._items:
-            print("marker", marker.distance, "state", marker.state)
+            print("marker", marker.distance, "state", marker.state, "at boundary", marker.at_boundary())
             if marker.taken:
                 continue
 
@@ -98,6 +95,32 @@ class Markers(ObjectBasedModel[Marker]):
                 if self.atProximity(marker, proximity_marker) and proximity_marker.taken:
                     new_state = MarkerState.Blocked
             marker.state = new_state
+
+            if marker.at_boundary():
+                #print("marker.connector", marker.connector, self._connectors)
+                connected_rail_id = self._connectors.getByName(marker.connector).connectedRailId
+                #print("connector", connected_rail_id, self.rail.id)
+                marker.state = MarkerState.Blocked if connected_rail_id > self.rail.id else MarkerState.Free
+
+
+                #for connector in self.rail._connectors._items:
+                #    if connector.connected():
+                #        rails_model = self.rail.parent()
+                #        siblings = rails_model.findsiblingsOf(connector._connectedRailId)
+                #        print(datetime.datetime.now().time(), "siblings of", self.rail.id, "are", siblings, self.rail.id in siblings)
+                #        #print(datetime.datetime.now().time(), "connector._connectedRailId", connector._connectedRailId)
+                #        #marker.state = MarkerState.Blocked
+
+
+                #rails_model = self.rail.parent()
+                #for connector in self.rail._connectors._items:
+                #    if connector.connected():
+                #        connected_rail = rails_model.findRailData(connector._connectedRailId)
+                #        if connected_rail:
+                #            print("original", self.rail.id, "connected", connected_rail.id)
+                #            connected_rail._markers.updateEnabledStates(self.rail)
+
+            # if connected
 
 
             #marker.set_state(marker.state == MarkerState. and not self.atProximity(marker))
