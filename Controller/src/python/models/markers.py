@@ -98,9 +98,11 @@ class Markers(ObjectBasedModel[Marker]):
 
             if marker.at_boundary():
                 #print("marker.connector", marker.connector, self._connectors)
-                connected_rail_id = self._connectors.getByName(marker.connector).connectedRailId
-                #print("connector", connected_rail_id, self.rail.id)
-                marker.state = MarkerState.Blocked if connected_rail_id > self.rail.id else MarkerState.Free
+                connector = self._connectors.getByName(marker.connector)
+                if connector.connected():
+                    #print("connector", connected_rail_id, self.rail.id)
+                    marker.state = MarkerState.Blocked if connector.connectedRailId > self.rail.id else MarkerState.Free
+
 
 
                 #for connector in self.rail._connectors._items:
