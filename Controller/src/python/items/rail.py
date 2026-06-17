@@ -94,9 +94,10 @@ class Rail(QObject):
         self._paths = {}                            # dictionary
 
         self.load_metadata()
+
         self._markers.rail = self
         self._markers._connectors = self._connectors
-        #self._markers.updateStates()
+        self._connectors._markers = self._markers
 
     def load_metadata(self):
         if self._type == RailType.Undefined:

@@ -4,10 +4,9 @@ from PySide6.QtCore import Slot, QModelIndex
 from PySide6.QtQml import QmlElement
 from PySide6.QtGui import QColor
 
+from python.items.connector import State
 from python.items.marker import Marker, MarkerState
 from python.models.object_based_model import ObjectBasedModel
-
-#import datetime
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -22,7 +21,6 @@ class Markers(ObjectBasedModel[Marker]):
         self._data = data or []
         self.rail = None    # TODO - add _
         self._connectors = None
-        #print("self._data", self._data)
 
     def resolveColor(self, index):
         color = next((d["color"] for d in self._data if d["index"] == index), None)
@@ -51,109 +49,60 @@ class Markers(ObjectBasedModel[Marker]):
             return True
         return pid1 == pid2
 
-    def getConnectionDisabledDistances(self):
-        if not self.rail:
-            return set()
-
-        disabled = set()
-        conn_to_distance = {}
-
-        for path in self.rail._paths:
-            from_conn = next((c for c in self.rail._connectors._items if c._name == path["from"]), None)
-            if from_conn and from_conn._dir == "forward":
-                conn_to_distance[path["from"]] = 0
-                conn_to_distance[path["to"]] = path["length"]
-
-        for connector in self.rail._connectors._items:
-            if connector.connected() and self.rail._id > connector._connectedRailId:
-                distance = conn_to_distance.get(connector._name)
-                if distance is not None:
-                    disabled.add(distance)
-
-        return disabled
-
-    def getCrossRailBlockedIndices(self, connectedRail):
-        if connectedRail is None:
-            return
-
     def atProximity(self, marker1, marker2):
-        return abs(marker1.distance - marker2.distance) == 1 # + add from connected if at boundary
+        return abs(marker1.distance - marker2.distance) == 1
 
-    # called first for self and third for connected by updateConnectedRailsEnabledStates()
-    def updateStates(self, connectedRail = None):
-        print("updateStates", self)
-        #free_markers = [m for m in self._items if m.visible]
+    def updateStates(self):
+        def taken_marker_at_proximity(markers, marker):
+            for proximity_marker in markers:
+                if self.atProximity(marker, proximity_marker) and proximity_marker.taken:
+                    return True
+            return False
+
+        def connected_rail_from_marker(connectors, marker):
+            return connectors.getByName(marker.connector).connectedRailId
 
         # for all markers
         for marker in self._items:
-            print("marker", marker.distance, "state", marker.state, "at boundary", marker.at_boundary())
             if marker.taken:
                 continue
 
+            # if there is a taken marker at proximity, blocked this one
             new_state = MarkerState.Free
-            for proximity_marker in self._items:
-                if self.atProximity(marker, proximity_marker) and proximity_marker.taken:
-                    new_state = MarkerState.Blocked
+            if taken_marker_at_proximity(self._items, marker):
+                new_state = MarkerState.Blocked
             marker.state = new_state
 
+            # if two rails are connected, the one with lower id has blocked boundary marker point
             if marker.at_boundary():
-                #print("marker.connector", marker.connector, self._connectors)
-                connector = self._connectors.getByName(marker.connector)
-                if connector.connected():
-                    #print("connector", connected_rail_id, self.rail.id)
-                    marker.state = MarkerState.Blocked if connector.connectedRailId > self.rail.id else MarkerState.Free
+                connectedRailId = connected_rail_from_marker(self._connectors, marker)
 
+                if connectedRailId == State.NotConnected:
+                    continue
 
+                if not marker.taken:
+                    marker.state = MarkerState.Blocked if connectedRailId > self.rail.id else MarkerState.Free
 
-                #for connector in self.rail._connectors._items:
-                #    if connector.connected():
-                #        rails_model = self.rail.parent()
-                #        siblings = rails_model.findsiblingsOf(connector._connectedRailId)
-                #        print(datetime.datetime.now().time(), "siblings of", self.rail.id, "are", siblings, self.rail.id in siblings)
-                #        #print(datetime.datetime.now().time(), "connector._connectedRailId", connector._connectedRailId)
-                #        #marker.state = MarkerState.Blocked
+                # no need to go further if blocked
+                if marker.blocked:
+                    continue
 
+                # I need the overlapping marker from the connected rail
+                rails_model = self.rail.parent() # TODO - fix parent of parent...
+                connected_rail = rails_model.findRailData(connectedRailId)
+                close_markers = connected_rail._markers._items
+                close_connectors = connected_rail._connectors
 
-                #rails_model = self.rail.parent()
-                #for connector in self.rail._connectors._items:
-                #    if connector.connected():
-                #        connected_rail = rails_model.findRailData(connector._connectedRailId)
-                #        if connected_rail:
-                #            print("original", self.rail.id, "connected", connected_rail.id)
-                #            connected_rail._markers.updateEnabledStates(self.rail)
-
-            # if connected
-
-
-            #marker.set_state(marker.state == MarkerState. and not self.atProximity(marker))
-
-            #if marker.visible:
-            #    continue
-        #    blocked = any(
-        #        abs(v.distance - marker.distance) == 1
-        #        and self._path_ids_compatible(marker.path_id, v.path_id)
-        #        for v in free_markers
-        #    )
-
-        #    # TODO - here return connected marker!
-        #    connected_marker = False#marker.distance == 16 or marker.distance == 0
-
-        #    at_connection = False#marker.distance in disabled_at_connection
-        #    marker.set_enabled(not at_connection)
-        #    marker.set_enabled(not blocked and not connected_marker and not at_connection)
-
-    ## called second for self
-    #def updateConnectedRailsEnabledStates(self):
-    #    if not self.rail:
-    #        return
-
-    #    rails_model = self.rail.parent()
-    #    for connector in self.rail._connectors._items:
-    #        if connector.connected():
-    #            connected_rail = rails_model.findRailData(connector._connectedRailId)
-    #            if connected_rail:
-    #                print("original", self.rail.id, "connected", connected_rail.id)
-    #                connected_rail._markers.updateEnabledStates(self.rail)
+                # loop markers at boundary and compare if that marker reference a connector connected to this rail
+                for close_marker in connected_rail._markers._items:
+                    if close_marker.at_boundary():
+                        print("close_marker", close_marker.distance, connected_rail_from_marker(close_connectors, close_marker),
+                            self.rail.id, connected_rail_from_marker(self._connectors, marker))
+                        if connected_rail_from_marker(close_connectors, close_marker) == self.rail.id:
+                            print("got it!")
+                            if taken_marker_at_proximity(close_markers, close_marker):
+                                 marker.state = MarkerState.Blocked
+                                 break
 
     @Slot(result=int)
     def activeCount(self, path_id = None):

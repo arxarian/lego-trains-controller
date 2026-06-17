@@ -41,10 +41,9 @@ class Rails(ObjectBasedModel[Rail]):
         self._items = [Rail.load_data(d, self) for d in data]
         self.endResetModel()
 
+        print("loaded, size", len(self._items))
         for rail in self._items:
             rail._markers.updateStates()
-
-        print("loaded, size", len(self._items))
 
     @Slot(QQuickItem, int)
     def registerRail(self, item, id):
