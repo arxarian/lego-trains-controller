@@ -91,7 +91,7 @@ class Marker(QObject):
         self.set_state(MarkerState.Taken)
 
         parent = self.parent()
-        parent.updateStates()
+        parent.updateStates()   # TODO - pass the pointer so I can check just at proximity
 
     def state(self):
         return self._state
