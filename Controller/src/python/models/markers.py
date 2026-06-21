@@ -49,15 +49,12 @@ class Markers(ObjectBasedModel[Marker]):
             return True
         return pid1 == pid2
 
-    def atProximity(self, marker1, marker2):
-        return abs(marker1.distance - marker2.distance) == 1
-
     def updateStates(self):
+        def atProximity(marker1, marker2):
+            return abs(marker1.distance - marker2.distance) == 1
+
         def taken_marker_at_proximity(markers, marker):
-            for proximity_marker in markers:
-                if self.atProximity(marker, proximity_marker) and proximity_marker.taken:
-                    return True
-            return False
+            return any(m.taken for m in markers if atProximity(marker, m))
 
         def connected_rail_from_marker(connectors, marker):
             return connectors.getByName(marker.connector).connectedRailId

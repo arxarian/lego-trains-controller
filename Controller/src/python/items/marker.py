@@ -14,8 +14,8 @@ QML_IMPORT_MAJOR_VERSION = 1
 class MarkerState(IntEnum):
     Undefined = auto()
     Free = auto()
-    Taken = auto()
     Blocked = auto()
+    Taken = auto()
 
 @QmlElement
 class Marker(QObject):
