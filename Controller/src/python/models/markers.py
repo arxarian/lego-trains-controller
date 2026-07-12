@@ -8,8 +8,6 @@ from python.items.connector import State
 from python.items.marker import Marker, MarkerState
 from python.models.object_based_model import ObjectBasedModel
 
-#import datetime
-
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
@@ -52,6 +50,17 @@ class Markers(ObjectBasedModel[Marker]):
         return pid1 == pid2
 
     def updateStates(self):
+        self.updateStatesLocally()
+
+        # a marker placed/removed at a shared boundary also affects the connected
+        # rail's markers, so recompute every connected rail (own state only)
+        rails_model = self.rail.parent()
+        for connectedRailId in self.connectedRailIds():
+            connected_rail = rails_model.findRailData(connectedRailId)
+            if connected_rail:
+                connected_rail._markers.updateStatesLocally()
+
+    def updateStatesLocally(self):
         def atProximity(marker1, marker2):
             return abs(marker1.distance - marker2.distance) == 1
 
@@ -61,124 +70,78 @@ class Markers(ObjectBasedModel[Marker]):
         def connected_rail_from_marker(connectors, marker):
             return connectors.getByName(marker.connector).connectedRailId
 
-        print("updateStates", self.rail.id)
-
-        connections = []
-
         # for all markers
         for marker in self._items:
             overlapping = False
-            print("marker", marker.distance)
             if marker.at_boundary():
                 connectedRailId = connected_rail_from_marker(self._connectors, marker)
-                if connectedRailId != State.NotConnected:
-                    connections.append((connectedRailId, marker))
 
-                # if at boundary and connected, resolved overlapping markers
+                # at a shared boundary the lower id rail owns the tie
                 if not marker.taken:
                     overlapping = connectedRailId != State.NotConnected and connectedRailId < self.rail.id
 
-            # taken marker is updated only of color changes -> continue
+            # a taken marker only changes when its color changes
             if marker.taken:
                 continue
 
-            # if there is a taken marker at proximity, blocked this one, otherwise free
+            # blocked by a taken marker on this rail or across a connected boundary
             new_state = MarkerState.Blocked if overlapping else MarkerState.Free
             if taken_marker_at_proximity(self._items, marker):
                 new_state = MarkerState.Blocked
+            if self.taken_across_boundary(marker):
+                new_state = MarkerState.Blocked
             marker.state = new_state
 
-        print("loop connected", connections)
-        # find all markers at proximity
-        # if they have an equivalent, block equivalent
+    def connectedRailIds(self):
+        ids = []
+        for connector in self._connectors._items:
+            if connector.connected() and connector.connectedRailId not in ids:
+                ids.append(connector.connectedRailId)
+        return ids
 
-        rails_model = self.rail.parent() # TODO - fix parent of parent...
-        for rail_id, marker in connections:
-            connected_rail = rails_model.findRailData(rail_id)
-            for marker in connected_rail._markers._items:
-                if marker.at_boundary():
-                    print("close marker", marker.distance)
+    def boundaryMarkerTo(self, railId):
+        for marker in self._items:
+            if marker.at_boundary():
+                connector = self._connectors.getByName(marker.connector)
+                if connector.connectedRailId == railId:
+                    return marker
+        return None
 
+    def taken_across_boundary(self, marker):
+        rails_model = self.rail.parent()
 
+        for boundary in self._items:
+            if not boundary.at_boundary():
+                continue
 
-            ## if two rails are connected, the one with lower id has blocked boundary marker point
-            #if marker.at_boundary():
-            #    #print("marker.connector", marker.connector, self._connectors)
-            #    connectedRailId = connected_rail_from_marker(self._connectors, marker)
-            #    print(self.rail.id, "connected to", connectedRailId)
+            # only the boundary marker or its immediate neighbour can overlap
+            local_gap = abs(marker.distance - boundary.distance)
+            if local_gap > 1 or not self._path_ids_compatible(marker.path_id, boundary.path_id):
+                continue
 
-            #    if connectedRailId == State.NotConnected:
-            #        print("non connected, continue")
-            #        continue
+            connectedRailId = self._connectors.getByName(boundary.connector).connectedRailId
+            if connectedRailId == State.NotConnected:
+                continue
 
-            #    if not marker.taken:
-            #        marker.state = MarkerState.Blocked if connectedRailId > self.rail.id else MarkerState.Free
-            #        print("not taken", marker.state)
+            connected_rail = rails_model.findRailData(connectedRailId)
+            if connected_rail is None:
+                continue
 
-            #    # no need to go further if blocked
-            #    if marker.blocked:
-            #        print("blocked, continue")
-            #        continue
+            remote = connected_rail._markers
+            remote_boundary = remote.boundaryMarkerTo(self.rail.id)
+            if remote_boundary is None:
+                continue
 
-            #    # I need the overlapping marker from the connected rail
-            #    rails_model = self.rail.parent() # TODO - fix parent of parent...
-            #    connected_rail = rails_model.findRailData(connectedRailId)
-            #    close_markers = connected_rail._markers._items
-            #    close_connectors = connected_rail._connectors
-            #    print("connected_rail", connected_rail.id)
+            # taken marker across the junction: block when the combined gap is <= 1 stud
+            for taken in remote._items:
+                if not taken.taken:
+                    continue
+                if not remote._path_ids_compatible(taken.path_id, remote_boundary.path_id):
+                    continue
+                if local_gap + abs(taken.distance - remote_boundary.distance) <= 1:
+                    return True
 
-            #    # loop markers at boundary and compare if that marker reference a connector connected to this rail
-            #    for close_marker in connected_rail._markers._items:
-            #         # TODO - fix for marker 1 and 15 (not at boundary) ?????
-            #        if close_marker.at_boundary():
-            #            for proximity_marker in connected_rail._markers._items:
-            #                if atProximity(proximity_marker, close_marker):
-            #                    print("close_marker", close_marker.distance, connected_rail_from_marker(close_connectors, close_marker),
-            #                    self.rail.id, connected_rail_from_marker(self._connectors, marker))
-            #                    if connected_rail_from_marker(close_connectors, close_marker) == self.rail.id:
-            #                        print("got it!")
-            #                        if taken_marker_at_proximity(close_markers, close_marker):
-            #                             marker.state = MarkerState.Blocked
-            #                             break
-
-                #print("connected_rail", connector._connectedRailId)#, connected_rail._markers)
-                # check if at proximity
-                # and set the state accordingly
-
-                ## THE LAST THING - Blocked if connected rails is TAKEN
-                ## I got connectedRailId, I need to get the rail
-                #rails_model = self.rail.parent() # TODO - fix parent of parent...
-                #connected_rail = rails_model.findRailData(connector._connectedRailId)
-                #print("connected_rail", connector._connectedRailId)#, connected_rail._markers)
-                ## I need to search the markers of that rail to find, which one is connected to this rail
-                #for close_marker in connected_rail._markers._items:
-                #    print("close marker", close_marker.distance, "at_boundary", close_marker.at_boundary(), "taken", close_marker.taken)
-                #    if close_marker.at_boundary() and close_marker.taken:
-                #        close_connector = connected_rail._connectors.getByName(close_marker.connector)
-                #        if close_connector.connectedRailId == self.rail.id:
-                #           marker.state = MarkerState.Blocked
-
-                # when I have it, I just check of taken
-
-
-                #for connector in self.rail._connectors._items:
-                #    if connector.connected():
-                #        rails_model = self.rail.parent()
-                #        siblings = rails_model.findsiblingsOf(connector._connectedRailId)
-                #        print(datetime.datetime.now().time(), "siblings of", self.rail.id, "are", siblings, self.rail.id in siblings)
-                #        #print(datetime.datetime.now().time(), "connector._connectedRailId", connector._connectedRailId)
-                #        #marker.state = MarkerState.Blocked
-
-
-                #rails_model = self.rail.parent()
-                #for connector in self.rail._connectors._items:
-                #    if connector.connected():
-                #        connected_rail = rails_model.findRailData(connector._connectedRailId)
-                #        if connected_rail:
-                #            print("original", self.rail.id, "connected", connected_rail.id)
-                #            connected_rail._markers.updateEnabledStates(self.rail)
-
-
+        return False
 
     @Slot(result=int)
     def activeCount(self, path_id = None):
