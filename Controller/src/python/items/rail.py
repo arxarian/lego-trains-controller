@@ -247,11 +247,11 @@ class Rail(QObject):
 
     def connectTo(self, fromRailId, fromIndex):
         self._connectors.connectTo(fromRailId, fromIndex)
-        #self._markers.updateStates()
+        self._markers.updateStates()
 
     def disconnectFrom(self, fromRailId):
         self._connectors.disconnectFrom(fromRailId)
-        #self._markers.updateStates()
+        self._markers.updateStates()
 
     @Slot(result=QObject)
     def setNextConnector(self):

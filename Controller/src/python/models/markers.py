@@ -63,7 +63,7 @@ class Markers(ObjectBasedModel[Marker]):
 
         print("updateStates", self.rail.id)
 
-        connected_rails = []
+        connections = []
 
         # for all markers
         for marker in self._items:
@@ -71,11 +71,12 @@ class Markers(ObjectBasedModel[Marker]):
             print("marker", marker.distance)
             if marker.at_boundary():
                 connectedRailId = connected_rail_from_marker(self._connectors, marker)
-                connected_rails.append(connectedRailId)
+                if connectedRailId != State.NotConnected:
+                    connections.append((connectedRailId, marker))
 
                 # if at boundary and connected, resolved overlapping markers
                 if not marker.taken:
-                    overlapping = connectedRailId != -1 and connectedRailId < self.rail.id
+                    overlapping = connectedRailId != State.NotConnected and connectedRailId < self.rail.id
 
             # taken marker is updated only of color changes -> continue
             if marker.taken:
@@ -87,7 +88,18 @@ class Markers(ObjectBasedModel[Marker]):
                 new_state = MarkerState.Blocked
             marker.state = new_state
 
-        print("loop connected", connected_rails)
+        print("loop connected", connections)
+        # find all markers at proximity
+        # if they have an equivalent, block equivalent
+
+        rails_model = self.rail.parent() # TODO - fix parent of parent...
+        for rail_id, marker in connections:
+            connected_rail = rails_model.findRailData(rail_id)
+            for marker in connected_rail._markers._items:
+                if marker.at_boundary():
+                    print("close marker", marker.distance)
+
+
 
             ## if two rails are connected, the one with lower id has blocked boundary marker point
             #if marker.at_boundary():
