@@ -20,6 +20,14 @@ Item {
         enabled: Globals.editMode && item.marker.taken
         rotation: item.marker.rotator.angle
 
+        Text {
+            z: 10
+            x: -100
+            visible: Globals.markersStatesVisible
+            font.pixelSize: 50
+            text: item.marker.distance + " - " + item.marker.state
+        }
+
         Rectangle {
             id: markerBrick
             anchors.fill: parent

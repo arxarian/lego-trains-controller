@@ -5,7 +5,9 @@ import QtQuick.Layouts
 ColumnLayout {
     spacing: 5
 
-    Row {
+    Grid {
+        columns: 3
+
         CheckBox {
             text: "Grid"
             checked: Globals.gridVisible
@@ -28,6 +30,12 @@ ColumnLayout {
             text: "Rails Ids"
             checked: Globals.railIdVisible
             onClicked: Globals.railIdVisible = checked
+        }
+
+        CheckBox {
+            text: "Markers states"
+            checked: Globals.markersStatesVisible
+            onClicked: Globals.markersStatesVisible = checked
         }
     }
 
