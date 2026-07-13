@@ -44,7 +44,7 @@ class Markers(ObjectBasedModel[Marker]):
     def load_data(data, parent):
         return Markers(data=data, parent=parent)
 
-    def _path_ids_compatible(self, pid1, pid2):
+    def path_ids_compatible(self, pid1, pid2):
         if pid1 in (None, "") or pid2 in (None, ""):
             return True
         return pid1 == pid2
@@ -61,11 +61,11 @@ class Markers(ObjectBasedModel[Marker]):
                 connected_rail._markers.updateStatesLocally()
 
     def updateStatesLocally(self):
-        def atProximity(marker1, marker2):
+        def at_proximity(marker1, marker2):
             return abs(marker1.distance - marker2.distance) == 1
 
         def taken_marker_at_proximity(markers, marker):
-            return any(m.taken for m in markers if atProximity(marker, m))
+            return any(m.taken for m in markers if at_proximity(marker, m))
 
         def connected_rail_from_marker(connectors, marker):
             return connectors.getByName(marker.connector).connectedRailId
@@ -88,7 +88,7 @@ class Markers(ObjectBasedModel[Marker]):
             new_state = MarkerState.Blocked if overlapping else MarkerState.Free
             if taken_marker_at_proximity(self._items, marker):
                 new_state = MarkerState.Blocked
-            if self.taken_across_boundary(marker):
+            if self.takenAcrossBoundary(marker):
                 new_state = MarkerState.Blocked
             marker.state = new_state
 
@@ -107,7 +107,7 @@ class Markers(ObjectBasedModel[Marker]):
                     return marker
         return None
 
-    def taken_across_boundary(self, marker):
+    def takenAcrossBoundary(self, marker):
         rails_model = self.rail.parent()
 
         for boundary in self._items:
@@ -116,7 +116,7 @@ class Markers(ObjectBasedModel[Marker]):
 
             # only the boundary marker or its immediate neighbour can overlap
             local_gap = abs(marker.distance - boundary.distance)
-            if local_gap > 1 or not self._path_ids_compatible(marker.path_id, boundary.path_id):
+            if local_gap > 1 or not self.path_ids_compatible(marker.path_id, boundary.path_id):
                 continue
 
             connectedRailId = self._connectors.getByName(boundary.connector).connectedRailId
@@ -136,7 +136,7 @@ class Markers(ObjectBasedModel[Marker]):
             for taken in remote._items:
                 if not taken.taken:
                     continue
-                if not remote._path_ids_compatible(taken.path_id, remote_boundary.path_id):
+                if not remote.path_ids_compatible(taken.path_id, remote_boundary.path_id):
                     continue
                 if local_gap + abs(taken.distance - remote_boundary.distance) <= 1:
                     return True

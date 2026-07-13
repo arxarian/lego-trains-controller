@@ -256,5 +256,4 @@ class Rail(QObject):
     @Slot(result=QObject)
     def setNextConnector(self):
         connector = self._connectors.setNextConnector()
-        #self._markers.updateStates()
         return connector

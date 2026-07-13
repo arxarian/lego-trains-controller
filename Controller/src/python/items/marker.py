@@ -54,8 +54,7 @@ class Marker(QObject):
         self.set_color(None)
         self.set_state(MarkerState.Free)
 
-        parent = self.parent()
-        parent.updateStates()
+        self.parent().updateStates()
 
     def position(self):
         return self._position
@@ -90,8 +89,7 @@ class Marker(QObject):
         self.set_color(value)
         self.set_state(MarkerState.Taken)
 
-        parent = self.parent()
-        parent.updateStates()   # TODO - pass the pointer so I can check just at proximity
+        self.parent().updateStates()   # possible TODO - pass the pointer so I can check just at proximity
 
     def state(self):
         return self._state
@@ -103,10 +101,6 @@ class Marker(QObject):
             self.taken_changed.emit()   # TODO - no guard
             self.free_changed.emit()    # TODO - no guard
             self.blocked_changed.emit() # TODO - no guard
-
-            #parent = self.parent()
-            #parent.updateStates()
-            #parent.updateConnectedRailsEnabledStates()
 
     state_changed = Signal()
     state = Property(int, state, set_state, notify=state_changed)
