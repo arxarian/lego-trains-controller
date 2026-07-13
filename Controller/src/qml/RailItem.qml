@@ -58,7 +58,7 @@ SelectableItem {
     }
 
     function snapToRotationPoint(fromConnector, toConnector, sibling, rotationOffset = 0) {
-        let origin = sibling.mapToItem(area, Qt.point(fromConnector.rotator.x, fromConnector.rotator.y))
+        let origin = sibling.mapToItem(Globals.globalArea, Qt.point(fromConnector.rotator.x, fromConnector.rotator.y))
 
         root.railData.x = origin.x - toConnector.rotator.x
         root.railData.y = origin.y - toConnector.rotator.y

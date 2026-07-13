@@ -15,7 +15,7 @@ class Rails(ObjectBasedModel[Rail]):
     def __init__(self, connectorRegister: ConnectorRegister, parent=None) -> None:
         super().__init__(parent)
         self._registeredRails = {}      # id -> item
-        self._loading = False
+        self._loading = False   # TODO - is it used?
         connectorRegister.appendRail.connect(self.append)
         connectorRegister.connectRails.connect(self.connectRails)
 
@@ -40,7 +40,10 @@ class Rails(ObjectBasedModel[Rail]):
         self.beginResetModel()
         self._items = [Rail.load_data(d, self) for d in data]
         self.endResetModel()
+
         print("loaded, size", len(self._items))
+        for rail in self._items:
+            rail._markers.updateStates()
 
     @Slot(QQuickItem, int)
     def registerRail(self, item, id):
@@ -57,7 +60,7 @@ class Rails(ObjectBasedModel[Rail]):
         return None
 
     @Slot()
-    def checkLoaded(self):
+    def checkLoaded(self):  # TODO - delete? Not used?
         if len(self._registeredRails) == self.rowCount():
             self.set_loading(False)
 
@@ -143,4 +146,3 @@ class Rails(ObjectBasedModel[Rail]):
             self.beginRemoveRows(QModelIndex(), index, index)
             self._items.remove(rail)
             self.endRemoveRows()
-

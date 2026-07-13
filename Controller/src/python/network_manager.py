@@ -57,7 +57,7 @@ class NetworkManager(QObject):
             for path in rail._paths:
                 path_id = path["path_id"]
                 for marker in rail.markers._items:
-                    if marker.visible and marker.path_id in (None, "", path_id) and marker.color is not None:
+                    if marker.taken and marker.path_id in (None, "", path_id) and marker.color is not None:
                         node_id = f"{rail.id}{path_id}{marker.distance}"
                         if self._graph.has_node(node_id):
                             color_key = marker.color.name()  # normalized lowercase hex e.g. "#ff0000"

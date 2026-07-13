@@ -10,7 +10,7 @@ QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
 @QEnum
-class State(IntEnum):
+class State(IntEnum):   # TODO - rename to connected state
     NotConnected = -1
 
 @QmlElement

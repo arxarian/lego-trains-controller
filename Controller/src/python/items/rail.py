@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import webcolors
 from enum import IntEnum
-from pathlib import Path
 from importlib import resources
 from PySide6.QtCore import QObject, Property, Signal, Slot, QEnum
 from PySide6.QtQml import QmlElement
@@ -95,8 +94,10 @@ class Rail(QObject):
         self._paths = {}                            # dictionary
 
         self.load_metadata()
+
         self._markers.rail = self
-        self._markers.updateEnabledStates()
+        self._markers._connectors = self._connectors
+        self._connectors._markers = self._markers
 
     def load_metadata(self):
         if self._type == RailType.Undefined:
@@ -132,7 +133,7 @@ class Rail(QObject):
     def toString(self):
         ret = "id " + str(self.id) + " markers "
         for m in self.markers._items:
-            if m.visible:
+            if m.taken:
                 ret = ret + webcolors.hex_to_name(m.color.name()) + " "
         return ret
 
@@ -246,14 +247,13 @@ class Rail(QObject):
 
     def connectTo(self, fromRailId, fromIndex):
         self._connectors.connectTo(fromRailId, fromIndex)
-        self._markers.updateEnabledStates()
+        self._markers.updateStates()
 
     def disconnectFrom(self, fromRailId):
         self._connectors.disconnectFrom(fromRailId)
-        self._markers.updateEnabledStates()
+        self._markers.updateStates()
 
     @Slot(result=QObject)
     def setNextConnector(self):
         connector = self._connectors.setNextConnector()
-        self._markers.updateEnabledStates()
         return connector

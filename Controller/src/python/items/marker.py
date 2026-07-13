@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QObject, Signal, Property, Slot, QPointF
+from enum import IntEnum, auto
+from PySide6.QtCore import QObject, Signal, Property, Slot, QPointF, QEnum
 from PySide6.QtQml import QmlElement
 from PySide6.QtGui import QColor
 
@@ -9,19 +10,27 @@ from python.items.rotator import Rotator
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
+@QEnum
+class MarkerState(IntEnum):
+    Undefined = auto()
+    Free = auto()
+    Blocked = auto()
+    Taken = auto()
+
 @QmlElement
 class Marker(QObject):
+    QEnum(MarkerState)
 
     def __init__(self, data: dict=None, color=None, index=-1, parent=None):
         super().__init__(parent)
-        self._visible = False if color is None else True
+        self._state = MarkerState.Taken if color else MarkerState.Free
         self._index = index
         self._color = color
-        self._enabled = True
         self._rotator = None    # set in load_metadata
         self._distance = 0      # set in load_metadata
         self._path_id = None    # set in load_metadata
         self._position = QPointF()
+        self._connector = None
 
         self.load_metadata(data)
 
@@ -43,7 +52,9 @@ class Marker(QObject):
     @Slot()
     def remove(self):
         self.set_color(None)
-        self.set_visible(False)
+        self.set_state(MarkerState.Free)
+
+        self.parent().updateStates()
 
     def position(self):
         return self._position
@@ -55,19 +66,44 @@ class Marker(QObject):
     position_changed = Signal()
     position = Property(QPointF, position, set_position, notify=position_changed)
 
-    def visible(self):
-        return self._visible
+    def free(self):
+        return self._state == MarkerState.Free
 
-    def set_visible(self, value):
-        self._visible = value
-        self.visible_changed.emit()
-        from python.models.markers import Markers
-        parent = self.parent()
-        if isinstance(parent, Markers):
-            parent.updateEnabledStates()
+    free_changed = Signal()
+    free = Property(int, free, notify=free_changed)
 
-    visible_changed = Signal()
-    visible = Property(bool, visible, set_visible, notify=visible_changed)
+    def taken(self):
+        return self._state == MarkerState.Taken
+
+    taken_changed = Signal()
+    taken = Property(int, taken, notify=taken_changed)
+
+    def blocked(self):
+        return self._state == MarkerState.Blocked
+
+    blocked_changed = Signal()
+    blocked = Property(int, blocked, notify=blocked_changed)
+
+    @Slot(QColor)
+    def take(self, value):
+        self.set_color(value)
+        self.set_state(MarkerState.Taken)
+
+        self.parent().updateStates()   # possible TODO - pass the pointer so I can check just at proximity
+
+    def state(self):
+        return self._state
+
+    def set_state(self, value):
+        if self._state != value:
+            self._state = value
+            self.state_changed.emit()
+            self.taken_changed.emit()   # TODO - no guard
+            self.free_changed.emit()    # TODO - no guard
+            self.blocked_changed.emit() # TODO - no guard
+
+    state_changed = Signal()
+    state = Property(int, state, set_state, notify=state_changed)
 
     def color(self):
         return self._color
@@ -114,13 +150,15 @@ class Marker(QObject):
     path_id_changed = Signal()
     path_id = Property(str, path_id, set_path_id, notify=path_id_changed)
 
-    def enabled(self):
-        return self._enabled
+    def at_boundary(self):
+        return self._connector != None
 
-    def set_enabled(self, value):
-        if self._enabled != value:
-            self._enabled = value
-            self.enabled_changed.emit()
+    def connector(self):
+        return self._connector
 
-    enabled_changed = Signal()
-    enabled = Property(bool, enabled, set_enabled, notify=enabled_changed)
+    def set_connector(self, value):
+        self._connector = value
+        self.connector_changed.emit()
+
+    connector_changed = Signal()
+    connector = Property(str, connector, set_connector, notify=connector_changed)

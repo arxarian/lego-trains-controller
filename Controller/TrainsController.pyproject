@@ -1,7 +1,9 @@
 {
     "files": [
         "pyproject.toml",
+        "README.md",
         "tests/test_general.py",
+        "tests/test_marker_states.py",
         "tests/test_network_generator.py",
         "tests/test_network_manager.py",
         "src/main.py",

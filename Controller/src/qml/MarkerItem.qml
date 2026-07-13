@@ -17,14 +17,14 @@ Item {
         anchors.centerIn: parent
         width: 160
         height: 80
-        enabled: Globals.editMode && item.marker.visible
+        enabled: Globals.editMode && item.marker.taken
         rotation: item.marker.rotator.angle
 
         Rectangle {
             id: markerBrick
             anchors.fill: parent
 
-            visible: item.marker.visible
+            visible: item.marker.taken
             color: item.marker.color
 
             onVisibleChanged: { if (visible) {
@@ -48,7 +48,7 @@ Item {
             }
 
             anchors.centerIn: parent
-            visible: Globals.editMode && (markerTypes ? markerTypes.markersActive : true) && !item.marker.visible && item.marker.enabled
+            visible: Globals.editMode && (markerTypes ? markerTypes.markersActive : true) && item.marker.free
 
             radius: markerPoint.size
             width: markerPoint.size
@@ -71,8 +71,7 @@ Item {
                 propagateComposedEvents: true
                 onClicked: function(mouse) {
                     if (Globals.selectedMarker >= 0) {
-                        item.marker.color = markerTypes.get(Globals.selectedMarker).color
-                        item.marker.visible = true
+                        item.marker.take(markerTypes.get(Globals.selectedMarker).color) // TODO - move it to python as well?
                     } else {
                         console.warn("Marker was not found, Globals.selectedMarker equals to",
                                      Globals.selectedMarker)

@@ -13,6 +13,7 @@ class Connectors(ObjectBasedModel[Connector]):
         super().__init__(parent)
         data = data or []
         self._items = [Connector.load_data(d, self) for d in data]
+        self._markers = None
 
     def setModel(self, metaData):
         if len(self._items) > 0:
