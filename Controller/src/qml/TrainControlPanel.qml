@@ -36,9 +36,10 @@ Item {
             Slider {
                 id: speedSlider
 
+                value: root.device.speed
                 orientation: Qt.Vertical
                 wheelEnabled: true
-                from: -100
+                from: root.device.minimalSpeed
                 to: 100
                 stepSize: 10
                 snapMode: Slider.SnapAlways

@@ -17,6 +17,9 @@ class Simulator(QObject):
         self._train = None
         self._circuit = []
         self._run_task = None
+        self._current_index = 0
+        self._step_delay = 1.5
+        self._pause_delay = 0.3
 
     def is_running(self):
         return self._is_running
@@ -76,6 +79,23 @@ class Simulator(QObject):
         return None
 
     @Slot()
+    def onSpeedChanged(self):
+        # change simulation speed
+        if self._fake_device.speed == 0:
+            self.pause_simulation()
+            return
+
+        if self._is_running == False:
+            self.unpause_simulation()
+
+        # 25 = 1.6
+        # 50 = 0.8
+        # 100 = 0.4
+        self._step_delay = 40 / self._fake_device.speed
+        print("speed changed", self._fake_device.speed, "simulation speed", self._step_delay)
+
+
+    @Slot()
     def start(self):
         if self._is_running:
             return
@@ -85,10 +105,12 @@ class Simulator(QObject):
             print("Simulator: empty circuit, cannot start")
             return
 
+        self._current_index = 0
         self._fake_device = FakeDevice(name="Simulator", parent=self)
-        self._fake_device.set_speed(10)
+        self._fake_device.set_speed(30)
         self._train = self._trains.add_train(self._fake_device)
         self._fake_device.disconnected.connect(self.on_fake_device_disconnected)
+        self._fake_device.speed_changed.connect(self.onSpeedChanged)
 
         self.set_is_running(True)
         self._run_task = asyncio.ensure_future(self.run_loop())
@@ -116,21 +138,29 @@ class Simulator(QObject):
         if self._is_running:
             self.stop()
 
+    def pause_simulation(self):
+        self._is_running = False
+
+    def unpause_simulation(self):
+        self._is_running = True
+        self._run_task = asyncio.ensure_future(self.run_loop())
+
     async def run_loop(self):
-        step_delay = 1.5
-        pause_delay = 0.3
 
         while self._is_running:
-            for node_id, color_hex in self._circuit:
-                if not self._is_running:
-                    return
+            _, color_hex = self._circuit[self._current_index]
 
-                color = QColor(color_hex)
-                self._fake_device.set_color(color)
-                await asyncio.sleep(pause_delay)
+            color = QColor(color_hex)
+            self._fake_device.set_color(color)
+            await asyncio.sleep(self._pause_delay)
 
-                if not self._is_running:
-                    return
+            if not self._is_running:
+                return
 
-                self._fake_device.set_color(TRANSPARENT_COLOR)
-                await asyncio.sleep(step_delay)
+            self._fake_device.set_color(TRANSPARENT_COLOR)
+            await asyncio.sleep(self._step_delay)
+
+            if not self._is_running:
+                return
+
+            self._current_index = (self._current_index + 1) % len(self._circuit)

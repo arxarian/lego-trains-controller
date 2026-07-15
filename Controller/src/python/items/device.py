@@ -26,6 +26,7 @@ class Device(QObject):
         self._name = hub_name
         self._voltage = 0
         self._speed = 0
+        self._minimal_speed = -100
         self._initialized = False
         asyncio.create_task(self.set_rx_method())
         asyncio.create_task(self.async_voltage_status())
@@ -82,6 +83,11 @@ class Device(QObject):
 
     voltage_changed = Signal()
     voltage = Property(int, voltage, set_voltage, notify=voltage_changed)
+
+    def minimalSpeed(self):
+        return self._minimal_speed
+
+    minimalSpeed = Property(int, minimalSpeed)
 
     def name(self):
         return self._name
