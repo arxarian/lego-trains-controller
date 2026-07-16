@@ -1,0 +1,8 @@
+---
+description: Coding conventions for edits
+alwaysApply: true
+---
+
+- Never rewrite entire files just to change a few lines.
+- Only output the specific modified code blocks, functions, or a unified diff.
+- Use placeholders (like `// ... rest of the code remains unchanged`) for untouched blocks.
