@@ -23,6 +23,8 @@ class FakeDevice(QObject):
         return self._color
 
     def set_color(self, value):
+        if self._color == value:
+            return
         self._color = value
         self.color_changed.emit()
 
