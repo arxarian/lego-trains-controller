@@ -17,6 +17,10 @@ class Simulator(QObject):
         self._train = None
         self._circuit = []
         self._run_task = None
+        self._current_index = 0
+        self._marker_consumed = False
+        self._step_delay = 1.5
+        self._pause_delay = 0.3
 
     def is_running(self):
         return self._is_running
@@ -76,6 +80,29 @@ class Simulator(QObject):
         return None
 
     @Slot()
+    def onSpeedChanged(self):
+        if self._fake_device is None:
+            return
+
+        if self._fake_device.speed == 0:
+            self.pause_simulation()
+            return
+
+        if self._run_task is None or self._run_task.done():
+            self.unpause_simulation()
+
+        # 25 = 1.6
+        # 50 = 0.8
+        # 100 = 0.4
+        self._step_delay = 40 / self._fake_device.speed
+        print("speed changed", self._fake_device.speed, "simulation speed", self._step_delay)
+
+    def _cancel_run_task(self):
+        if self._run_task and not self._run_task.done():
+            self._run_task.cancel()
+        self._run_task = None
+
+    @Slot()
     def start(self):
         if self._is_running:
             return
@@ -85,10 +112,13 @@ class Simulator(QObject):
             print("Simulator: empty circuit, cannot start")
             return
 
+        self._current_index = 0
+        self._marker_consumed = False
         self._fake_device = FakeDevice(name="Simulator", parent=self)
-        self._fake_device.set_speed(10)
+        self._fake_device.set_speed(30)
         self._train = self._trains.add_train(self._fake_device)
         self._fake_device.disconnected.connect(self.on_fake_device_disconnected)
+        self._fake_device.speed_changed.connect(self.onSpeedChanged)
 
         self.set_is_running(True)
         self._run_task = asyncio.ensure_future(self.run_loop())
@@ -99,10 +129,8 @@ class Simulator(QObject):
             return
 
         self.set_is_running(False)
-
-        if self._run_task:
-            self._run_task.cancel()
-            self._run_task = None
+        self._cancel_run_task()
+        self._marker_consumed = False
 
         if self._train and self._train._current_segment_id:
             self._network.unreserve(self._train._current_segment_id)
@@ -116,21 +144,45 @@ class Simulator(QObject):
         if self._is_running:
             self.stop()
 
-    async def run_loop(self):
-        step_delay = 1.5
-        pause_delay = 0.3
+    def pause_simulation(self):
+        """Stop advancing the circuit; keep reserved segment and last known position."""
+        self._cancel_run_task()
+        if self._fake_device:
+            self._fake_device.set_color(TRANSPARENT_COLOR)
 
-        while self._is_running:
-            for node_id, color_hex in self._circuit:
-                if not self._is_running:
-                    return
+    def unpause_simulation(self):
+        if not self._is_running:
+            return
+        if self._run_task and not self._run_task.done():
+            return
+
+        # Already localized at current marker — continue from the next one.
+        if self._marker_consumed and self._circuit:
+            self._current_index = (self._current_index + 1) % len(self._circuit)
+            self._marker_consumed = False
+
+        self._run_task = asyncio.ensure_future(self.run_loop())
+
+    async def run_loop(self):
+        try:
+            while self._is_running:
+                _, color_hex = self._circuit[self._current_index]
 
                 color = QColor(color_hex)
                 self._fake_device.set_color(color)
-                await asyncio.sleep(pause_delay)
+                self._marker_consumed = True
+                await asyncio.sleep(self._pause_delay)
 
                 if not self._is_running:
                     return
 
                 self._fake_device.set_color(TRANSPARENT_COLOR)
-                await asyncio.sleep(step_delay)
+                await asyncio.sleep(self._step_delay)
+
+                if not self._is_running:
+                    return
+
+                self._current_index = (self._current_index + 1) % len(self._circuit)
+                self._marker_consumed = False
+        except asyncio.CancelledError:
+            return

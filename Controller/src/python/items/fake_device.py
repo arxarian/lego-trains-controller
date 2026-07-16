@@ -16,12 +16,15 @@ class FakeDevice(QObject):
         self._name = name
         self._speed = 0
         self._voltage = 0
+        self._minimal_speed = 0
         self._initialized = True
 
     def color(self):
         return self._color
 
     def set_color(self, value):
+        if self._color == value:
+            return
         self._color = value
         self.color_changed.emit()
 
@@ -45,14 +48,21 @@ class FakeDevice(QObject):
 
     def set_speed(self, value):
         self._speed = value
+        self.speed_changed.emit()
 
-    speed = Property(int, speed, set_speed)
+    speed_changed = Signal()
+    speed = Property(int, speed, set_speed, notify=speed_changed)
 
     def voltage(self):
         return self._voltage
 
     voltage_changed = Signal()
     voltage = Property(int, voltage, notify=voltage_changed)
+
+    def minimalSpeed(self):
+        return self._minimal_speed
+
+    minimalSpeed = Property(int, minimalSpeed)
 
     @Slot()
     def disconnect(self):
