@@ -106,7 +106,7 @@ Existing GitHub issue: https://github.com/arxarian/lego-trains-controller/issues
 **Prompt (expanded for planning epic):**
 
 ```
-Implement marker sanity checks so localization and route planning are not corrupted by duplicate or adjacent identical colors.
+Implement marker sanity checks so localization and route planning are not corrupted by duplicate marker colors.
 
 ## Why before / early in the epic
 Trains resolve position via color_map (hex → one node). Duplicate colors last-write-wins today and break Auto plans and simulation. This is issue #114, pulled into Route Planning MVP foundations.
@@ -117,7 +117,6 @@ None. Can ship before A1.
 ## Requirements
 1. On network generate() and/or when markers change in Edit mode:
    - Detect duplicate marker colors among taken/visible colored markers used as graph nodes
-   - Detect identical colors on immediately adjacent marker positions (as #114 suggested)
 2. Surface result clearly: warning list in UI and/or block Run/generate with a visible message (prefer warn in Edit, fail or hard-warn before Run/Auto)
 3. color_map construction should not silently overwrite without logging which nodes collided
 4. Tests for duplicate detection
@@ -125,11 +124,6 @@ None. Can ship before A1.
 
 ## Acceptance
 - Two markers with the same color → user-visible warning (and documented Run behavior)
-- Adjacent identical markers → warning
-- Unique layout → no warnings; color_map size matches colored marker count
-
-## Out of scope
-Auto-fixing colors, planner executor, switch actuators, marker clustering (see F2 / #68)
 ```
 
 ## Issue F2 — Marker color clustering (#68)
