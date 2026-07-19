@@ -9,6 +9,7 @@ globs: ["**/*.py", "**/*.qml"]
 - Only output the specific modified code blocks, functions, or a unified diff.
 - Indentation Safety (Python): When editing Python code, always output the complete block or method signature to preserve exact indentation hierarchy. Use placeholders (e.g., `# ... rest of class remains unchanged`) only for untouched sibling methods.
 - Always use language-appropriate placeholders (e.g., `# ...` for Python, `// ...` for QML) to represent untouched segments.
+
 - Prioritize expressive, human-readable code. Do not sacrifice clarity or safety for brevity.
 - Avoid unnecessary boilerplate, redundant logic, or overly verbose syntax. Prefer concise, idiomatic Python and QML implementations.
 - Standard Strictness: Strictly adhere to modern Python 3.x idioms, PySide6 conventions, and declarative QML patterns.
@@ -17,3 +18,9 @@ globs: ["**/*.py", "**/*.qml"]
 - Never let long-lived UI components, QThreads, or underlying worker objects exist as unanchored local Python variables that risk premature garbage collection.
 - Architecture: Maintain a strict separation between QML presentation layout and Python business logic. Utilizing clean Qt Signals and Slots to communicate between Python and QML.
 - QML Best Practices: Favor declarative property bindings over imperative JavaScript functions whenever possible.
+
+- Text & Code Formatting:
+  - Never leave trailing whitespaces at the end of lines, comments, or blank blocks. Ensure all lines terminate cleanly with a newline character.
+  - Python Spacing: Adhere to PEP 8 spacing. Use two blank lines before top-level definitions and one blank line between class methods. Limit code lines to 89 characters.
+  - QML Layout Structure: Order blocks by: id, properties, signal handlers, anchors, then children. Use a single blank line to separate distinct visual layers or structural logic.
+  - Clean Comments: Always insert a single space after comment symbols (`# ` or `// `) and keep comments on separate lines above the code they describe.
