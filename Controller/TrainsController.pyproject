@@ -6,6 +6,7 @@
         "tests/test_marker_states.py",
         "tests/test_network_generator.py",
         "tests/test_network_manager.py",
+        "tests/test_marker_sanity.py",
         "tests/test_simulator_pause.py",
         "src/main.py",
         "src/projects/rails.json",

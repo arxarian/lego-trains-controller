@@ -14,6 +14,7 @@ class NetworkManager(QObject):
         self._segments = {} # lookup table
         self._color_map = {} # color hex -> node_id
         self._has_graph = False
+        self._marker_warnings = []
 
     def updateRailsModel(self, rails):
         self._rails = rails
@@ -51,8 +52,12 @@ class NetworkManager(QObject):
             )
         return False
 
-    def build_color_map(self):
-        self._color_map = {}
+    def _collect_graph_markers(self):
+        """Return taken colored markers that exist as graph nodes."""
+        results = []
+        if self._graph is None:
+            return results
+
         for rail in self._rails.items():
             for path in rail._paths:
                 path_id = path["path_id"]
@@ -60,8 +65,48 @@ class NetworkManager(QObject):
                     if marker.taken and marker.path_id in (None, "", path_id) and marker.color is not None:
                         node_id = f"{rail.id}{path_id}{marker.distance}"
                         if self._graph.has_node(node_id):
-                            color_key = marker.color.name()  # normalized lowercase hex e.g. "#ff0000"
-                            self._color_map[color_key] = node_id
+                            results.append({
+                                "color_key": marker.color.name(),
+                                "node_id": node_id,
+                                "rail_id": rail.id,
+                                "path_id": path_id,
+                                "distance": marker.distance,
+                            })
+        return results
+
+    def validate_markers(self) -> list[str]:
+        """Detect duplicate colors among graph markers."""
+        warnings = []
+        markers = self._collect_graph_markers()
+
+        by_color: dict[str, list[str]] = {}
+        for entry in markers:
+            nodes = by_color.setdefault(entry["color_key"], [])
+            if entry["node_id"] not in nodes:
+                nodes.append(entry["node_id"])
+
+        for color_key, nodes in by_color.items():
+            if len(nodes) > 1:
+                warnings.append(
+                    f"Duplicate marker color {color_key} at nodes: {', '.join(nodes)}"
+                )
+
+        return warnings
+
+    def build_color_map(self):
+        self._color_map = {}
+        for entry in self._collect_graph_markers():
+            color_key = entry["color_key"]
+            node_id = entry["node_id"]
+            if color_key in self._color_map:
+                existing = self._color_map[color_key]
+                if existing != node_id:
+                    print(
+                        f"Network: Color map collision for {color_key}: "
+                        f"keeping {existing}, ignoring {node_id}"
+                    )
+                continue
+            self._color_map[color_key] = node_id
         print(f"Network: Color map built with {len(self._color_map)} entries: {self._color_map}")
 
     def find_node_marker(self, node_id: str):
@@ -99,6 +144,7 @@ class NetworkManager(QObject):
             self._segments[id] = edge
 
         self.build_color_map()
+        self.set_marker_warnings(self.validate_markers())
         self.set_has_graph(True)
 
     def has_graph(self):
@@ -110,3 +156,15 @@ class NetworkManager(QObject):
 
     has_graph_changed = Signal()
     has_graph = Property(bool, has_graph, set_has_graph, notify=has_graph_changed)
+
+    def marker_warnings(self):
+        return self._marker_warnings
+
+    def set_marker_warnings(self, value):
+        self._marker_warnings = list(value) if value else []
+        self.marker_warnings_changed.emit()
+
+    marker_warnings_changed = Signal()
+    markerWarnings = Property(
+        "QStringList", marker_warnings, set_marker_warnings, notify=marker_warnings_changed
+    )

@@ -37,6 +37,15 @@ ColumnLayout {
         }
     }
 
+    Label {
+        visible: network.markerWarnings.length > 0
+        text: "Marker warnings:\n" + network.markerWarnings.join("\n")
+        color: "#b00020"
+        wrapMode: Text.WordWrap
+        Layout.fillWidth: true
+        Layout.maximumWidth: parent.width
+    }
+
     ButtonGroup { id: group }
 
     GridLayout {
