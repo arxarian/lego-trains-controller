@@ -5,7 +5,9 @@ Implement issues in order within each slice; do not start a slice before its dep
 
 **Related project rules:** `.cursor/rules/project-spec.mdc`, `.cursor/rules/coding-spec.mdc`
 
-**Master plan issue (order, priorities, architecture):** see GitHub milestone [Route Planning MVP](https://github.com/arxarian/lego-trains-controller/milestone/1) — issue titled `[EPIC] Route Planning MVP — master plan`.
+**Master plan issue (order, priorities, architecture):** see GitHub milestone [Route Planning MVP](https://github.com/arxarian/lego-trains-controller/milestone/1) — issue titled `[EPIC] Route Planning MVP — master plan` (#155).
+
+**UX / UI epic (editor, Run canvas, visual polish):** [#158](https://github.com/arxarian/lego-trains-controller/issues/158). Slice C / E UI issues are dual-tracked; editor chip #157 lives only there.
 
 ---
 
@@ -30,6 +32,8 @@ Implement issues in order within each slice; do not start a slice before its dep
 2. **F1** #154 (**M**, —)  
 3. **F2** #68 marker clustering (**M–L**, needs F0) — P2 / after first Auto demo (capacity upgrade; not critical path)
 
+Editor multi-color chip and other UX/UI polish: see GitHub epic **[#158](https://github.com/arxarian/lego-trains-controller/issues/158)** (not part of this foundations slice).
+
 ### Phase 1 — Backend critical path
 3. A1.1 (**S–M**) → A1.2 (**M**, needs A1.1)  
 4. A2.1 (**S–M**) → A2.2 (**S–M**, A2.1+A1.1) → A3.1 (**M**) → A3.2 (**M**, A3.1+A2.1)  
@@ -46,7 +50,7 @@ Implement issues in order within each slice; do not start a slice before its dep
 
 ### Phase 4 — Multi-train + polish
 11. S3 (**L–XL**) → E3 (**M**) → E1/E2 (**M**); E4 (**S**) design only  
-12. **F2** #68 (**M–L**, F0) when layouts outgrow ~5 unique single-color markers
+12. **F2** #68 (**M–L**, F0) when layouts outgrow ~5 unique single-color markers; editor chip #157 lives under UX/UI epic #158
 
 ### Architecture constraints (do not violate)
 - **Auto owns motion** when Automatic; sim only emits colors along the reserved leg; Manual = today’s slider, pause executor later (B2).  
@@ -136,42 +140,50 @@ Existing GitHub issue: https://github.com/arxarian/lego-trains-controller/issues
 **Prompt:**
 
 ```
-Expand localization capacity beyond 5 single colors by treating two adjacent different-colored bricks as one compound beacon (e.g. blue+red → signatures blue→red / red→blue).
+Expand localization capacity beyond 5 colors by treating consecutive adjacent bricks as one compound beacon of length N = 1..MAX_CLUSTER_SIZE (same type for size-1 and multi-color). Example: blue+red → signatures blue→red / red→blue.
 
 ## Why later (not instead of F0)
-F0 keeps single-color layouts reliable. Clustering is a capacity upgrade for large layouts. Hub still emits one discrete color at a time; the host reconstructs pairs.
+F0 keeps layouts reliable. Clustering is a capacity upgrade for large layouts. Hub still emits one discrete color at a time; the host reconstructs sequences.
 
 ## Depends on
 F0 (#114) — uniqueness / warnings must exist so signature collisions are detectable.
 
 ## Design (agreed)
-1. Host-side sequence matching (no hub firmware change in v1). Adjacent bricks produce a sequence of clr events (possibly with BLACK/NONE between).
-2. Geometry clusters at generate/edit: consecutive taken markers on the same path with abs(d1-d2)==1 and different colors → one virtual marker node (midpoint or first distance); remove the two singles from the localization map.
-3. Signatures: ordered pairs; both blue→red and red→blue resolve to the same node (bidirectional travel).
-4. Replace or extend color_map with signature_map:
-   - Single marker: key = color hex (as today)
-   - Cluster: keys "#0000ff|#ff0000" and "#ff0000|#0000ff" → same node
-5. Train localization: buffer last accepted color; on new color try pair signature first, else single. Clear buffer after match, timeout, or non-adjacent second color.
-6. Uniqueness (generalized F0): colors used in any cluster cannot also be used as singles; warn on duplicate unordered cluster pairs.
-7. Simulator: emit both colors in order when crossing a cluster node.
-8. UI dual-color chip in editor is optional follow-up.
+1. Unified beacon model: every localization beacon is a cluster of length N (1 ≤ N ≤ MAX_CLUSTER_SIZE). Size 1 is today’s short signature — no separate “single” vs “cluster” type.
+2. Constant: MAX_CLUSTER_SIZE = 3 (design for raising to 5 later without redesign).
+3. Host-side sequence matching (no hub firmware change in v1). Adjacent bricks produce a sequence of clr events (possibly with BLACK/NONE between).
+4. Geometry at generate/edit: consecutive taken markers on the same path with abs(d_i - d_{i+1})==1 and pairwise different colors, length in [1, MAX_CLUSTER_SIZE] → one virtual marker node; physical bricks remain for edit/render.
+5. Signatures: ordered color sequences; forward and full reverse → same node. Keys like "#ff0000" (N=1) or "#0000ff|#ff0000|#00ff00" (N=3).
+6. signature_map: signature string → node (replaces/extends color_map).
+7. Train localization: buffer recent colors; prefer longest matching signature; clear on full match, non-extendable next color, or timeout. Timeout scales with train speed (slower → longer), e.g. timeout ∝ 1/|speed|. If buffer is a prefix of a longer cluster, do not resolve shorter match until timeout or extension.
+8. Uniqueness (generalized F0): warn on duplicate full signatures (reverse-equivalent = same beacon). Colors may appear in clusters of any length (including size 1) if full signatures stay unique; longest-match + timeout handles prefix ambiguity.
+9. Simulator: emit all cluster colors in travel order when crossing a cluster node.
+10. Editor multi-color chip: out of scope — see #157 under UX/UI epic #158.
 
 ## Requirements
 1. Detect geometry clusters on generate
 2. signature_map + sequence matcher in Train (or NetworkManager helper)
-3. F0-style warnings for signature / single-vs-cluster collisions
-4. Tests: cluster detection, signature map, sequence matcher, simulator pair emission
+3. F0-style warnings for signature collisions / prefix conflicts
+4. Tests: cluster detection, signature map, sequence matcher, speed-based timeout, simulator multi-color emission
 5. Follow project-spec.mdc / coding-spec.mdc
 
 ## Acceptance
-- Blue+red adjacent → one beacon; red/blue reusable only under the uniqueness rules above
-- Train crossing a cluster localizes once to the cluster node
+- Adjacent 2–3 different colors → one beacon (MAX_CLUSTER_SIZE=3); isolated brick → cluster of size 1
+- Train crossing a multi-color cluster localizes once to the cluster node
+- Incomplete sequences clear after a speed-dependent timeout
 - Signature collisions produce warnings
-- Pair-only clusters (no 3+ brick clusters in v1)
+- Size-1 and size-N+ share the same signature/matcher model
 
 ## Out of scope
-New physical brick colors / hub HSV changes; clusters of 3+; auto-placement of bricks; replacing F0
+New physical brick colors / hub HSV changes; auto-placement of bricks; replacing F0; editor multi-color chip (#157 / epic #158); raising MAX_CLUSTER_SIZE above 3 in the first implementation (but keep the constant)
 ```
+
+## Editor multi-color cluster chip (#157) — moved to UX/UI epic
+
+GitHub: https://github.com/arxarian/lego-trains-controller/issues/157  
+Epic: https://github.com/arxarian/lego-trains-controller/issues/158  
+
+No longer a Route Planning foundation (F2.1). Tracked only under the **UX/UI** epic. Still depends on F2 (#68) for clustering data. Prompt lives on the issue itself.
 
 ## Issue F1 — Device layering (`BleDevice` + train hub; switches separate)
 
