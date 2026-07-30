@@ -2,7 +2,8 @@ from unittest.mock import MagicMock, patch
 
 from PySide6.QtGui import QColor
 
-from python.items.fake_device import FakeDevice, TRANSPARENT_COLOR
+from python.items.train_device import TRANSPARENT_COLOR
+from python.items.train_device_sim import TrainDeviceSim
 from python.simulator import Simulator
 
 
@@ -13,7 +14,7 @@ def _close_coro(coro):
 
 
 def test_fake_device_set_color_skips_duplicate_emit():
-    device = FakeDevice()
+    device = TrainDeviceSim()
     emissions = []
     device.color_changed.connect(lambda: emissions.append(device.color))
 
@@ -35,7 +36,7 @@ def test_pause_keeps_reservation_and_resume_skips_consumed_marker():
     sim._circuit = [("nodeA", "#ff0000"), ("nodeB", "#00ff00"), ("nodeC", "#0000ff")]
     sim._current_index = 0
     sim._marker_consumed = True
-    sim._fake_device = FakeDevice()
+    sim._fake_device = TrainDeviceSim()
     sim._train = MagicMock()
     sim._train._current_segment_id = "nodeA:nodeB"
     sim.set_is_running(True)
@@ -62,7 +63,7 @@ def test_unpause_does_not_start_second_loop_while_running():
     sim = Simulator(network, trains)
     sim._circuit = [("nodeA", "#ff0000"), ("nodeB", "#00ff00")]
     sim.set_is_running(True)
-    sim._fake_device = FakeDevice()
+    sim._fake_device = TrainDeviceSim()
     first = MagicMock()
     first.done.return_value = False
     sim._run_task = first
