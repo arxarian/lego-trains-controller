@@ -4,7 +4,8 @@ import asyncio
 from PySide6.QtCore import QObject, Property, Signal, Slot
 from PySide6.QtGui import QColor
 
-from python.items.fake_device import FakeDevice, TRANSPARENT_COLOR
+from python.items.train_device import TRANSPARENT_COLOR
+from python.items.train_device_sim import TrainDeviceSim
 
 class Simulator(QObject):
 
@@ -114,7 +115,7 @@ class Simulator(QObject):
 
         self._current_index = 0
         self._marker_consumed = False
-        self._fake_device = FakeDevice(name="Simulator", parent=self)
+        self._fake_device = TrainDeviceSim(name="Simulator", parent=self)
         self._fake_device.set_speed(30)
         self._train = self._trains.add_train(self._fake_device)
         self._fake_device.disconnected.connect(self.on_fake_device_disconnected)

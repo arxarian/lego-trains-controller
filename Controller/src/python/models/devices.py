@@ -5,13 +5,13 @@ from PySide6.QtCore import Slot, Property, Signal, QModelIndex, QObject
 from python.models.object_based_model import ObjectBasedModel
 
 from bleak import BleakScanner, BleakClient
-from python.items.device import Device
+from python.items.train_device_hw import TrainDeviceHW
 
 import asyncio
 
-class Devices(ObjectBasedModel[Device]):
+class Devices(ObjectBasedModel[TrainDeviceHW]):
 
-    _item_class = Device
+    _item_class = TrainDeviceHW
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
@@ -83,7 +83,7 @@ class Devices(ObjectBasedModel[Device]):
             await client.connect()
             if client.is_connected:
                 print("Connected")
-                self.append(Device(client=client, hub_name=hub_name, parent=self))
+                self.append(TrainDeviceHW(client=client, hub_name=hub_name, parent=self))
             else:
                 print("Connection to", hub_name, "failed")
 
