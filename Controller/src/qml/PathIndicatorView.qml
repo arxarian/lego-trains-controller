@@ -9,8 +9,19 @@ Item {
     property color strokeColor: "red"
     property int strokeWidth: 10
     property var _createdElements: []
+    property bool _ready: false
+
+    onModelChanged: root.rebuildPath()
+
+    Component.onCompleted: {
+        root._ready = true
+        root.rebuildPath()
+    }
 
     function rebuildPath() {
+        if (!root._ready)
+            return
+
         for (var i = 0; i < root._createdElements.length; i++) {
             root._createdElements[i].destroy()
         }
@@ -65,6 +76,8 @@ Item {
         target: root.model
         function onRowsInserted() { root.rebuildPath() }
         function onRowsRemoved() { root.rebuildPath() }
+        function onModelReset() { root.rebuildPath() }
+        function onLayoutChanged() { root.rebuildPath() }
     }
 
     Component {
