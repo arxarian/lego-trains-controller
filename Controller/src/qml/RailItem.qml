@@ -165,8 +165,11 @@ SelectableItem {
         anchors.fill: parent
         propagateComposedEvents: true
         onClicked: (mouse) => {
-            mouse.accepted = false
             console.log("rail id", root.railData.id)
+
+            mouse.accepted = false
+            if (root.railData.is_switch())
+                root.railData.toggleSwitchPosition()
         }
     }
 

@@ -9,6 +9,7 @@
         "tests/test_marker_sanity.py",
         "tests/test_simulator_pause.py",
         "tests/test_train_device.py",
+        "tests/test_switch_position.py",
         "src/main.py",
         "src/projects/rails.json",
         "src/resources/rails_rc.py",
