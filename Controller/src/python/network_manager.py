@@ -116,6 +116,17 @@ class NetworkManager(QObject):
         """color_key should be a lowercase hex string e.g. '#ff0000'"""
         return self._color_map.get(color_key)
 
+    def _edge_matches_switch_state(self, node_id: str, neighbor: str) -> bool:
+        """True if every switch rail on the edge matches its active path_id."""
+        edge_data = self._graph.get_edge_data(node_id, neighbor) or {}
+        for rail_data in edge_data.get("segment_data", []):
+            rail = self._rails.findRailData(rail_data["rail_id"])
+            if rail is None:
+                return False
+            if rail.is_switch() and rail.switch_position != rail_data["path_id"]:
+                return False
+        return True
+
     def find_segment_by_entry_node(self, node_id: str, exclude_node: str = None) -> str:
         """Return the segment ID the train enters after arriving at node_id.
         exclude_node is the node the train came from (to avoid going backward)."""
@@ -125,9 +136,18 @@ class NetworkManager(QObject):
             print(f"Network: No forward neighbor from {node_id} (excluding {exclude_node})")
             return None
         if len(candidates) > 1:
-            # TODO: use direction + switch state to pick the correct branch
-            print(f"Network: Multiple forward neighbors from {node_id}, picking first: {candidates}")
-        next_node = candidates[0]
+            compatible = [n for n in candidates if self._edge_matches_switch_state(node_id, n)]
+            if len(compatible) == 1:
+                next_node = compatible[0]
+            else:
+                print(
+                    f"Network: No unique switch-compatible neighbor from {node_id} "
+                    f"(excluding {exclude_node}); candidates={candidates}, "
+                    f"compatible={compatible}"
+                )
+                return None
+        else:
+            next_node = candidates[0]
         a, b = sorted([node_id, next_node])
         return f"{a}:{b}"
 
