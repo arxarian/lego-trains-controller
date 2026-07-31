@@ -168,7 +168,7 @@ SelectableItem {
             console.log("rail id", root.railData.id)
 
             mouse.accepted = false
-            if (root.railData.is_switch())
+            if (!Globals.editMode && root.railData.is_switch())
                 root.railData.toggleSwitchPosition()
         }
     }
