@@ -157,18 +157,17 @@ trains/
 
 - Before implementing a feature or bugfix: if the current branch is `master` (or `main`), create and check out a feature branch first. Do not commit implementation work directly on `master`/`main`.
 - Prefer branch names that reflect the work (e.g. `feat/a1.1-switch-position`, `fix/...`).
-- When development for the task is done (acceptance met, tests added/passing as applicable), create a git commit on the feature branch. Do not leave completed work uncommitted. Commit messages must use the form `task_id: description` (e.g. `A1.1: add logical switch position on switch rails`).
+- When development for the task is done (acceptance met, tests added/passing as applicable), create a git commit on the feature branch immediately — do not wait for the user to ask. Do not leave completed work uncommitted. Commit messages must use the form `task_id: description` (e.g. `A1.1: add logical switch position on switch rails`).
 
 ## Known Issues & TODOs
 
-1. **Switch routing**: `find_segment_by_entry_node` picks the first neighbor when multiple exist — needs direction + switch state logic
-2. **Planner**: Currently a debug tool — needs real shortest-path routing, multi-train conflict resolution, and scheduled stops
-3. **Graph simplification**: Needs to properly handle switches (noted TODO in `network_generator.py`)
-4. **`qmldir`**: References `TrackPiece.qml` which doesn't exist
-5. **`PathIndicatorsFilter`**: Imported in `app_context.py` but not registered on engine context
-6. **CI**: `pip install .[test]` but `pyproject.toml` has no `[project.optional-dependencies]` test group
-7. **`ProjectStorage.saveDataToFile`**: Parameter type annotation inconsistency with actual usage
-8. **Device disconnect**: No robust handling on client side
+1. **Planner**: Currently a debug tool — needs real shortest-path routing, multi-train conflict resolution, and scheduled stops
+2. **Graph simplification**: Needs to properly handle switches (noted TODO in `network_generator.py`)
+3. **`qmldir`**: References `TrackPiece.qml` which doesn't exist
+4. **`PathIndicatorsFilter`**: Imported in `app_context.py` but not registered on engine context
+5. **CI**: `pip install .[test]` but `pyproject.toml` has no `[project.optional-dependencies]` test group
+6. **`ProjectStorage.saveDataToFile`**: Parameter type annotation inconsistency with actual usage
+7. **Device disconnect**: No robust handling on client side
 
 ## Key Design Decisions
 
