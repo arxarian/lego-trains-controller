@@ -148,8 +148,8 @@ def test_find_next_marker_node_uses_switch_position():
     assert net_manager.find_next_marker_node(approach_node) == exit_a_node
 
 
-def test_select_next_node_rejects_inactive_single_candidate():
-    """Inactive switch edges are never chosen, even as the sole branch option."""
+def test_select_next_node_trailing_allows_inactive_single_candidate():
+    """Trailing (one forward hop) ignores switch state; forking still filters."""
     rails, switch = _make_switch_y_layout()
     approach, _switch_rail, exit_a, exit_b = rails._items
     _force_take(approach, 8, "#ff0000")
@@ -166,25 +166,72 @@ def test_select_next_node_rejects_inactive_single_candidate():
     assert "2-3" in neighbors and "2-4" in neighbors
 
     assert switch.switch_position == "A"
-    assert net_manager._edge_matches_switch_state(stem, "2-3") is True
     assert net_manager._edge_matches_switch_state(stem, "2-4") is False
 
-    # Only the inactive B exit remains after excluding A and approach → None.
-    # Approach marker keeps stem at deg-3; filter still drops B when it is alone.
-    only_inactive = [
-        n for n in ["2-4"] if net_manager._edge_matches_switch_state(stem, n)
-    ]
-    assert only_inactive == []
+    # Trailing: sole forward hop from exit-B side node toward stem is allowed
+    # even though path B does not match switch A.
+    exit_b_neighbors = list(net_manager.graph().neighbors(exit_b_node))
+    assert len(exit_b_neighbors) == 1
+    assert net_manager._select_next_node(exit_b_node, None) == exit_b_neighbors[0]
 
-    # Facing the frog: exclude approach → must pick A, not B.
+    # Forking: exclude approach → must pick A, not B.
     assert net_manager._select_next_node(stem, "1A8") == "2-3"
 
-    # Crossing frog from exit A must not jump to exit B when switch is A.
+    # From exit A with switch A, next marker is approach (not exit B).
+    assert net_manager.find_next_marker_node(exit_a_node) == "1A8"
     assert net_manager.find_next_marker_node(exit_a_node) != exit_b_node
 
     switch.setSwitchPosition("B")
     assert net_manager._select_next_node(stem, "1A8") == "2-4"
     assert net_manager.find_next_marker_node(exit_b_node) != exit_a_node
+
+
+def test_resolve_exclude_neighbor_maps_marker_to_entry_edge():
+    """Previous marker that is not adjacent resolves to the arrival neighbor."""
+    rails, switch = _make_switch_y_layout()
+    approach, _switch_rail, exit_a, exit_b = rails._items
+    _force_take(approach, 8, "#ff0000")
+    _force_take(exit_a, 8, "#00ff00")
+    _force_take(exit_b, 8, "#0000ff")
+
+    net_manager = net.NetworkManager(rails)
+    net_manager.generate()
+
+    approach_node = net_manager.find_node_by_color("#ff0000")
+    exit_a_node = net_manager.find_node_by_color("#00ff00")
+    stem = "1-2"
+
+    # Exit marker's entry edge from approach is junction 2-3.
+    entry = None
+    prev_map = {approach_node: None}
+    queue = [approach_node]
+    while queue:
+        cur = queue.pop(0)
+        for n in net_manager.graph().neighbors(cur):
+            if n in prev_map:
+                continue
+            prev_map[n] = cur
+            if n == exit_a_node:
+                entry = prev_map[n]
+                queue.clear()
+                break
+            queue.append(n)
+    assert entry == "2-3"
+
+    # Dead-end exit: resolve must not exclude the only neighbor (returns None),
+    # so the walk can still return toward the approach marker.
+    assert net_manager._resolve_exclude_neighbor(exit_a_node, approach_node) is None
+    assert switch.switch_position == "A"
+    assert net_manager.find_next_marker_node(exit_a_node, approach_node) == approach_node
+
+    # At the stem (deg >= 2), approach resolves to itself as direct neighbor.
+    assert net_manager._resolve_exclude_neighbor(stem, approach_node) == approach_node
+    # From stem, previous=exit_a resolves to entry edge 2-3 (not a no-op).
+    assert net_manager._resolve_exclude_neighbor(stem, exit_a_node) == "2-3"
+    # With that exclude, forking picks the other branch / approach correctly.
+    assert net_manager._select_next_node(
+        stem, net_manager._resolve_exclude_neighbor(stem, exit_a_node)
+    ) == "1A8"
 
 
 def test_find_segments_to_next_marker_covers_switch():

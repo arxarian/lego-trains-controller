@@ -141,13 +141,60 @@ class NetworkManager(QObject):
                 return False
         return True
 
+    def _resolve_exclude_neighbor(
+        self, at_node: str, from_node: str | None
+    ) -> str | None:
+        """Map a previous marker/node to the graph neighbor used to enter at_node.
+
+        If resolving would exclude the only neighbor (dead-end marker), return
+        None so the sole hop remains available (caller may reverse via that edge).
+        """
+        if from_node is None or self._graph is None:
+            return None
+        if not self._graph.has_node(at_node) or not self._graph.has_node(from_node):
+            return None
+
+        neighbors = list(self._graph.neighbors(at_node))
+        if self._graph.has_edge(at_node, from_node):
+            resolved = from_node
+        else:
+            # BFS from from_node to at_node; predecessor of at_node is the entry.
+            prev = {from_node: None}
+            queue = [from_node]
+            resolved = None
+            while queue:
+                cur = queue.pop(0)
+                for n in self._graph.neighbors(cur):
+                    if n in prev:
+                        continue
+                    prev[n] = cur
+                    if n == at_node:
+                        resolved = prev[at_node]
+                        queue.clear()
+                        break
+                    queue.append(n)
+
+        if resolved is None:
+            return None
+        # Dead-end: excluding the only neighbor traps the walk; leave exclude empty.
+        if len([n for n in neighbors if n != resolved]) == 0:
+            return None
+        return resolved
+
     def _select_next_node(self, node_id: str, exclude_node: str = None) -> str | None:
-        """Pick the next graph neighbor from node_id, honoring switch position."""
+        """Pick the next graph neighbor from node_id.
+
+        Switch position applies only when forking (multiple forward candidates).
+        A single forward hop is trailing and is always allowed.
+        """
         neighbors = list(self._graph.neighbors(node_id))
         candidates = [n for n in neighbors if n != exclude_node]
         if not candidates:
             print(f"Network: No forward neighbor from {node_id} (excluding {exclude_node})")
             return None
+        if len(candidates) == 1:
+            return candidates[0]
+
         compatible = [n for n in candidates if self._edge_matches_switch_state(node_id, n)]
         if len(compatible) == 1:
             return compatible[0]
@@ -168,7 +215,8 @@ class NetworkManager(QObject):
     def find_segment_by_entry_node(self, node_id: str, exclude_node: str = None) -> str:
         """Return the segment ID the train enters after arriving at node_id.
         exclude_node is the node the train came from (to avoid going backward)."""
-        next_node = self._select_next_node(node_id, exclude_node)
+        exclude = self._resolve_exclude_neighbor(node_id, exclude_node)
+        next_node = self._select_next_node(node_id, exclude)
         if next_node is None:
             return None
         a, b = sorted([node_id, next_node])
@@ -193,7 +241,7 @@ class NetworkManager(QObject):
         if self._graph is None or from_node is None:
             return [], None
         marker_nodes = set(self._color_map.values())
-        prev = exclude_node
+        prev = self._resolve_exclude_neighbor(from_node, exclude_node)
         node = from_node
         seen = {from_node}
         segment_ids = []
