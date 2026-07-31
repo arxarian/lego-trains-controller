@@ -78,3 +78,28 @@ def test_find_segment_by_entry_node_uses_switch_position():
     assert net_manager.find_segment_by_entry_node(entry) == segment_a
 
     assert segment_a != segment_b
+
+
+def _network_from_track(path: str):
+    data = project.loadDataFromFile(Path(path))
+    rails = [Rail.load_data(d) for d in data.get("rails", [])]
+    mock_rails = MagicMock()
+    mock_rails.items.return_value = rails
+    mock_rails.findRailData.side_effect = (
+        lambda rail_id: next((r for r in rails if r.id == int(rail_id)), None)
+    )
+    net_manager = net.NetworkManager(mock_rails)
+    net_manager.generate()
+    return net_manager
+
+
+def test_find_segment_circuit_empty_exclude_falls_back():
+    net_manager = _network_from_track(TEST_TRACK)
+    neighbors = list(net_manager.graph().neighbors("13A0"))
+    possible = {":".join(sorted(["13A0", n])) for n in neighbors}
+
+    segment = net_manager.find_segment_by_entry_node("13A0")
+    assert segment is not None
+    assert segment in possible
+
+    assert net_manager.find_segment_by_entry_node("13A0", "19A0") == "10A0:13A0"

@@ -139,13 +139,20 @@ class NetworkManager(QObject):
             compatible = [n for n in candidates if self._edge_matches_switch_state(node_id, n)]
             if len(compatible) == 1:
                 next_node = compatible[0]
-            else:
+            elif not compatible:
                 print(
-                    f"Network: No unique switch-compatible neighbor from {node_id} "
-                    f"(excluding {exclude_node}); candidates={candidates}, "
-                    f"compatible={compatible}"
+                    f"Network: No switch-compatible neighbor from {node_id} "
+                    f"(excluding {exclude_node}); candidates={candidates}"
                 )
                 return None
+            else:
+                # Switch state did not uniquely select (e.g. no switch on edges,
+                # or first localization with empty exclude_node).
+                print(
+                    f"Network: Multiple switch-compatible neighbors from {node_id} "
+                    f"(excluding {exclude_node}), picking first: {compatible}"
+                )
+                next_node = compatible[0]
         else:
             next_node = candidates[0]
         a, b = sorted([node_id, next_node])
