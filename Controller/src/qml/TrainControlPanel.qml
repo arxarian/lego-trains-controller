@@ -85,6 +85,7 @@ Item {
                 wrapMode: Text.WrapAnywhere
                 horizontalAlignment: Text.AlignHCenter
                 Layout.fillWidth: true
+                Layout.maximumWidth: root.width
             }
         }
     }

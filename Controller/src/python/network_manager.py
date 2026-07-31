@@ -52,6 +52,20 @@ class NetworkManager(QObject):
             )
         return False
 
+    def reserve_segments(self, segment_ids) -> bool:
+        ok = True
+        for segment_id in segment_ids or []:
+            if not self.reserve(segment_id):
+                ok = False
+        return ok
+
+    def unreserve_segments(self, segment_ids) -> bool:
+        ok = True
+        for segment_id in segment_ids or []:
+            if not self.unreserve(segment_id):
+                ok = False
+        return ok
+
     def _collect_graph_markers(self):
         """Return taken colored markers that exist as graph nodes."""
         results = []
@@ -127,36 +141,136 @@ class NetworkManager(QObject):
                 return False
         return True
 
-    def find_segment_by_entry_node(self, node_id: str, exclude_node: str = None) -> str:
-        """Return the segment ID the train enters after arriving at node_id.
-        exclude_node is the node the train came from (to avoid going backward)."""
+    def _edge_involves_switch(self, node_id: str, neighbor: str) -> bool:
+        """True if the edge includes any switch rail in segment_data."""
+        edge_data = self._graph.get_edge_data(node_id, neighbor) or {}
+        for rail_data in edge_data.get("segment_data", []):
+            rail = self._rails.findRailData(rail_data["rail_id"])
+            if rail is not None and rail.is_switch():
+                return True
+        return False
+
+    def _resolve_exclude_neighbor(self, at_node: str, from_node: str | None) -> str | None:
+        """Map a previous marker/node to the graph neighbor used to enter at_node.
+
+        If resolving would exclude the only neighbor (dead-end marker), return
+        None so the sole hop remains available (caller may reverse via that edge).
+        """
+        if from_node is None or self._graph is None:
+            return None
+        if not self._graph.has_node(at_node) or not self._graph.has_node(from_node):
+            return None
+
+        neighbors = list(self._graph.neighbors(at_node))
+        if self._graph.has_edge(at_node, from_node):
+            resolved = from_node
+        else:
+            # BFS from from_node to at_node; predecessor of at_node is the entry.
+            prev = {from_node: None}
+            queue = [from_node]
+            resolved = None
+            while queue:
+                cur = queue.pop(0)
+                for n in self._graph.neighbors(cur):
+                    if n in prev:
+                        continue
+                    prev[n] = cur
+                    if n == at_node:
+                        resolved = prev[at_node]
+                        queue.clear()
+                        break
+                    queue.append(n)
+
+        if resolved is None:
+            return None
+        # Dead-end: excluding the only neighbor traps the walk; leave exclude empty.
+        if len([n for n in neighbors if n != resolved]) == 0:
+            return None
+        return resolved
+
+    def _select_next_node(self, node_id: str, exclude_node: str = None) -> str | None:
+        """Pick the next graph neighbor from node_id.
+
+        Trailing into a switch (exclude is a branch edge): continue via stem only,
+        never across the frog onto another branch.
+        Facing from the stem (multiple branch candidates): use switch_position.
+        A single forward hop is always allowed.
+        """
         neighbors = list(self._graph.neighbors(node_id))
         candidates = [n for n in neighbors if n != exclude_node]
         if not candidates:
             print(f"Network: No forward neighbor from {node_id} (excluding {exclude_node})")
             return None
-        if len(candidates) > 1:
-            compatible = [n for n in candidates if self._edge_matches_switch_state(node_id, n)]
-            if len(compatible) == 1:
-                next_node = compatible[0]
-            elif not compatible:
-                print(
-                    f"Network: No switch-compatible neighbor from {node_id} "
-                    f"(excluding {exclude_node}); candidates={candidates}"
-                )
-                return None
-            else:
-                # Switch state did not uniquely select (e.g. no switch on edges,
-                # or first localization with empty exclude_node).
-                print(
-                    f"Network: Multiple switch-compatible neighbors from {node_id} "
-                    f"(excluding {exclude_node}), picking first: {compatible}"
-                )
-                next_node = compatible[0]
-        else:
-            next_node = candidates[0]
+
+        # Trailing: entered via a switch branch — drop other switch-branch exits.
+        if exclude_node is not None and self._edge_involves_switch(node_id, exclude_node):
+            non_branch = [n for n in candidates if not self._edge_involves_switch(node_id, n)]
+
+            if non_branch:
+                candidates = non_branch
+
+        if len(candidates) == 1:
+            return candidates[0]
+
+        compatible = [n for n in candidates if self._edge_matches_switch_state(node_id, n)]
+        if len(compatible) == 1:
+            return compatible[0]
+        if not compatible:
+            print(
+                f"Network: No switch-compatible neighbor from {node_id} "
+                f"(excluding {exclude_node}); candidates={candidates}"
+            )
+            return None
+        # Switch state did not uniquely select (e.g. no switch on edges,
+        # or first localization with empty exclude_node).
+        print(
+            f"Network: Multiple switch-compatible neighbors from {node_id} "
+            f"(excluding {exclude_node}), picking first: {compatible}"
+        )
+        return compatible[0]
+
+    def find_segment_by_entry_node(self, node_id: str, exclude_node: str = None) -> str:
+        """Return the segment ID the train enters after arriving at node_id.
+        exclude_node is the node the train came from (to avoid going backward)."""
+        exclude = self._resolve_exclude_neighbor(node_id, exclude_node)
+        next_node = self._select_next_node(node_id, exclude)
+        if next_node is None:
+            return None
         a, b = sorted([node_id, next_node])
         return f"{a}:{b}"
+
+    def find_segments_to_next_marker(self, from_node: str, exclude_node: str = None) -> list[str]:
+        """Segment ids from from_node through switch nodes until next marker."""
+        segments, _ = self.walk_to_next_marker(from_node, exclude_node)
+        return segments
+
+    def find_next_marker_node(self, from_node: str, exclude_node: str = None) -> str | None:
+        """Walk switch-aware edges from from_node until the next marker node."""
+        _, next_marker = self.walk_to_next_marker(from_node, exclude_node)
+        return next_marker
+
+    def walk_to_next_marker(self, from_node: str, exclude_node: str = None) -> tuple[list[str], str | None]:
+        """Return (segment_ids, next_marker_node) or ([], None) if stuck."""
+        if self._graph is None or from_node is None:
+            return [], None
+        marker_nodes = set(self._color_map.values())
+        prev = self._resolve_exclude_neighbor(from_node, exclude_node)
+        node = from_node
+        seen = {from_node}
+        segment_ids = []
+        while True:
+            next_node = self._select_next_node(node, prev)
+            if next_node is None:
+                return [], None
+            a, b = sorted([node, next_node])
+            segment_ids.append(f"{a}:{b}")
+            if next_node in marker_nodes:
+                return segment_ids, next_node
+            if next_node in seen:
+                return [], None
+            seen.add(next_node)
+            prev = node
+            node = next_node
 
     @Slot()
     def generate(self):
@@ -192,6 +306,4 @@ class NetworkManager(QObject):
         self.marker_warnings_changed.emit()
 
     marker_warnings_changed = Signal()
-    markerWarnings = Property(
-        "QStringList", marker_warnings, set_marker_warnings, notify=marker_warnings_changed
-    )
+    markerWarnings = Property("QStringList", marker_warnings, set_marker_warnings, notify=marker_warnings_changed)

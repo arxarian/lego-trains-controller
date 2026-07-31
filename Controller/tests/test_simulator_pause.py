@@ -31,20 +31,22 @@ def test_fake_device_set_color_skips_duplicate_emit():
 
 def test_pause_keeps_reservation_and_resume_skips_consumed_marker():
     network = MagicMock()
+    network.find_next_marker_node.return_value = "nodeB"
     trains = MagicMock()
     sim = Simulator(network, trains)
-    sim._circuit = [("nodeA", "#ff0000"), ("nodeB", "#00ff00"), ("nodeC", "#0000ff")]
-    sim._current_index = 0
+    sim._current_node_id = "nodeA"
+    sim._previous_node_id = None
     sim._marker_consumed = True
     sim._fake_device = TrainDeviceSim()
     sim._train = MagicMock()
-    sim._train._current_segment_id = "nodeA:nodeB"
+    sim._train._current_segment_ids = ["nodeA:nodeB"]
     sim.set_is_running(True)
 
     sim.pause_simulation()
 
     network.unreserve.assert_not_called()
-    assert sim._train._current_segment_id == "nodeA:nodeB"
+    network.unreserve_segments.assert_not_called()
+    assert sim._train._current_segment_ids == ["nodeA:nodeB"]
     assert sim.is_running is True
     assert sim._run_task is None
     assert sim._fake_device.color == TRANSPARENT_COLOR
@@ -52,7 +54,9 @@ def test_pause_keeps_reservation_and_resume_skips_consumed_marker():
     with patch("python.simulator.asyncio.ensure_future", side_effect=_close_coro) as ensure_future:
         sim.unpause_simulation()
 
-    assert sim._current_index == 1
+    network.find_next_marker_node.assert_called_with("nodeA", None)
+    assert sim._current_node_id == "nodeB"
+    assert sim._previous_node_id == "nodeA"
     assert sim._marker_consumed is False
     ensure_future.assert_called_once()
 
@@ -61,7 +65,7 @@ def test_unpause_does_not_start_second_loop_while_running():
     network = MagicMock()
     trains = MagicMock()
     sim = Simulator(network, trains)
-    sim._circuit = [("nodeA", "#ff0000"), ("nodeB", "#00ff00")]
+    sim._current_node_id = "nodeA"
     sim.set_is_running(True)
     sim._fake_device = TrainDeviceSim()
     first = MagicMock()
@@ -73,4 +77,4 @@ def test_unpause_does_not_start_second_loop_while_running():
 
     ensure_future.assert_not_called()
     assert sim._run_task is first
-    assert sim._current_index == 0
+    assert sim._current_node_id == "nodeA"
