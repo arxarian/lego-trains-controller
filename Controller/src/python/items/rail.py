@@ -30,6 +30,9 @@ RailSource = {
     RailType.SwitchRight: "switch right.json"
 }
 
+SWITCH_PATH_IDS = ("A", "B")
+DEFAULT_SWITCH_POSITION = "A"
+
 @QmlElement
 class Rail(QObject):
     last_id = 0  # static variable
@@ -90,6 +93,8 @@ class Rail(QObject):
         self._path_indicators = PathIndicators(parent=self)
         self._reservation_indicators = PathIndicators(parent=self)
         self._reserved = False  # reserved by train
+        # Session-only logical turnout position; TODO sync from switch hub on BLE connect (Auto/Manual = C2)
+        self._switch_position = DEFAULT_SWITCH_POSITION
 
         self._paths = {}                            # dictionary
 
@@ -98,6 +103,16 @@ class Rail(QObject):
         self._markers.rail = self
         self._markers._connectors = self._connectors
         self._connectors._markers = self._markers
+
+        if self.is_switch():
+            self._sync_path_id_active()
+
+    @Slot(result=bool)
+    def is_switch(self) -> bool:
+        return self._type in (RailType.SwitchLeft, RailType.SwitchRight)
+
+    def _sync_path_id_active(self) -> None:
+        self._path_indicators.set_path_id_active(self._switch_position)
 
     def load_metadata(self):
         if self._type == RailType.Undefined:
@@ -236,6 +251,31 @@ class Rail(QObject):
 
     paths_changed = Signal()
     paths = Property(list, paths, set_paths, notify=paths_changed)
+
+    def switch_position(self):
+        return self._switch_position
+
+    def set_switch_position(self, value):
+        if not self.is_switch() or value not in SWITCH_PATH_IDS:
+            return
+        if self._switch_position == value:
+            return
+        self._switch_position = value
+        self._sync_path_id_active()
+        self.switch_position_changed.emit()
+
+    switch_position_changed = Signal()
+    switch_position = Property(str, switch_position, set_switch_position, notify=switch_position_changed)
+
+    @Slot(str)
+    def setSwitchPosition(self, path_id):
+        self.set_switch_position(path_id)
+
+    @Slot()
+    def toggleSwitchPosition(self):
+        if not self.is_switch():
+            return
+        self.set_switch_position("B" if self._switch_position == "A" else "A")
 
     def reserve_segment(self, path_id, from_d, to_d):
         pts = [{"x": p.x, "y": p.y} for p in self._path_indicators._items
