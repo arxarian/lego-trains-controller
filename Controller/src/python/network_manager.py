@@ -127,9 +127,8 @@ class NetworkManager(QObject):
                 return False
         return True
 
-    def find_segment_by_entry_node(self, node_id: str, exclude_node: str = None) -> str:
-        """Return the segment ID the train enters after arriving at node_id.
-        exclude_node is the node the train came from (to avoid going backward)."""
+    def _select_next_node(self, node_id: str, exclude_node: str = None) -> str | None:
+        """Pick the next graph neighbor from node_id, honoring switch position."""
         neighbors = list(self._graph.neighbors(node_id))
         candidates = [n for n in neighbors if n != exclude_node]
         if not candidates:
@@ -138,25 +137,50 @@ class NetworkManager(QObject):
         if len(candidates) > 1:
             compatible = [n for n in candidates if self._edge_matches_switch_state(node_id, n)]
             if len(compatible) == 1:
-                next_node = compatible[0]
-            elif not compatible:
+                return compatible[0]
+            if not compatible:
                 print(
                     f"Network: No switch-compatible neighbor from {node_id} "
                     f"(excluding {exclude_node}); candidates={candidates}"
                 )
                 return None
-            else:
-                # Switch state did not uniquely select (e.g. no switch on edges,
-                # or first localization with empty exclude_node).
-                print(
-                    f"Network: Multiple switch-compatible neighbors from {node_id} "
-                    f"(excluding {exclude_node}), picking first: {compatible}"
-                )
-                next_node = compatible[0]
-        else:
-            next_node = candidates[0]
+            # Switch state did not uniquely select (e.g. no switch on edges,
+            # or first localization with empty exclude_node).
+            print(
+                f"Network: Multiple switch-compatible neighbors from {node_id} "
+                f"(excluding {exclude_node}), picking first: {compatible}"
+            )
+            return compatible[0]
+        return candidates[0]
+
+    def find_segment_by_entry_node(self, node_id: str, exclude_node: str = None) -> str:
+        """Return the segment ID the train enters after arriving at node_id.
+        exclude_node is the node the train came from (to avoid going backward)."""
+        next_node = self._select_next_node(node_id, exclude_node)
+        if next_node is None:
+            return None
         a, b = sorted([node_id, next_node])
         return f"{a}:{b}"
+
+    def find_next_marker_node(self, from_node: str, exclude_node: str = None) -> str | None:
+        """Walk switch-aware edges from from_node until the next marker node."""
+        if self._graph is None or from_node is None:
+            return None
+        marker_nodes = set(self._color_map.values())
+        prev = exclude_node
+        node = from_node
+        seen = {from_node}
+        while True:
+            next_node = self._select_next_node(node, prev)
+            if next_node is None:
+                return None
+            if next_node in marker_nodes:
+                return next_node
+            if next_node in seen:
+                return None
+            seen.add(next_node)
+            prev = node
+            node = next_node
 
     @Slot()
     def generate(self):

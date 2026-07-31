@@ -3,11 +3,13 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QApplication
 
 import python.network_manager as net
 import python.models.project_storage as project
 from python.items.rail import Rail, RailType
+from python.items.marker import MarkerState
 from python.models.rails import Rails
 from python.connectorregister import ConnectorRegister
 
@@ -103,3 +105,44 @@ def test_find_segment_circuit_empty_exclude_falls_back():
     assert segment in possible
 
     assert net_manager.find_segment_by_entry_node("13A0", "19A0") == "10A0:13A0"
+
+
+def _force_take(rail, distance, color, path_id=None):
+    marker = next(
+        m for m in rail.markers._items
+        if m.distance == distance and (path_id is None or m.path_id in (None, "", path_id))
+    )
+    marker.set_color(QColor(color))
+    marker.set_state(MarkerState.Taken)
+    return marker
+
+
+def test_find_next_marker_node_uses_switch_position():
+    """From the approach marker, switch A vs B selects different exit markers."""
+    rails, switch = _make_switch_y_layout()
+    approach, _switch_rail, exit_a, exit_b = rails._items
+
+    _force_take(approach, 8, "#ff0000")
+    _force_take(exit_a, 8, "#00ff00")
+    _force_take(exit_b, 8, "#0000ff")
+
+    net_manager = net.NetworkManager(rails)
+    net_manager.generate()
+
+    approach_node = net_manager.find_node_by_color("#ff0000")
+    exit_a_node = net_manager.find_node_by_color("#00ff00")
+    exit_b_node = net_manager.find_node_by_color("#0000ff")
+    assert approach_node and exit_a_node and exit_b_node
+
+    # After simplify, the approach marker's only neighbor is the switch junction
+    # "1-2", so exclude=None walks toward the exits.
+    assert list(net_manager.graph().neighbors(approach_node)) == ["1-2"]
+
+    assert switch.switch_position == "A"
+    assert net_manager.find_next_marker_node(approach_node) == exit_a_node
+
+    switch.setSwitchPosition("B")
+    assert net_manager.find_next_marker_node(approach_node) == exit_b_node
+
+    switch.setSwitchPosition("A")
+    assert net_manager.find_next_marker_node(approach_node) == exit_a_node

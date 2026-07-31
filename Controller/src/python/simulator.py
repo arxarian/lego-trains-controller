@@ -7,6 +7,7 @@ from PySide6.QtGui import QColor
 from python.items.train_device import TRANSPARENT_COLOR
 from python.items.train_device_sim import TrainDeviceSim
 
+
 class Simulator(QObject):
 
     def __init__(self, network, trains, parent=None):
@@ -16,9 +17,9 @@ class Simulator(QObject):
         self._is_running = False
         self._fake_device = None
         self._train = None
-        self._circuit = []
         self._run_task = None
-        self._current_index = 0
+        self._current_node_id = None
+        self._previous_node_id = None
         self._marker_consumed = False
         self._step_delay = 1.5
         self._pause_delay = 0.3
@@ -33,52 +34,32 @@ class Simulator(QObject):
     is_running_changed = Signal()
     is_running = Property(bool, is_running, set_is_running, notify=is_running_changed)
 
-    def _build_circuit(self):
-        """Walk the color map to build an ordered circuit."""
-        color_map = self._network._color_map
-
-        marker_nodes = set(color_map.values())
-        if not marker_nodes:
-            return []
-
-        start = next(iter(marker_nodes))
-        circuit = []
-        visited = set()
-        current = start
-
-        while current not in visited:
-            visited.add(current)
-            color_hex = next((c for c, n in color_map.items() if n == current), None)
-            if color_hex:
-                circuit.append((current, color_hex))
-            current = self._next_marker_neighbor(current, visited, marker_nodes)
-            if current is None:
-                break
-
-        if circuit and start in marker_nodes:
-            color_hex = next((c for c, n in color_map.items() if n == start), None)
-            if color_hex and circuit[0][0] != start:
-                circuit.append((start, color_hex))
-
-        print(f"Simulator: circuit has {len(circuit)} stops: {[c[0] for c in circuit]}")
-        return circuit
-
-    def _next_marker_neighbor(self, node_id, visited, marker_nodes):
-        """Find the next unvisited marker node reachable from node_id, skipping intermediates."""
-        graph = self._network._graph
-        queue = list(graph.neighbors(node_id))
-        seen = {node_id}
-        while queue:
-            candidate = queue.pop(0)
-            if candidate in seen:
-                continue
-            seen.add(candidate)
-            if candidate in marker_nodes and candidate not in visited:
-                return candidate
-            for n in graph.neighbors(candidate):
-                if n not in seen:
-                    queue.append(n)
+    def _color_for_node(self, node_id):
+        """Return hex color for a marker node, or None."""
+        for color_hex, mapped in self._network._color_map.items():
+            if mapped == node_id:
+                return color_hex
         return None
+
+    def _advance_to_next_marker(self) -> bool:
+        """Move current/previous to the next switch-aware marker. Returns False if stuck."""
+        next_node = self._network.find_next_marker_node(
+            self._current_node_id, self._previous_node_id
+        )
+        if next_node is None:
+            # Dead end: reverse by allowing the back-neighbor.
+            next_node = self._network.find_next_marker_node(
+                self._current_node_id, None
+            )
+        if next_node is None:
+            print(
+                f"Simulator: no next marker from {self._current_node_id} "
+                f"(prev={self._previous_node_id})"
+            )
+            return False
+        self._previous_node_id = self._current_node_id
+        self._current_node_id = next_node
+        return True
 
     @Slot()
     def onSpeedChanged(self):
@@ -108,12 +89,13 @@ class Simulator(QObject):
         if self._is_running:
             return
 
-        self._circuit = self._build_circuit()
-        if not self._circuit:
-            print("Simulator: empty circuit, cannot start")
+        color_map = self._network._color_map
+        if not color_map:
+            print("Simulator: empty color map, cannot start")
             return
 
-        self._current_index = 0
+        self._current_node_id = next(iter(color_map.values()))
+        self._previous_node_id = None
         self._marker_consumed = False
         self._fake_device = TrainDeviceSim(name="Simulator", parent=self)
         self._fake_device.set_speed(30)
@@ -132,6 +114,8 @@ class Simulator(QObject):
         self.set_is_running(False)
         self._cancel_run_task()
         self._marker_consumed = False
+        self._current_node_id = None
+        self._previous_node_id = None
 
         if self._train and self._train._current_segment_id:
             self._network.unreserve(self._train._current_segment_id)
@@ -146,7 +130,7 @@ class Simulator(QObject):
             self.stop()
 
     def pause_simulation(self):
-        """Stop advancing the circuit; keep reserved segment and last known position."""
+        """Stop advancing; keep reserved segment and last known position."""
         self._cancel_run_task()
         if self._fake_device:
             self._fake_device.set_color(TRANSPARENT_COLOR)
@@ -158,8 +142,9 @@ class Simulator(QObject):
             return
 
         # Already localized at current marker — continue from the next one.
-        if self._marker_consumed and self._circuit:
-            self._current_index = (self._current_index + 1) % len(self._circuit)
+        if self._marker_consumed and self._current_node_id:
+            if not self._advance_to_next_marker():
+                return
             self._marker_consumed = False
 
         self._run_task = asyncio.ensure_future(self.run_loop())
@@ -167,7 +152,12 @@ class Simulator(QObject):
     async def run_loop(self):
         try:
             while self._is_running:
-                _, color_hex = self._circuit[self._current_index]
+                color_hex = self._color_for_node(self._current_node_id)
+                if color_hex is None:
+                    print(
+                        f"Simulator: no color for node {self._current_node_id}"
+                    )
+                    return
 
                 color = QColor(color_hex)
                 self._fake_device.set_color(color)
@@ -183,7 +173,8 @@ class Simulator(QObject):
                 if not self._is_running:
                     return
 
-                self._current_index = (self._current_index + 1) % len(self._circuit)
+                if not self._advance_to_next_marker():
+                    return
                 self._marker_consumed = False
         except asyncio.CancelledError:
             return
