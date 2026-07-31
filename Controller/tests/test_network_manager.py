@@ -146,3 +146,71 @@ def test_find_next_marker_node_uses_switch_position():
 
     switch.setSwitchPosition("A")
     assert net_manager.find_next_marker_node(approach_node) == exit_a_node
+
+
+def test_select_next_node_rejects_inactive_single_candidate():
+    """Inactive switch edges are never chosen, even as the sole branch option."""
+    rails, switch = _make_switch_y_layout()
+    approach, _switch_rail, exit_a, exit_b = rails._items
+    _force_take(approach, 8, "#ff0000")
+    _force_take(exit_a, 8, "#00ff00")
+    _force_take(exit_b, 8, "#0000ff")
+
+    net_manager = net.NetworkManager(rails)
+    net_manager.generate()
+
+    exit_a_node = net_manager.find_node_by_color("#00ff00")
+    exit_b_node = net_manager.find_node_by_color("#0000ff")
+    stem = "1-2"
+    neighbors = list(net_manager.graph().neighbors(stem))
+    assert "2-3" in neighbors and "2-4" in neighbors
+
+    assert switch.switch_position == "A"
+    assert net_manager._edge_matches_switch_state(stem, "2-3") is True
+    assert net_manager._edge_matches_switch_state(stem, "2-4") is False
+
+    # Only the inactive B exit remains after excluding A and approach → None.
+    # Approach marker keeps stem at deg-3; filter still drops B when it is alone.
+    only_inactive = [
+        n for n in ["2-4"] if net_manager._edge_matches_switch_state(stem, n)
+    ]
+    assert only_inactive == []
+
+    # Facing the frog: exclude approach → must pick A, not B.
+    assert net_manager._select_next_node(stem, "1A8") == "2-3"
+
+    # Crossing frog from exit A must not jump to exit B when switch is A.
+    assert net_manager.find_next_marker_node(exit_a_node) != exit_b_node
+
+    switch.setSwitchPosition("B")
+    assert net_manager._select_next_node(stem, "1A8") == "2-4"
+    assert net_manager.find_next_marker_node(exit_b_node) != exit_a_node
+
+
+def test_find_segments_to_next_marker_covers_switch():
+    """Approach → next marker reserves every edge through the junction."""
+    rails, switch = _make_switch_y_layout()
+    approach, _switch_rail, exit_a, exit_b = rails._items
+    _force_take(approach, 8, "#ff0000")
+    _force_take(exit_a, 8, "#00ff00")
+    _force_take(exit_b, 8, "#0000ff")
+
+    net_manager = net.NetworkManager(rails)
+    net_manager.generate()
+
+    approach_node = net_manager.find_node_by_color("#ff0000")
+    exit_a_node = net_manager.find_node_by_color("#00ff00")
+    exit_b_node = net_manager.find_node_by_color("#0000ff")
+
+    segments_a = net_manager.find_segments_to_next_marker(approach_node)
+    assert len(segments_a) >= 2
+    assert segments_a[0] == ":".join(sorted([approach_node, "1-2"]))
+    assert exit_a_node in segments_a[-1]
+    assert net_manager.find_next_marker_node(approach_node) == exit_a_node
+
+    switch.setSwitchPosition("B")
+    segments_b = net_manager.find_segments_to_next_marker(approach_node)
+    assert len(segments_b) >= 2
+    assert segments_b != segments_a
+    assert exit_b_node in segments_b[-1]
+    assert net_manager.find_next_marker_node(approach_node) == exit_b_node

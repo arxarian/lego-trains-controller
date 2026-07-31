@@ -39,13 +39,14 @@ def test_pause_keeps_reservation_and_resume_skips_consumed_marker():
     sim._marker_consumed = True
     sim._fake_device = TrainDeviceSim()
     sim._train = MagicMock()
-    sim._train._current_segment_id = "nodeA:nodeB"
+    sim._train._current_segment_ids = ["nodeA:nodeB"]
     sim.set_is_running(True)
 
     sim.pause_simulation()
 
     network.unreserve.assert_not_called()
-    assert sim._train._current_segment_id == "nodeA:nodeB"
+    network.unreserve_segments.assert_not_called()
+    assert sim._train._current_segment_ids == ["nodeA:nodeB"]
     assert sim.is_running is True
     assert sim._run_task is None
     assert sim._fake_device.color == TRANSPARENT_COLOR

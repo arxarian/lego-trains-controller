@@ -6,6 +6,7 @@ from PySide6.QtQml import QmlElement
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
+
 @QmlElement
 class Train(QObject):
 
@@ -13,7 +14,7 @@ class Train(QObject):
         super().__init__(parent)
         self._device = device
         self._network = network
-        self._current_segment_id = ""
+        self._current_segment_ids = []
         self._current_node_id = ""
         self._direction = "forward"
         self._position = QPointF()
@@ -33,16 +34,21 @@ class Train(QObject):
             print(f"Train: no marker node found for color {color_key}")
             return
 
-        new_segment_id = self._network.find_segment_by_entry_node(node_id, self._current_node_id)
-        if new_segment_id is None:
+        new_segment_ids = self._network.find_segments_to_next_marker(
+            node_id, self._current_node_id or None
+        )
+        if not new_segment_ids:
             return
 
-        self._network.unreserve(self._current_segment_id)
-        self._network.reserve(new_segment_id)
+        self._network.unreserve_segments(self._current_segment_ids)
+        self._network.reserve_segments(new_segment_ids)
 
         self.set_current_node_id(node_id)
-        self.set_current_segment_id(new_segment_id)
-        print(f"Train '{self._device.name}': entered segment {new_segment_id} via node {node_id}")
+        self.set_current_segment_ids(new_segment_ids)
+        print(
+            f"Train '{self._device.name}': reserved {new_segment_ids} "
+            f"via node {node_id}"
+        )
 
     def device(self):
         return self._device
@@ -77,16 +83,29 @@ class Train(QObject):
     current_node_id_changed = Signal()
     current_node_id = Property(str, current_node_id, set_current_node_id, notify=current_node_id_changed)
 
-    def current_segment_id(self):
-        return self._current_segment_id
+    def current_segment_ids(self):
+        return list(self._current_segment_ids)
 
-    def set_current_segment_id(self, value):
-        self._current_segment_id = value
+    def set_current_segment_ids(self, value):
+        self._current_segment_ids = list(value) if value else []
         self.current_segment_id_changed.emit()
 
+    def current_segment_id(self):
+        return ";".join(self._current_segment_ids)
+
+    def set_current_segment_id(self, value):
+        if not value:
+            self.set_current_segment_ids([])
+            return
+        self.set_current_segment_ids(
+            [s for s in str(value).split(";") if s]
+        )
+
     current_segment_id_changed = Signal()
-    current_segment_id = Property(str, current_segment_id, set_current_segment_id,
-                                  notify=current_segment_id_changed)
+    current_segment_id = Property(
+        str, current_segment_id, set_current_segment_id,
+        notify=current_segment_id_changed
+    )
 
     def direction(self):
         return self._direction

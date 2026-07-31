@@ -117,8 +117,8 @@ class Simulator(QObject):
         self._current_node_id = None
         self._previous_node_id = None
 
-        if self._train and self._train._current_segment_id:
-            self._network.unreserve(self._train._current_segment_id)
+        if self._train and self._train._current_segment_ids:
+            self._network.unreserve_segments(self._train._current_segment_ids)
 
         if self._fake_device:
             self._trains.remove_by_device(self._fake_device)

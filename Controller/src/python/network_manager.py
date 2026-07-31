@@ -52,6 +52,20 @@ class NetworkManager(QObject):
             )
         return False
 
+    def reserve_segments(self, segment_ids) -> bool:
+        ok = True
+        for segment_id in segment_ids or []:
+            if not self.reserve(segment_id):
+                ok = False
+        return ok
+
+    def unreserve_segments(self, segment_ids) -> bool:
+        ok = True
+        for segment_id in segment_ids or []:
+            if not self.unreserve(segment_id):
+                ok = False
+        return ok
+
     def _collect_graph_markers(self):
         """Return taken colored markers that exist as graph nodes."""
         results = []
@@ -134,24 +148,22 @@ class NetworkManager(QObject):
         if not candidates:
             print(f"Network: No forward neighbor from {node_id} (excluding {exclude_node})")
             return None
-        if len(candidates) > 1:
-            compatible = [n for n in candidates if self._edge_matches_switch_state(node_id, n)]
-            if len(compatible) == 1:
-                return compatible[0]
-            if not compatible:
-                print(
-                    f"Network: No switch-compatible neighbor from {node_id} "
-                    f"(excluding {exclude_node}); candidates={candidates}"
-                )
-                return None
-            # Switch state did not uniquely select (e.g. no switch on edges,
-            # or first localization with empty exclude_node).
-            print(
-                f"Network: Multiple switch-compatible neighbors from {node_id} "
-                f"(excluding {exclude_node}), picking first: {compatible}"
-            )
+        compatible = [n for n in candidates if self._edge_matches_switch_state(node_id, n)]
+        if len(compatible) == 1:
             return compatible[0]
-        return candidates[0]
+        if not compatible:
+            print(
+                f"Network: No switch-compatible neighbor from {node_id} "
+                f"(excluding {exclude_node}); candidates={candidates}"
+            )
+            return None
+        # Switch state did not uniquely select (e.g. no switch on edges,
+        # or first localization with empty exclude_node).
+        print(
+            f"Network: Multiple switch-compatible neighbors from {node_id} "
+            f"(excluding {exclude_node}), picking first: {compatible}"
+        )
+        return compatible[0]
 
     def find_segment_by_entry_node(self, node_id: str, exclude_node: str = None) -> str:
         """Return the segment ID the train enters after arriving at node_id.
@@ -162,22 +174,39 @@ class NetworkManager(QObject):
         a, b = sorted([node_id, next_node])
         return f"{a}:{b}"
 
+    def find_segments_to_next_marker(
+        self, from_node: str, exclude_node: str = None
+    ) -> list[str]:
+        """Segment ids from from_node through switch nodes until next marker."""
+        segments, _ = self._walk_to_next_marker(from_node, exclude_node)
+        return segments
+
     def find_next_marker_node(self, from_node: str, exclude_node: str = None) -> str | None:
         """Walk switch-aware edges from from_node until the next marker node."""
+        _, next_marker = self._walk_to_next_marker(from_node, exclude_node)
+        return next_marker
+
+    def _walk_to_next_marker(
+        self, from_node: str, exclude_node: str = None
+    ) -> tuple[list[str], str | None]:
+        """Return (segment_ids, next_marker_node) or ([], None) if stuck."""
         if self._graph is None or from_node is None:
-            return None
+            return [], None
         marker_nodes = set(self._color_map.values())
         prev = exclude_node
         node = from_node
         seen = {from_node}
+        segment_ids = []
         while True:
             next_node = self._select_next_node(node, prev)
             if next_node is None:
-                return None
+                return [], None
+            a, b = sorted([node, next_node])
+            segment_ids.append(f"{a}:{b}")
             if next_node in marker_nodes:
-                return next_node
+                return segment_ids, next_node
             if next_node in seen:
-                return None
+                return [], None
             seen.add(next_node)
             prev = node
             node = next_node
