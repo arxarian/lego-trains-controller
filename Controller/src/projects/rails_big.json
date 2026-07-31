@@ -88,12 +88,6 @@
                     "name": "end",
                     "connectedRailId": 15
                 }
-            ],
-            "markers": [
-                {
-                    "index": 0,
-                    "color": "#008000"
-                }
             ]
         },
         {
@@ -177,12 +171,6 @@
                 {
                     "name": "end",
                     "connectedRailId": 19
-                }
-            ],
-            "markers": [
-                {
-                    "index": 9,
-                    "color": "#008000"
                 }
             ]
         },
@@ -324,16 +312,6 @@
                     "name": "end",
                     "connectedRailId": 26
                 }
-            ],
-            "markers": [
-                {
-                    "index": 3,
-                    "color": "#ff0000"
-                },
-                {
-                    "index": 6,
-                    "color": "#008000"
-                }
             ]
         },
         {
@@ -396,6 +374,12 @@
                 {
                     "name": "end",
                     "connectedRailId": 29
+                }
+            ],
+            "markers": [
+                {
+                    "index": 12,
+                    "color": "#ffffff"
                 }
             ]
         },
@@ -481,16 +465,6 @@
                     "name": "end",
                     "connectedRailId": 24
                 }
-            ],
-            "markers": [
-                {
-                    "index": 6,
-                    "color": "#ff0000"
-                },
-                {
-                    "index": 9,
-                    "color": "#ffff00"
-                }
             ]
         },
         {
@@ -511,16 +485,6 @@
                 {
                     "name": "end",
                     "connectedRailId": 24
-                }
-            ],
-            "markers": [
-                {
-                    "index": 6,
-                    "color": "#ffff00"
-                },
-                {
-                    "index": 9,
-                    "color": "#ff0000"
                 }
             ]
         },
@@ -627,16 +591,6 @@
                     "name": "end",
                     "connectedRailId": 39
                 }
-            ],
-            "markers": [
-                {
-                    "index": 3,
-                    "color": "#008000"
-                },
-                {
-                    "index": 6,
-                    "color": "#ff0000"
-                }
             ]
         },
         {
@@ -742,12 +696,6 @@
                     "name": "end",
                     "connectedRailId": 37
                 }
-            ],
-            "markers": [
-                {
-                    "index": 3,
-                    "color": "#0000ff"
-                }
             ]
         },
         {
@@ -799,10 +747,6 @@
             ],
             "markers": [
                 {
-                    "index": 6,
-                    "color": "#008000"
-                },
-                {
                     "index": 9,
                     "color": "#0000ff"
                 }
@@ -810,8 +754,8 @@
         }
     ],
     "settings": {
-        "canvas_x": 205.0,
-        "canvas_y": 61.0,
-        "canvas_zoom": 0.17
+        "canvas_x": 133.0,
+        "canvas_y": -28.0,
+        "canvas_zoom": 0.08
     }
 }
