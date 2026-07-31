@@ -90,8 +90,39 @@ class Train(QObject):
         self._current_segment_ids = list(value) if value else []
         self.current_segment_id_changed.emit()
 
+    def _reserved_path_endpoints(self) -> str:
+        """Display string: single segment id, or start:end of a multi-edge leg."""
+        ids = self._current_segment_ids
+        if not ids:
+            return ""
+        if len(ids) == 1:
+            return ids[0]
+
+        start = self._current_node_id
+        adj: dict[str, list[str]] = {}
+        for seg in ids:
+            a, b = seg.split(":", 1)
+            adj.setdefault(a, []).append(b)
+            adj.setdefault(b, []).append(a)
+
+        if not start or start not in adj:
+            # Fallback: any degree-1 node as start.
+            ends = [n for n, nbrs in adj.items() if len(nbrs) == 1]
+            if len(ends) >= 2:
+                return f"{ends[0]}:{ends[1]}"
+            return ids[0]
+
+        prev = None
+        node = start
+        while True:
+            nbrs = [n for n in adj.get(node, []) if n != prev]
+            if not nbrs:
+                break
+            prev, node = node, nbrs[0]
+        return f"{start}:{node}"
+
     def current_segment_id(self):
-        return ";".join(self._current_segment_ids)
+        return self._reserved_path_endpoints()
 
     def set_current_segment_id(self, value):
         if not value:

@@ -30,3 +30,22 @@ def test_train_accepts_train_device_sim():
     device = TrainDeviceSim(name="sim")
     train = Train(device, network)
     assert train.device is device
+
+
+def test_current_segment_id_shows_path_endpoints():
+    network = MagicMock()
+    device = TrainDeviceSim(name="sim")
+    train = Train(device, network)
+
+    assert train.current_segment_id == ""
+
+    train.set_current_segment_ids(["13A12:13-24"])
+    assert train.current_segment_id == "13A12:13-24"
+
+    train._current_node_id = "13A12"
+    train.set_current_segment_ids([
+        "13-24:13A12",
+        "13-24:24-32",
+        "24-32:28A16",
+    ])
+    assert train.current_segment_id == "13A12:28A16"
