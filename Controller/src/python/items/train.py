@@ -35,9 +35,8 @@ class Train(QObject):
             print(f"Train: no marker node found for color {color_key}")
             return
 
-        new_segment_ids, end_node = self._network.walk_to_next_marker(
-            node_id, self._current_node_id or None
-        )
+        new_segment_ids, end_node = self._network.walk_to_next_marker(node_id, self._current_node_id or None)
+
         if not new_segment_ids or end_node is None:
             return
 
@@ -46,10 +45,7 @@ class Train(QObject):
 
         self.set_current_node_id(node_id)
         self.set_current_segment_ids(new_segment_ids, f"{node_id}:{end_node}")
-        print(
-            f"Train '{self._device.name}': reserved {new_segment_ids} "
-            f"via node {node_id}"
-        )
+        print(f"Train '{self._device.name}': reserved {new_segment_ids} via node {node_id}")
 
     def device(self):
         return self._device
@@ -104,14 +100,11 @@ class Train(QObject):
         if not value:
             self.set_current_segment_ids([], "")
             return
-        self.set_current_segment_ids(
-            [s for s in str(value).split(";") if s], str(value)
-        )
+        self.set_current_segment_ids([s for s in str(value).split(";") if s], str(value))
 
     current_segment_id_changed = Signal()
     current_segment_id = Property(
-        str, current_segment_id, set_current_segment_id,
-        notify=current_segment_id_changed
+        str, current_segment_id, set_current_segment_id, notify=current_segment_id_changed
     )
 
     def direction(self):

@@ -43,20 +43,16 @@ class Simulator(QObject):
 
     def _advance_to_next_marker(self) -> bool:
         """Move current/previous to the next switch-aware marker. Returns False if stuck."""
-        next_node = self._network.find_next_marker_node(
-            self._current_node_id, self._previous_node_id
-        )
+        next_node = self._network.find_next_marker_node(self._current_node_id, self._previous_node_id)
+
         if next_node is None:
             # Dead end: reverse by allowing the back-neighbor.
-            next_node = self._network.find_next_marker_node(
-                self._current_node_id, None
-            )
+            next_node = self._network.find_next_marker_node(self._current_node_id, None)
+
         if next_node is None:
-            print(
-                f"Simulator: no next marker from {self._current_node_id} "
-                f"(prev={self._previous_node_id})"
-            )
+            print(f"Simulator: no next marker from {self._current_node_id} (prev={self._previous_node_id})")
             return False
+
         self._previous_node_id = self._current_node_id
         self._current_node_id = next_node
         return True
@@ -154,9 +150,7 @@ class Simulator(QObject):
             while self._is_running:
                 color_hex = self._color_for_node(self._current_node_id)
                 if color_hex is None:
-                    print(
-                        f"Simulator: no color for node {self._current_node_id}"
-                    )
+                    print(f"Simulator: no color for node {self._current_node_id}")
                     return
 
                 color = QColor(color_hex)

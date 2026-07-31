@@ -150,9 +150,7 @@ class NetworkManager(QObject):
                 return True
         return False
 
-    def _resolve_exclude_neighbor(
-        self, at_node: str, from_node: str | None
-    ) -> str | None:
+    def _resolve_exclude_neighbor(self, at_node: str, from_node: str | None) -> str | None:
         """Map a previous marker/node to the graph neighbor used to enter at_node.
 
         If resolving would exclude the only neighbor (dead-end marker), return
@@ -206,9 +204,8 @@ class NetworkManager(QObject):
 
         # Trailing: entered via a switch branch — drop other switch-branch exits.
         if exclude_node is not None and self._edge_involves_switch(node_id, exclude_node):
-            non_branch = [
-                n for n in candidates if not self._edge_involves_switch(node_id, n)
-            ]
+            non_branch = [n for n in candidates if not self._edge_involves_switch(node_id, n)]
+
             if non_branch:
                 candidates = non_branch
 
@@ -242,9 +239,7 @@ class NetworkManager(QObject):
         a, b = sorted([node_id, next_node])
         return f"{a}:{b}"
 
-    def find_segments_to_next_marker(
-        self, from_node: str, exclude_node: str = None
-    ) -> list[str]:
+    def find_segments_to_next_marker(self, from_node: str, exclude_node: str = None) -> list[str]:
         """Segment ids from from_node through switch nodes until next marker."""
         segments, _ = self.walk_to_next_marker(from_node, exclude_node)
         return segments
@@ -254,9 +249,7 @@ class NetworkManager(QObject):
         _, next_marker = self.walk_to_next_marker(from_node, exclude_node)
         return next_marker
 
-    def walk_to_next_marker(
-        self, from_node: str, exclude_node: str = None
-    ) -> tuple[list[str], str | None]:
+    def walk_to_next_marker(self, from_node: str, exclude_node: str = None) -> tuple[list[str], str | None]:
         """Return (segment_ids, next_marker_node) or ([], None) if stuck."""
         if self._graph is None or from_node is None:
             return [], None
@@ -313,6 +306,4 @@ class NetworkManager(QObject):
         self.marker_warnings_changed.emit()
 
     marker_warnings_changed = Signal()
-    markerWarnings = Property(
-        "QStringList", marker_warnings, set_marker_warnings, notify=marker_warnings_changed
-    )
+    markerWarnings = Property("QStringList", marker_warnings, set_marker_warnings, notify=marker_warnings_changed)
