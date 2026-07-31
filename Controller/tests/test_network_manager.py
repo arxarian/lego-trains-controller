@@ -234,6 +234,34 @@ def test_resolve_exclude_neighbor_maps_marker_to_entry_edge():
     ) == "1A8"
 
 
+def test_trailing_at_stem_never_frog_crosses():
+    """Trailing into the stem from one branch continues to approach, not the other exit."""
+    rails, switch = _make_switch_y_layout()
+    approach, _switch_rail, exit_a, exit_b = rails._items
+    _force_take(approach, 8, "#ff0000")
+    _force_take(exit_a, 8, "#00ff00")
+    _force_take(exit_b, 8, "#0000ff")
+
+    net_manager = net.NetworkManager(rails)
+    net_manager.generate()
+
+    stem = "1-2"
+    assert net_manager._edge_involves_switch(stem, "2-3")
+    assert net_manager._edge_involves_switch(stem, "2-4")
+    assert not net_manager._edge_involves_switch(stem, "1A8")
+
+    for path_id in ("A", "B"):
+        switch.setSwitchPosition(path_id)
+        assert net_manager._select_next_node(stem, "2-3") == "1A8"
+        assert net_manager._select_next_node(stem, "2-4") == "1A8"
+
+    # Facing from approach still respects switch position.
+    switch.setSwitchPosition("A")
+    assert net_manager._select_next_node(stem, "1A8") == "2-3"
+    switch.setSwitchPosition("B")
+    assert net_manager._select_next_node(stem, "1A8") == "2-4"
+
+
 def test_find_segments_to_next_marker_covers_switch():
     """Approach → next marker reserves every edge through the junction."""
     rails, switch = _make_switch_y_layout()

@@ -141,6 +141,15 @@ class NetworkManager(QObject):
                 return False
         return True
 
+    def _edge_involves_switch(self, node_id: str, neighbor: str) -> bool:
+        """True if the edge includes any switch rail in segment_data."""
+        edge_data = self._graph.get_edge_data(node_id, neighbor) or {}
+        for rail_data in edge_data.get("segment_data", []):
+            rail = self._rails.findRailData(rail_data["rail_id"])
+            if rail is not None and rail.is_switch():
+                return True
+        return False
+
     def _resolve_exclude_neighbor(
         self, at_node: str, from_node: str | None
     ) -> str | None:
@@ -184,14 +193,25 @@ class NetworkManager(QObject):
     def _select_next_node(self, node_id: str, exclude_node: str = None) -> str | None:
         """Pick the next graph neighbor from node_id.
 
-        Switch position applies only when forking (multiple forward candidates).
-        A single forward hop is trailing and is always allowed.
+        Trailing into a switch (exclude is a branch edge): continue via stem only,
+        never across the frog onto another branch.
+        Facing from the stem (multiple branch candidates): use switch_position.
+        A single forward hop is always allowed.
         """
         neighbors = list(self._graph.neighbors(node_id))
         candidates = [n for n in neighbors if n != exclude_node]
         if not candidates:
             print(f"Network: No forward neighbor from {node_id} (excluding {exclude_node})")
             return None
+
+        # Trailing: entered via a switch branch — drop other switch-branch exits.
+        if exclude_node is not None and self._edge_involves_switch(node_id, exclude_node):
+            non_branch = [
+                n for n in candidates if not self._edge_involves_switch(node_id, n)
+            ]
+            if non_branch:
+                candidates = non_branch
+
         if len(candidates) == 1:
             return candidates[0]
 
