@@ -246,15 +246,15 @@ class NetworkManager(QObject):
         self, from_node: str, exclude_node: str = None
     ) -> list[str]:
         """Segment ids from from_node through switch nodes until next marker."""
-        segments, _ = self._walk_to_next_marker(from_node, exclude_node)
+        segments, _ = self.walk_to_next_marker(from_node, exclude_node)
         return segments
 
     def find_next_marker_node(self, from_node: str, exclude_node: str = None) -> str | None:
         """Walk switch-aware edges from from_node until the next marker node."""
-        _, next_marker = self._walk_to_next_marker(from_node, exclude_node)
+        _, next_marker = self.walk_to_next_marker(from_node, exclude_node)
         return next_marker
 
-    def _walk_to_next_marker(
+    def walk_to_next_marker(
         self, from_node: str, exclude_node: str = None
     ) -> tuple[list[str], str | None]:
         """Return (segment_ids, next_marker_node) or ([], None) if stuck."""

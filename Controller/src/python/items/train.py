@@ -15,6 +15,7 @@ class Train(QObject):
         self._device = device
         self._network = network
         self._current_segment_ids = []
+        self._leg_label = ""
         self._current_node_id = ""
         self._direction = "forward"
         self._position = QPointF()
@@ -34,17 +35,17 @@ class Train(QObject):
             print(f"Train: no marker node found for color {color_key}")
             return
 
-        new_segment_ids = self._network.find_segments_to_next_marker(
+        new_segment_ids, end_node = self._network.walk_to_next_marker(
             node_id, self._current_node_id or None
         )
-        if not new_segment_ids:
+        if not new_segment_ids or end_node is None:
             return
 
         self._network.unreserve_segments(self._current_segment_ids)
         self._network.reserve_segments(new_segment_ids)
 
         self.set_current_node_id(node_id)
-        self.set_current_segment_ids(new_segment_ids)
+        self.set_current_segment_ids(new_segment_ids, f"{node_id}:{end_node}")
         print(
             f"Train '{self._device.name}': reserved {new_segment_ids} "
             f"via node {node_id}"
@@ -86,50 +87,25 @@ class Train(QObject):
     def current_segment_ids(self):
         return list(self._current_segment_ids)
 
-    def set_current_segment_ids(self, value):
+    def set_current_segment_ids(self, value, leg_label: str | None = None):
         self._current_segment_ids = list(value) if value else []
+        if leg_label is not None:
+            self._leg_label = leg_label
+        elif not self._current_segment_ids:
+            self._leg_label = ""
+        elif len(self._current_segment_ids) == 1:
+            self._leg_label = self._current_segment_ids[0]
         self.current_segment_id_changed.emit()
 
-    def _reserved_path_endpoints(self) -> str:
-        """Display string: single segment id, or start:end of a multi-edge leg."""
-        ids = self._current_segment_ids
-        if not ids:
-            return ""
-        if len(ids) == 1:
-            return ids[0]
-
-        start = self._current_node_id
-        adj: dict[str, list[str]] = {}
-        for seg in ids:
-            a, b = seg.split(":", 1)
-            adj.setdefault(a, []).append(b)
-            adj.setdefault(b, []).append(a)
-
-        if not start or start not in adj:
-            # Fallback: any degree-1 node as start.
-            ends = [n for n, nbrs in adj.items() if len(nbrs) == 1]
-            if len(ends) >= 2:
-                return f"{ends[0]}:{ends[1]}"
-            return ids[0]
-
-        prev = None
-        node = start
-        while True:
-            nbrs = [n for n in adj.get(node, []) if n != prev]
-            if not nbrs:
-                break
-            prev, node = node, nbrs[0]
-        return f"{start}:{node}"
-
     def current_segment_id(self):
-        return self._reserved_path_endpoints()
+        return self._leg_label
 
     def set_current_segment_id(self, value):
         if not value:
-            self.set_current_segment_ids([])
+            self.set_current_segment_ids([], "")
             return
         self.set_current_segment_ids(
-            [s for s in str(value).split(";") if s]
+            [s for s in str(value).split(";") if s], str(value)
         )
 
     current_segment_id_changed = Signal()
