@@ -3,7 +3,9 @@
 from PySide6.QtCore import QObject, Slot
 from PySide6.QtQml import QQmlApplicationEngine
 
-from python.models.devices import Devices
+from python.models.train_devices import TrainDevices
+from python.models.switch_devices import SwitchDevices
+from python.hub_connector import HubConnector
 from python.network_manager import NetworkManager
 from python.models.project_storage import ProjectStorage
 from python.models.marker_types import MarkerTypes
@@ -13,24 +15,29 @@ from python.models.path_indicators_filter import PathIndicatorsFilter
 from python.models.trains import Trains
 from python.simulator import Simulator
 
+
 class AppContext:
     def __init__(self, engine: QQmlApplicationEngine):
         self.context = engine.rootContext()
 
         self.projectStorage = ProjectStorage()
-        self.devices = Devices()
+        self.trainDevices = TrainDevices()
+        self.switchDevices = SwitchDevices()
+        self.hubConnector = HubConnector(self.trainDevices, self.switchDevices)
         self.markerTypes = MarkerTypes()
         self.railTypes = RailTypes()
         self.network = NetworkManager(self.projectStorage.currentProject.rails)
         self.planner = Planner(self.projectStorage.currentProject.rails, self.network)
-        self.trains = Trains(self.network, self.devices)
+        self.trains = Trains(self.network, self.trainDevices)
         self.simulator = Simulator(self.network, self.trains)
 
         self.projectStorage.currentProject_changed.connect(self.updateProjectProperties)
         self.updateProjectProperties()
 
         self.setContextProperty("projectStorage", self.projectStorage)
-        self.setContextProperty("devices", self.devices)
+        self.setContextProperty("trainDevices", self.trainDevices)
+        self.setContextProperty("switchDevices", self.switchDevices)
+        self.setContextProperty("hubConnector", self.hubConnector)
         self.setContextProperty("network", self.network)
         self.setContextProperty("markerTypes", self.markerTypes)
         self.setContextProperty("railTypes", self.railTypes)
@@ -43,10 +50,10 @@ class AppContext:
 
     @Slot()
     def updateProjectProperties(self):
-            self.planner.updateRailsModel(self.projectStorage.currentProject.rails)
-            self.network.updateRailsModel(self.projectStorage.currentProject.rails)
-            self.setContextProperty("project", self.projectStorage.currentProject)
-            self.setContextProperty("settings", self.projectStorage.currentProject.settings)
-            self.setContextProperty("connectorRegister", self.projectStorage.currentProject.connectorRegister)
-            self.setContextProperty("rails", self.projectStorage.currentProject.rails)
-
+        self.planner.updateRailsModel(self.projectStorage.currentProject.rails)
+        self.network.updateRailsModel(self.projectStorage.currentProject.rails)
+        self.switchDevices.set_rails_model(self.projectStorage.currentProject.rails)
+        self.setContextProperty("project", self.projectStorage.currentProject)
+        self.setContextProperty("settings", self.projectStorage.currentProject.settings)
+        self.setContextProperty("connectorRegister", self.projectStorage.currentProject.connectorRegister)
+        self.setContextProperty("rails", self.projectStorage.currentProject.rails)

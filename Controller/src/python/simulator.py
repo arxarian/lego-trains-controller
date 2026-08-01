@@ -15,7 +15,7 @@ class Simulator(QObject):
         self._network = network
         self._trains = trains
         self._is_running = False
-        self._fake_device = None
+        self._sim_device = None
         self._train = None
         self._run_task = None
         self._current_node_id = None
@@ -59,10 +59,10 @@ class Simulator(QObject):
 
     @Slot()
     def onSpeedChanged(self):
-        if self._fake_device is None:
+        if self._sim_device is None:
             return
 
-        if self._fake_device.speed == 0:
+        if self._sim_device.speed == 0:
             self.pause_simulation()
             return
 
@@ -72,8 +72,8 @@ class Simulator(QObject):
         # 25 = 1.6
         # 50 = 0.8
         # 100 = 0.4
-        self._step_delay = 40 / self._fake_device.speed
-        print("speed changed", self._fake_device.speed, "simulation speed", self._step_delay)
+        self._step_delay = 40 / self._sim_device.speed
+        print("speed changed", self._sim_device.speed, "simulation speed", self._step_delay)
 
     def _cancel_run_task(self):
         if self._run_task and not self._run_task.done():
@@ -93,11 +93,11 @@ class Simulator(QObject):
         self._current_node_id = next(iter(color_map.values()))
         self._previous_node_id = None
         self._marker_consumed = False
-        self._fake_device = TrainDeviceSim(name="Simulator", parent=self)
-        self._fake_device.set_speed(30)
-        self._train = self._trains.add_train(self._fake_device)
-        self._fake_device.disconnected.connect(self.on_fake_device_disconnected)
-        self._fake_device.speed_changed.connect(self.onSpeedChanged)
+        self._sim_device = TrainDeviceSim(name="Simulator", parent=self)
+        self._sim_device.set_speed(30)
+        self._train = self._trains.add_train(self._sim_device)
+        self._sim_device.disconnected.connect(self.on_sim_device_disconnected)
+        self._sim_device.speed_changed.connect(self.onSpeedChanged)
 
         self.set_is_running(True)
         self._run_task = asyncio.ensure_future(self.run_loop())
@@ -116,20 +116,20 @@ class Simulator(QObject):
         if self._train and self._train._current_segment_ids:
             self._network.unreserve_segments(self._train._current_segment_ids)
 
-        if self._fake_device:
-            self._trains.remove_by_device(self._fake_device)
-            self._fake_device = None
+        if self._sim_device:
+            self._trains.remove_by_device(self._sim_device)
+            self._sim_device = None
             self._train = None
 
-    def on_fake_device_disconnected(self, device):
+    def on_sim_device_disconnected(self, device):
         if self._is_running:
             self.stop()
 
     def pause_simulation(self):
         """Stop advancing; keep reserved segment and last known position."""
         self._cancel_run_task()
-        if self._fake_device:
-            self._fake_device.set_color(TRANSPARENT_COLOR)
+        if self._sim_device:
+            self._sim_device.set_color(TRANSPARENT_COLOR)
 
     def unpause_simulation(self):
         if not self._is_running:
@@ -154,14 +154,14 @@ class Simulator(QObject):
                     return
 
                 color = QColor(color_hex)
-                self._fake_device.set_color(color)
+                self._sim_device.set_color(color)
                 self._marker_consumed = True
                 await asyncio.sleep(self._pause_delay)
 
                 if not self._is_running:
                     return
 
-                self._fake_device.set_color(TRANSPARENT_COLOR)
+                self._sim_device.set_color(TRANSPARENT_COLOR)
                 await asyncio.sleep(self._step_delay)
 
                 if not self._is_running:

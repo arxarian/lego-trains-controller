@@ -13,7 +13,7 @@ def _close_coro(coro):
     return MagicMock()
 
 
-def test_fake_device_set_color_skips_duplicate_emit():
+def test_sim_device_set_color_skips_duplicate_emit():
     device = TrainDeviceSim()
     emissions = []
     device.color_changed.connect(lambda: emissions.append(device.color))
@@ -37,7 +37,7 @@ def test_pause_keeps_reservation_and_resume_skips_consumed_marker():
     sim._current_node_id = "nodeA"
     sim._previous_node_id = None
     sim._marker_consumed = True
-    sim._fake_device = TrainDeviceSim()
+    sim._sim_device = TrainDeviceSim()
     sim._train = MagicMock()
     sim._train._current_segment_ids = ["nodeA:nodeB"]
     sim.set_is_running(True)
@@ -49,7 +49,7 @@ def test_pause_keeps_reservation_and_resume_skips_consumed_marker():
     assert sim._train._current_segment_ids == ["nodeA:nodeB"]
     assert sim.is_running is True
     assert sim._run_task is None
-    assert sim._fake_device.color == TRANSPARENT_COLOR
+    assert sim._sim_device.color == TRANSPARENT_COLOR
 
     with patch("python.simulator.asyncio.ensure_future", side_effect=_close_coro) as ensure_future:
         sim.unpause_simulation()
@@ -67,7 +67,7 @@ def test_unpause_does_not_start_second_loop_while_running():
     sim = Simulator(network, trains)
     sim._current_node_id = "nodeA"
     sim.set_is_running(True)
-    sim._fake_device = TrainDeviceSim()
+    sim._sim_device = TrainDeviceSim()
     first = MagicMock()
     first.done.return_value = False
     sim._run_task = first

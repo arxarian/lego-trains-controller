@@ -16,18 +16,6 @@ Item {
         ColumnLayout {
             anchors.fill: parent
 
-            Button {
-                text: "Disconnect"
-                onClicked: root.device.disconnect()
-                Layout.fillWidth: true
-            }
-
-            Button {
-                text: "Shut down"
-                onClicked: root.device.shutDown()
-                Layout.fillWidth: true
-            }
-
             Text {
                 text: "Speed " + speedSlider.value
                 Layout.alignment: Qt.AlignHCenter
