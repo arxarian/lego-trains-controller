@@ -20,6 +20,8 @@ keyboard.register(stdin)
 
 stdout.buffer.write(b"int")
 wait(10) # wait 10 ms for the int command to be sent
+stdout.buffer.write(b"roltrain")
+wait(10)
 
 while True:
 

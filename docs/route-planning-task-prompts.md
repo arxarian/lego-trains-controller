@@ -239,6 +239,8 @@ SW1/SW2 implementation, plan executor, BLE protocol changes for switches.
 
 GitHub: https://github.com/arxarian/lego-trains-controller/issues/164
 
+Protocol notes: [`Hubs/README.md`](../Hubs/README.md). Often shipped together with SW2 (#150).
+
 **Prompt:**
 
 ```
@@ -849,7 +851,7 @@ Implement the real BLE switch hub device and wire it into the SW1 assignment flo
 SW1 (actuator interface + assignment UI). A1 logical state.
 
 ## Context
-Train BLE: bleak + GATT c5f50002-8280-46da-89f4-6d8051e4aeef; see items/device.py, TrainHub/main.py. Switch hub is a similar CityHub/Pybricks device but commands set turnout A/B instead of motor speed.
+Train BLE: bleak + GATT c5f50002-8280-46da-89f4-6d8051e4aeef; see items/ble_device.py, Hubs/TrainHub/main.py. Switch hub is a similar CityHub/Pybricks device but commands set turnout A/B instead of motor speed.
 
 ## Requirements
 1. Minimal host↔hub protocol: set_position(A|B), optional ack/state; document next to firmware.
@@ -857,7 +859,7 @@ Train BLE: bleak + GATT c5f50002-8280-46da-89f4-6d8051e4aeef; see items/device.p
 3. Discover/connect flow analogous to trains (reuse Devices patterns where sensible, or a SwitchDevices discover path).
 4. Assignment UI from SW1: “Assign detected switch” lists connected real hubs not yet bound.
 5. Logical rail change → BLE command when bound and connected; failures log clearly without crashing UI.
-6. Firmware sketch under TrainHub/ or SwitchHub/ (MicroPython) — keep intelligence in the Controller.
+6. Firmware under Hubs/SwitchHub/ (MicroPython) — keep intelligence in the Controller. See also Hubs/README.md.
 
 ## Acceptance
 - Mockable send path in tests; manual QA checklist with a real hub optional.
