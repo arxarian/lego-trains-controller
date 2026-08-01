@@ -61,5 +61,6 @@ while True:
         hub.system.shutdown()
     elif cmd == b"vol":
         stdout.buffer.write(b"vol" + hub.battery.voltage().to_bytes(2, 'big'))
+        wait(10)  # flush before next rdy (avoid coalesced vol+rdy notify)
     else:
         train_motor.stop()

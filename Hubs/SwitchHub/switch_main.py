@@ -36,6 +36,7 @@ def set_position(letter):
     switch_motor.stop()
     current_position = letter
     stdout.buffer.write(b"pos" + current_position)
+    wait(10)  # flush before next rdy (avoid coalesced pos+rdy notify)
 
 
 while True:
@@ -55,5 +56,6 @@ while True:
         hub.system.shutdown()
     elif cmd == b"vol":
         stdout.buffer.write(b"vol" + hub.battery.voltage().to_bytes(2, "big"))
+        wait(10)  # flush before next rdy (avoid coalesced vol+rdy notify)
     else:
         switch_motor.stop()
