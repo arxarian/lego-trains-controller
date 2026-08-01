@@ -40,6 +40,7 @@ while True:
             lastSentColor = color
             strColor = str(color).split('.')[-1]
             stdout.buffer.write(b"clr" + bytes(strColor, "utf-8"))
+            wait(10)  # flush before next stdout (avoid coalesced clr+rdy)
 
         lastColor = color
 
