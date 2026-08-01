@@ -2,10 +2,12 @@
 
 CityHub programs that talk to the LEGO Trains Controller over BLE.
 
-| Folder | Role | Purpose |
+| Folder / entry script | Role | Purpose |
 |---|---|---|
-| [`TrainHub/`](TrainHub/) | `train` | Drive motor + color sensor |
-| [`SwitchHub/`](SwitchHub/) | `switch` | Throw a turnout (position A/B) |
+| [`TrainHub/train_main.py`](TrainHub/train_main.py) | `train` | Drive motor + color sensor |
+| [`SwitchHub/switch_main.py`](SwitchHub/switch_main.py) | `switch` | Throw a turnout (position A/B) |
+
+Entry scripts use unique names (`train_main` / `switch_main`) so both can exist in [Pybricks Code](https://code.pybricks.com/) without colliding on `main.py`. Open the matching file, connect the hub, download/run.
 
 ## Framing
 

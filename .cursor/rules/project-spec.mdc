@@ -52,7 +52,7 @@ Each connected LEGO hub becomes a `Train`. A train holds a reference to its `Dev
 - **Protocol**: Pybricks GATT characteristic `c5f50002-8280-46da-89f4-6d8051e4aeef`
 - **Host → Hub**: `0x06` + 3-byte command + optional data. Commands: `fwd` (forward + 2-byte speed), `rev` (reverse + 2-byte speed), `bye` (disconnect), `sht` (shutdown), `vol` (request voltage)
 - **Hub → Host**: `0x01` prefix + payload. Payloads: `rdy` (ready for command), `clr` + color name (sensor reading), `vol` + 2-byte voltage, `int` (initialized), `rol` + role (`train`/`switch`)
-- Hub firmware is MicroPython (Pybricks) under `Hubs/` (`Hubs/TrainHub/main.py`, `Hubs/SwitchHub/main.py`)
+- Hub firmware is MicroPython (Pybricks) under `Hubs/` (`Hubs/TrainHub/train_main.py`, `Hubs/SwitchHub/switch_main.py`)
 
 ### Planner (Route Planning)
 
@@ -130,11 +130,11 @@ trains/
 ├── Hubs/                              # LEGO hub firmwares (MicroPython / Pybricks)
 │   ├── README.md                      # Shared host↔hub protocol + role handshake
 │   ├── TrainHub/                      # Train motor + color sensor
-│   │   ├── main.py
+│   │   ├── train_main.py
 │   │   ├── colors.py
 │   │   └── tests.py
 │   └── SwitchHub/                     # Switch turnout actuator
-│       └── main.py
+│       └── switch_main.py
 └── RailwaysGraphics/                  # SVG assets
 ```
 

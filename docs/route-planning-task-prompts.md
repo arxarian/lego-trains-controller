@@ -851,7 +851,7 @@ Implement the real BLE switch hub device and wire it into the SW1 assignment flo
 SW1 (actuator interface + assignment UI). A1 logical state.
 
 ## Context
-Train BLE: bleak + GATT c5f50002-8280-46da-89f4-6d8051e4aeef; see items/ble_device.py, Hubs/TrainHub/main.py. Switch hub is a similar CityHub/Pybricks device but commands set turnout A/B instead of motor speed.
+Train BLE: bleak + GATT c5f50002-8280-46da-89f4-6d8051e4aeef; see items/ble_device.py, Hubs/TrainHub/train_main.py. Switch hub is a similar CityHub/Pybricks device but commands set turnout A/B instead of motor speed.
 
 ## Requirements
 1. Minimal host↔hub protocol: set_position(A|B), optional ack/state; document next to firmware.
