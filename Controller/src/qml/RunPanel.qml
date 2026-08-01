@@ -8,21 +8,6 @@ Item {
         spacing: 2
 
         Button {
-            text: "Discover"
-            onClicked: devices.discover()
-        }
-
-        Button {
-            text: "Connect to Pybricks Hub"
-            onClicked: devices.connect_to("Pybricks Hub")
-        }
-
-        Button {
-            text: "Connect to Express Train"
-            onClicked: devices.connect_to("Express Train")
-        }
-
-        Button {
             text: simulator.is_running ? "\u23F9 Stop Simulation" : "\u25B6 Simulate"
             enabled: network.has_graph
             onClicked: simulator.is_running ? simulator.stop() : simulator.start()

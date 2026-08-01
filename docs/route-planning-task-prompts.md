@@ -30,7 +30,8 @@ Implement issues in order within each slice; do not start a slice before its dep
 ### Phase 0 — Foundations
 1. **F0** #114 (**S**, —)  
 2. **F1** #154 (**M**, —)  
-3. **F2** #68 marker clustering (**M–L**, needs F0) — P2 / after first Auto demo (capacity upgrade; not critical path)
+3. **F3** #164 hub role identification (**S–M**, F1) — needed for shared Discover → route train vs switch  
+4. **F2** #68 marker clustering (**M–L**, needs F0) — P2 / after first Auto demo (capacity upgrade; not critical path)
 
 Editor multi-color chip and other UX/UI polish: see GitHub epic **[#158](https://github.com/arxarian/lego-trains-controller/issues/158)** (not part of this foundations slice).
 
@@ -44,9 +45,9 @@ Editor multi-color chip and other UX/UI polish: see GitHub epic **[#158](https:/
 7. B2 (**M**, B1.2) later
 
 ### Phase 3 — Switches + plan UI
-8. SW1 (**L**, A1.1) → C2.1 (**S–M**, A1.1) → C2.2 (**M–L**)  
+8. SW1 (**L**, A1.1; F3 for HW role routing) → C2.1 (**S–M**, A1.1) → C2.2 (**M–L**)  
 9. C1.1 (**M**, B1.1) → C1.2 (**M**, C1.1)  
-10. SW2 (**L**, SW1) when hardware ready
+10. SW2 (**L**, SW1) when hardware ready; pairs with F3 switch role on hub
 
 ### Phase 4 — Multi-train + polish
 11. S3 (**L–XL**) → E3 (**M**) → E1/E2 (**M**); E4 (**S**) design only  
@@ -230,6 +231,42 @@ None. Prefer before S1/S2/S3. SW1 uses the switch role separately.
 
 ## Out of scope
 SW1/SW2 implementation, plan executor, BLE protocol changes for switches.
+```
+
+---
+
+## Issue F3 — Hub role identification (train vs switch)
+
+GitHub: https://github.com/arxarian/lego-trains-controller/issues/164
+
+**Prompt:**
+
+```
+After BLE connect, the hub enumerates its role (`train` or `switch`) so the host can append it to `TrainDevices` or `SwitchDevices` without the user choosing.
+
+## Depends on
+F1 (#154). Complements SW1 (#149) HubConnector connect→route; real switch role handshake pairs with SW2 (#150).
+
+## Context
+Shared Discover uses one Connect. Scan alone cannot tell train vs switch. Role must come from the hub after connect. Simulated hubs already expose a fixed `role` property in SW1.
+
+## Requirements
+1. Document host↔hub role payload in init handshake (next to firmware / protocol notes).
+2. HubConnector waits for role after connect, then routes to `TrainDevices` or `SwitchDevices`.
+3. Train hub firmware reports `train` (migrate from implicit `int`-only init if needed).
+4. Switch hub reports `switch` (can land with SW2 firmware; host must accept the role when present).
+5. Unknown/timeout: fail safely (log and disconnect; do not invent a role as the wrong type).
+6. Smoke test that routing uses sim `role` (`TrainDeviceSim` / `SwitchDeviceSim`).
+
+## Acceptance
+- Train hub → `TrainDevices` (Trains auto-wrap as today).
+- Switch hub → `SwitchDevices`.
+- User never picks "connect as train/switch" in Discover.
+- Sims with `role` route correctly in a unit/smoke test.
+- Protocol documented for firmware implementers.
+
+## Out of scope
+Full switch motor `set_position` BLE protocol (SW2), switch-rail assign UI (SW1), multi-train sim, interlocking.
 ```
 
 ---
@@ -990,6 +1027,7 @@ Design-only or later implementation: allow meets at sidings; reserve only to nex
 | C1.2 | feat(ui): click canvas marker to add order |
 | C2.1 | feat(ui): click switch to toggle logical position |
 | C2.2 | feat(switch): Manual/Auto mode + lock on reserved leg |
+| F3 | feat(device): hub role identification (train vs switch) |
 | SW1 | feat(switch): sim/real actuators + assign to graph switches |
 | SW2 | feat(device): BLE switch hub (real actuator) |
 | S1 | feat(sim): path-aware single simulated train |

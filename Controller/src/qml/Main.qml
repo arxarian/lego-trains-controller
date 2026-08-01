@@ -41,6 +41,7 @@ ApplicationWindow {
 
             TabButton { text: "Run Mode" }
             TabButton { text: "Edit Mode" }
+            TabButton { text: "Devices" }
             TabButton { text: "Debug Features" }
         }
 
@@ -52,6 +53,7 @@ ApplicationWindow {
 
             TrackCanvas {
                 anchors.fill: parent
+                visible: tabBar.currentIndex !== 2
             }
 
             RunPanel {
@@ -69,11 +71,18 @@ ApplicationWindow {
                 z: 1
             }
 
+            DevicesPanel {
+                anchors.fill: parent
+                anchors.margins: 8
+                visible: tabBar.currentIndex === 2
+                z: 1
+            }
+
             DebugPanel {
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.margins: 5
-                visible: tabBar.currentIndex === 2
+                visible: tabBar.currentIndex === 3
                 z: 1
             }
         }
@@ -87,7 +96,7 @@ ApplicationWindow {
         width: Overlay.overlay.width - 40
 
         Connections {
-            target: devices
+            target: hubConnector
             function onOpenDiscoverPopup() {
                 discoveredDevicesPopup.open()
             }

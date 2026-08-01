@@ -23,7 +23,7 @@ Popup {
                 id: view
                 anchors.fill: parent
                 anchors.margins: 15
-                model: devices.discovered
+                model: hubConnector.discovered
                 delegate: Rectangle {
                     height: 30
                     width: view.width
@@ -66,7 +66,7 @@ Popup {
                 enabled: view.currentIndex > -1
                 text: "Connect"
                 onClicked: {
-                    devices.connect_to(devices.discovered[view.currentIndex])
+                    hubConnector.connect_to(hubConnector.discovered[view.currentIndex])
                     root.close()
                 }
             }

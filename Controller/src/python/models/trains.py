@@ -7,10 +7,10 @@ class Trains(ObjectBasedModel[Train]):
 
     _item_class = Train
 
-    def __init__(self, network, devices, parent=None):
+    def __init__(self, network, train_devices, parent=None):
         super().__init__(parent)
         self._network = network
-        devices.device_connected.connect(self.add_train)
+        train_devices.device_connected.connect(self.add_train)
 
     def add_train(self, device):
         train = Train(device=device, network=self._network, parent=self)

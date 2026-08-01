@@ -88,6 +88,11 @@ class TrainDevice(QObject):
 
     name = Property(str, name, set_name, notify=name_changed)
 
+    def role(self):
+        return "train"
+
+    role = Property(str, role, constant=True)
+
     @Slot()
     def disconnect(self):
         self.disconnected.emit(self)
