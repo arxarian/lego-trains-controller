@@ -25,7 +25,6 @@ class TrainDeviceHW(TrainDevice):
         self._ble = ble if ble is not None else BleDevice(client)
         asyncio.create_task(self._set_rx_method())
         asyncio.create_task(self._async_voltage_status())
-        print("Start the program on the hub now with the button")
 
     @property
     def client(self):

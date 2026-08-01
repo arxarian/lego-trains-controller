@@ -14,6 +14,27 @@ from python.items.switch_device_hw import SwitchDeviceHW
 ROLE_WAIT_TIMEOUT_S = 15
 
 
+def _role_from_stdout_payload(buf: bytes) -> str | None:
+    """Extract train/switch role from a stdout payload (may be coalesced)."""
+    if b"roltrain" in buf:
+        return "train"
+    if b"rolswitch" in buf:
+        return "switch"
+    idx = buf.find(b"rol")
+    if idx == -1:
+        return None
+    role = buf[idx + 3 :].decode("utf-8", errors="replace").strip().lower()
+    # Trim if another tag follows (e.g. rdy)
+    for stop in (b"rdy", b"int", b"vol", b"clr", b"pos"):
+        cut = role.find(stop.decode())
+        if cut != -1:
+            role = role[:cut]
+    role = role.strip()
+    if role in ("train", "switch"):
+        return role
+    return None
+
+
 class HubConnector(QObject):
     """Role-neutral BLE discover/connect. Routes hubs into TrainDevices or SwitchDevices."""
 
@@ -51,24 +72,21 @@ class HubConnector(QObject):
         asyncio.create_task(async_discover())
 
     async def _wait_for_role(self, ble: BleDevice) -> str | None:
-        """Probe notifications until rol payload arrives or timeout."""
+        """Subscribe, start user program, wait for rol handshake."""
         role_future: asyncio.Future[str] = asyncio.get_running_loop().create_future()
 
         def handle_rx(_, data: bytearray):
             if not data or data[0] != 0x01:
                 return
-            payload = data[1:4]
-            if payload == b"rdy":
+            buf = bytes(data[1:])
+            if b"rdy" in buf:
                 ble.ready_event.set()
-            elif payload == b"rol":
-                role = data[4:].decode("utf-8", errors="replace").strip().lower()
-                if not role_future.done():
-                    role_future.set_result(role)
-            elif payload == b"int":
-                # Wait for rol that follows int; ignore here.
-                pass
+            role = _role_from_stdout_payload(buf)
+            if role is not None and not role_future.done():
+                role_future.set_result(role)
 
         await ble.start_notify(handle_rx)
+        await ble.start_user_program()
         try:
             return await asyncio.wait_for(role_future, timeout=ROLE_WAIT_TIMEOUT_S)
         except asyncio.TimeoutError:
@@ -76,7 +94,7 @@ class HubConnector(QObject):
 
     @Slot(str)
     def connect_to(self, hub_name):
-        """Connect, wait for hub role handshake, route to train or switch model."""
+        """Connect, auto-start hub program, wait for role, route to train or switch."""
         print("Wanna connect to", hub_name)
 
         async def async_connect_to():
@@ -94,7 +112,7 @@ class HubConnector(QObject):
                 print("Connection to", hub_name, "failed")
                 return
 
-            print("Connected — waiting for hub role (start the program on the hub)")
+            print("Connected — waiting for hub role (starting program…)")
             ble = BleDevice(client)
             role = await self._wait_for_role(ble)
             target = resolve_hub_target(role)
@@ -102,7 +120,7 @@ class HubConnector(QObject):
             if target is None:
                 print(
                     f"Hub role handshake failed for {hub_name!r} "
-                    f"(got {role!r}); disconnecting"
+                    f"(got {role!r}); is the program downloaded? Disconnecting."
                 )
                 try:
                     await client.disconnect()
@@ -111,18 +129,17 @@ class HubConnector(QObject):
                 return
 
             if target == "train":
-                print(f"Routing {hub_name} as train")
+                print(f"{hub_name} ready (train)")
                 hw = TrainDeviceHW(
                     client=client,
                     hub_name=hub_name,
                     parent=self._train_devices,
                     ble=ble,
                 )
-                # int already observed before rol during probe
                 hw.set_initialized(True)
                 self._train_devices.append(hw)
             else:
-                print(f"Routing {hub_name} as switch")
+                print(f"{hub_name} ready (switch)")
                 hw = SwitchDeviceHW(
                     client=client,
                     hub_name=hub_name,

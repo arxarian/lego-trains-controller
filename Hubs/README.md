@@ -7,7 +7,9 @@ CityHub programs that talk to the LEGO Trains Controller over BLE.
 | [`TrainHub/train_main.py`](TrainHub/train_main.py) | `train` | Drive motor + color sensor |
 | [`SwitchHub/switch_main.py`](SwitchHub/switch_main.py) | `switch` | Throw a turnout (position A/B) |
 
-Entry scripts use unique names (`train_main` / `switch_main`) so both can exist in [Pybricks Code](https://code.pybricks.com/) without colliding on `main.py`. Open the matching file, connect the hub, download/run.
+Entry scripts use unique names (`train_main` / `switch_main`) so both can exist in [Pybricks Code](https://code.pybricks.com/) without colliding on `main.py`. Open the matching file, connect the hub, and **download** the program once.
+
+After that, the Controller starts the downloaded program over BLE (`START_USER_PROGRAM`) when you Connect — no hub button press required (hub must still be powered on and advertising).
 
 ## Framing
 

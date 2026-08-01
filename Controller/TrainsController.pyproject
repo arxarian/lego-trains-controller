@@ -13,6 +13,7 @@
         "tests/test_switch_device.py",
         "tests/test_switch_device_hw.py",
         "tests/test_hub_role.py",
+        "tests/test_ble_device.py",
         "src/main.py",
         "src/projects/rails.json",
         "src/resources/rails_rc.py",
