@@ -47,11 +47,12 @@ Editor multi-color chip and other UX/UI polish: see GitHub epic **[#158](https:/
 ### Phase 3 — Switches + plan UI
 8. SW1 (**L**, A1.1; F3 for HW role routing) → C2.1 (**S–M**, A1.1) → C2.2 (**M–L**)  
 9. C1.1 (**M**, B1.1) → C1.2 (**M**, C1.1)  
-10. SW2 (**L**, SW1) when hardware ready; pairs with F3 switch role on hub
+10. SW2 (**L**, SW1) when hardware ready; pairs with F3 switch role on hub  
+11. SW3 (**L**, SW2) one hub → up to four turnouts (multi-channel)
 
 ### Phase 4 — Multi-train + polish
-11. S3 (**L–XL**) → E3 (**M**) → E1/E2 (**M**); E4 (**S**) design only  
-12. **F2** #68 (**M–L**, F0) when layouts outgrow ~5 unique single-color markers; editor chip #157 lives under UX/UI epic #158
+12. S3 (**L–XL**) → E3 (**M**) → E1/E2 (**M**); E4 (**S**) design only  
+13. **F2** #68 (**M–L**, F0) when layouts outgrow ~5 unique single-color markers; editor chip #157 lives under UX/UI epic #158
 
 ### Architecture constraints (do not violate)
 - **Auto owns motion** when Automatic; sim only emits colors along the reserved leg; Manual = today’s slider, pause executor later (B2).  
@@ -866,7 +867,40 @@ Train BLE: bleak + GATT c5f50002-8280-46da-89f4-6d8051e4aeef; see items/ble_devi
 - Simulated and real actuators interchangeable at the binding layer.
 
 ## Out of scope
-One hub driving multiple turnouts, planning, sim trains.
+One hub driving multiple turnouts (see SW3 #167), planning, sim trains.
+```
+
+---
+
+## Issue SW3 — One switch hub drives up to four turnouts
+
+GitHub: https://github.com/arxarian/lego-trains-controller/issues/167
+
+**Prompt:**
+
+```
+One BLE switch hub should bind to and actuate up to four switch rails (channels), not only the SW2 1 hub ↔ 1 rail MVP.
+
+## Depends on
+SW2 (#150) — done.
+
+## Context
+SW2 delivered a real switch hub with 1:1 rail binding. City Hub has 2 motor ports; Technic-style hubs can have 4. Protocol and host assignment must address a channel (0–3 / A–D) plus turnout path A|B. See Hubs/SwitchHub/, SwitchDeviceHW, SW1 assign UI.
+
+## Requirements
+1. Protocol: extend set_position (or equivalent) with a channel/port id (0–3); document in Hubs/README.md / SwitchHub firmware.
+2. Firmware: drive up to N≤4 motors (ports present on the hub); unused channels idle.
+3. Host: SwitchDeviceHW (and sim) supports multiple channel→rail bindings on one device.
+4. Assignment UI: bind multiple unbound switch rails to channels on the same connected hub; unbind/reassign per channel.
+5. Tests: mockable send path asserts channel + path in the BLE payload.
+
+## Acceptance
+- One hub toggles up to four assigned rails independently.
+- Unbind/reassign works per channel without dropping the whole hub.
+- Simulated and real multi-channel actuators stay interchangeable at the binding layer.
+
+## Out of scope
+Planning/interlocking beyond calling set_position per rail; more than four channels; auto-discovery of which motor is which physical turnout.
 ```
 
 ---
@@ -1032,6 +1066,7 @@ Design-only or later implementation: allow meets at sidings; reserve only to nex
 | F3 | feat(device): hub role identification (train vs switch) |
 | SW1 | feat(switch): sim/real actuators + assign to graph switches |
 | SW2 | feat(device): BLE switch hub (real actuator) |
+| SW3 | feat(device): one switch hub drives up to four turnouts |
 | S1 | feat(sim): path-aware single simulated train |
 | S2 | feat(sim): plan route for one simulated train |
 | S3 | feat(sim): multiple simulated trains + planning |
