@@ -19,10 +19,10 @@ VOLTAGE_REFRESH_INTERVAL = 60
 class TrainDeviceHW(TrainDevice):
     """Real BLE train hub."""
 
-    def __init__(self, client, hub_name="unknown", parent=None):
+    def __init__(self, client, hub_name="unknown", parent=None, *, ble=None):
         super().__init__(name=hub_name, initialized=False, minimal_speed=-100, parent=parent)
 
-        self._ble = BleDevice(client)
+        self._ble = ble if ble is not None else BleDevice(client)
         asyncio.create_task(self._set_rx_method())
         asyncio.create_task(self._async_voltage_status())
         print("Start the program on the hub now with the button")
@@ -70,6 +70,8 @@ class TrainDeviceHW(TrainDevice):
                         self.set_color(QColor(color))
                 elif payload == b"int":
                     self.set_initialized(True)
+                elif payload == b"rol":
+                    pass
                 else:
                     print("Received:", payload)
 

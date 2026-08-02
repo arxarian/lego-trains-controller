@@ -1,0 +1,11 @@
+---
+description: Keep test-only helpers in tests/, not in production src/
+alwaysApply: true
+---
+
+# Test-only helpers
+
+- Do **not** put test-only helpers in `Controller/src/` (or other production trees).
+- Put them in the relevant `tests/` file, or `tests/helpers/` if shared across multiple test modules.
+- If a function is used by both production and tests, keep it in `src/` with a normal docstring — do not label it “test only”.
+- When adding a seam “just for unit tests,” prefer defining it next to the tests unless production code must call it.

@@ -37,12 +37,12 @@ Item {
                         onClicked: hubConnector.discover()
                     }
                     Button {
-                        text: "Connect to Pybricks Hub"
-                        onClicked: hubConnector.connect_to("Pybricks Hub")
+                        text: "Connect to Switch"
+                        onClicked: hubConnector.connect_to("City Hub 2")
                     }
                     Button {
                         text: "Connect to Express Train"
-                        onClicked: hubConnector.connect_to("Express Train")
+                        onClicked: hubConnector.connect_to("City Hub 1")
                     }
                     Item { Layout.fillWidth: true }
                 }
@@ -113,11 +113,26 @@ Item {
                                 text: object.name
                                       + (object.isSimulated ? " [sim]" : " [hw]")
                                       + " — " + object.boundRailLabel
+                                      + " — pos " + object.position
                                 Layout.fillWidth: true
+                            }
+                            Button {
+                                text: "A"
+                                highlighted: object.position === "A"
+                                onClicked: object.setPosition("A")
+                            }
+                            Button {
+                                text: "B"
+                                highlighted: object.position === "B"
+                                onClicked: object.setPosition("B")
                             }
                             Button {
                                 text: "Disconnect"
                                 onClicked: object.disconnect()
+                            }
+                            Button {
+                                text: "Shut down"
+                                onClicked: object.shutDown()
                             }
                         }
                     }
