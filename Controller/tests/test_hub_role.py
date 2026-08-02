@@ -1,7 +1,7 @@
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from python.hub_role import resolve_hub_target, route_device_by_role
+from python.hub_role import resolve_hub_target
 from python.items.train_device_sim import TrainDeviceSim
 from python.items.switch_device_sim import SwitchDeviceSim
 from python.models.train_devices import TrainDevices
@@ -12,6 +12,18 @@ from python.models.switch_devices import SwitchDevices
 def ensure_qapp():
     app = QApplication.instance() or QApplication([])
     yield app
+
+
+def route_device_by_role(role: str | None, train_devices, switch_devices, device):
+    """Test helper: append device to TrainDevices or SwitchDevices based on role."""
+    target = resolve_hub_target(role)
+    if target == "train":
+        train_devices.append(device)
+        return target
+    if target == "switch":
+        switch_devices.append(device)
+        return target
+    return None
 
 
 @pytest.mark.parametrize(

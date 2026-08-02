@@ -16,19 +16,3 @@ def resolve_hub_target(role: str | None) -> HubTarget | None:
     if normalized in KNOWN_ROLES:
         return normalized  # type: ignore[return-value]
     return None
-
-
-def route_device_by_role(role: str | None, train_devices, switch_devices, device):
-    """Append device to TrainDevices or SwitchDevices based on role.
-
-    Returns the target name ('train'/'switch'), or None if role is unknown
-    (device is not appended).
-    """
-    target = resolve_hub_target(role)
-    if target == "train":
-        train_devices.append(device)
-        return target
-    if target == "switch":
-        switch_devices.append(device)
-        return target
-    return None
