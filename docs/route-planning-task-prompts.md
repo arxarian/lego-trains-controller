@@ -81,6 +81,7 @@ These decisions are final for MVP:
 | Switch modes | Per-switch **Manual** \| **Automatic** (logical first) |
 | Physical switches | Later; same style BLE hub as trains — not in early slices |
 | Auto speed | Reuse last non-zero speed; fallback constant (e.g. 40) |
+| Auto travel direction | Prefer continue **forward** along arrival direction (same `exclude_node` idea as NetworkManager). Reverse only at **dead-ends** (sole neighbor). Executor sets signed speed (`fwd`/`rev`) to match the reserved leg’s first hop. Mid-leg reverse forbidden. |
 | Manual during plan | **Pause** executor; keep orders; release current leg reservation |
 | Persist orders | Session-only in MVP |
 | First verification | Simulator first, then real hub |
@@ -605,6 +606,11 @@ A2 (compute_leg), A3 (try_reserve_leg), B1.1 (orders on Train). A1 for correct b
 - Between markers position unknown — only advance on color events.
 - Must have known current_node_id before starting Auto; else wait until first localization.
 - Manual mid-run (if mode exists): Pause — release leg, keep orders, speed manual. If mode API not ready, provide pause()/resume() on executor.
+- Track previous_node (node the train arrived from), same semantics as NetworkManager exclude_node.
+- Before Moving on a reserved leg: first hop of leg.nodes must not be back along previous_node, unless current node is a dead-end (only one graph neighbor) — then reverse is allowed.
+- If the computed leg’s first hop would reverse and the node is not a dead-end → do not depart; Hold with a clear reason (do not start Moving in reverse on a multi-way junction).
+- When Moving: set device direction/signed speed so physical motion matches that first hop (fwd vs rev); keep magnitude = last non-zero or fallback 40.
+- At switches while executing, rely on existing NetworkManager trailing/facing rules (stem-only when trailing; never across the frog). Do not reimplement frog logic inside the executor.
 
 ## Architecture guidance
 - Prefer a PlanExecutor class (QObject) owned by Train or Planner/AppContext, not a giant ball of logic in Device.
@@ -618,10 +624,14 @@ Extend or cooperate with Simulator so an Auto train can be tested: FakeDevice co
 ## Acceptance
 - With two waypoints and free track: Auto train reserves leg, "moves" (speed > 0), on fake color at destination waits, loops.
 - Second owner holding overlapping leg → executor stays Hold (speed 0) until free.
+- Non-dead-end: Auto does not depart a leg whose first hop reverses against previous_node (Hold / no reverse start).
+- Dead-end: reverse to continue the order list is allowed.
+- Moving uses correct signed speed for the leg’s first hop.
 - No QML required beyond existing speed display.
 
 ## Out of scope
 Canvas order editing UI (C1), switch click UI (C2), physical hubs, order persistence.
+Changing compute_leg graph search / A2.2 required_switches (planner stays undirected; orientation is executor-side at depart time).
 ```
 
 ---
