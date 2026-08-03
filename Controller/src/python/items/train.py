@@ -1,14 +1,26 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QObject, Property, Signal, QPointF
+from enum import IntEnum
+
+from PySide6.QtCore import QObject, Property, Signal, Slot, QPointF, QEnum
 from PySide6.QtQml import QmlElement
+
+from python.items.order import Order
+from python.models.orders import Orders
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
 
+@QEnum
+class ControlMode(IntEnum):
+    Manual = 1
+    Automatic = 2
+
+
 @QmlElement
 class Train(QObject):
+    QEnum(ControlMode)
 
     def __init__(self, device, network, parent=None):
         super().__init__(parent)
@@ -19,6 +31,9 @@ class Train(QObject):
         self._current_node_id = ""
         self._direction = "forward"
         self._position = QPointF()
+        self._orders = Orders(parent=self)
+        self._current_order_index = 0
+        self._control_mode = ControlMode.Manual
 
         device.color_changed.connect(self.on_color_changed)
 
@@ -116,3 +131,82 @@ class Train(QObject):
 
     direction_changed = Signal()
     direction = Property(str, direction, set_direction, notify=direction_changed)
+
+    def orders(self):
+        return self._orders
+
+    orders = Property(QObject, orders, constant=True)
+
+    def current_order_index(self):
+        return self._current_order_index
+
+    def set_current_order_index(self, value):
+        value = int(value)
+        if self._current_order_index != value:
+            self._current_order_index = value
+            self.current_order_index_changed.emit()
+
+    current_order_index_changed = Signal()
+    current_order_index = Property(
+        int, current_order_index, set_current_order_index, notify=current_order_index_changed
+    )
+
+    def control_mode(self):
+        return self._control_mode
+
+    def set_control_mode(self, value):
+        value = ControlMode(int(value))
+        if self._control_mode != value:
+            self._control_mode = value
+            self.control_mode_changed.emit()
+
+    control_mode_changed = Signal()
+    control_mode = Property(int, control_mode, set_control_mode, notify=control_mode_changed)
+
+    def _clamp_current_order_index(self):
+        count = self._orders.rowCount()
+        if count == 0:
+            self.set_current_order_index(0)
+        elif self._current_order_index >= count:
+            self.set_current_order_index(count - 1)
+
+    @Slot(str, float)
+    def add_order(self, node_id: str, wait_seconds: float = 0.0):
+        self._orders.append(Order(node_id, wait_seconds, parent=self._orders))
+
+    @Slot(int)
+    def remove_order(self, index: int):
+        order = self._orders.get(index)
+        if order is None:
+            return
+
+        self._orders.remove(order)
+        if index < self._current_order_index:
+            self.set_current_order_index(self._current_order_index - 1)
+        else:
+            self._clamp_current_order_index()
+
+    @Slot(int, int)
+    def move_order(self, from_index: int, to_index: int):
+        if not self._orders.move(from_index, to_index):
+            return
+
+        current = self._current_order_index
+        if current == from_index:
+            self.set_current_order_index(to_index)
+        elif from_index < current <= to_index:
+            self.set_current_order_index(current - 1)
+        elif to_index <= current < from_index:
+            self.set_current_order_index(current + 1)
+
+    @Slot()
+    def clear_orders(self):
+        self._orders.clear()
+        self.set_current_order_index(0)
+
+    @Slot(int, float)
+    def set_wait(self, index: int, seconds: float):
+        order = self._orders.get(index)
+        if order is None:
+            return
+        order.set_wait_seconds(seconds)
