@@ -154,6 +154,19 @@ Item {
             Layout.fillWidth: true
             spacing: 4
 
+            // Color swatch outside ComboBox — native Windows style forbids
+            // customizing ComboBox/ItemDelegate contentItem.
+            Rectangle {
+                property color nodeColor: markerPick.currentIndex >= 0 && network
+                    ? network.color_for_node(markerPick.currentText)
+                    : "transparent"
+                visible: markerPick.currentIndex >= 0 && nodeColor.valid
+                color: nodeColor
+                border.width: 1
+                Layout.preferredWidth: 12
+                Layout.preferredHeight: 12
+            }
+
             ComboBox {
                 id: markerPick
                 Layout.fillWidth: true
@@ -173,59 +186,8 @@ Item {
                     required property var modelData
                     required property int index
                     width: markerPick.width
+                    text: modelData
                     highlighted: markerPick.highlightedIndex === index
-
-                    contentItem: RowLayout {
-                        spacing: 6
-
-                        Rectangle {
-                            property color nodeColor: network
-                                ? network.color_for_node(modelData)
-                                : "transparent"
-                            visible: nodeColor.valid
-                            color: nodeColor
-                            border.width: 1
-                            Layout.preferredWidth: 12
-                            Layout.preferredHeight: 12
-                        }
-
-                        Text {
-                            text: modelData
-                            elide: Text.ElideRight
-                            Layout.fillWidth: true
-                        }
-                    }
-                }
-
-                contentItem: Item {
-                    implicitHeight: 24
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 8
-                        anchors.rightMargin: markerPick.indicator
-                            ? markerPick.indicator.width + 8
-                            : 8
-                        spacing: 6
-
-                        Rectangle {
-                            property color nodeColor: markerPick.currentIndex >= 0 && network
-                                ? network.color_for_node(markerPick.currentText)
-                                : "transparent"
-                            visible: markerPick.currentIndex >= 0 && nodeColor.valid
-                            color: nodeColor
-                            border.width: 1
-                            Layout.preferredWidth: 12
-                            Layout.preferredHeight: 12
-                        }
-
-                        Text {
-                            text: markerPick.displayText
-                            elide: Text.ElideRight
-                            Layout.fillWidth: true
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                    }
                 }
             }
 

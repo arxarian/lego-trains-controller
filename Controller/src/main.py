@@ -4,7 +4,6 @@ import resources.rails_rc
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
-from PySide6.QtQuickControls2 import QQuickStyle
 from qasync import QEventLoop
 from pathlib import Path
 import asyncio
@@ -20,7 +19,6 @@ if __name__ == '__main__':
     app = QGuiApplication(sys.argv)
     QGuiApplication.setOrganizationName("arProjects")
     QGuiApplication.setApplicationName("Lego Trains Controller")
-    QQuickStyle.setStyle("Fusion")
     loop = QEventLoop(app)
     asyncio.set_event_loop(loop)
 
