@@ -158,10 +158,20 @@ Item {
                             required property var object
                             required property int index
 
+                            property string boundDeviceName: object
+                                ? switchDevices.deviceNameForRail(object) : ""
+
                             width: switchRails.width
                             height: object && object.is_switch() ? 40 : 0
                             visible: height > 0
                             color: root.selectedRailIndex === index ? "#cce5ff" : "transparent"
+
+                            function refreshBoundDeviceName() {
+                                boundDeviceName = object
+                                    ? switchDevices.deviceNameForRail(object) : ""
+                            }
+
+                            Component.onCompleted: refreshBoundDeviceName()
 
                             RowLayout {
                                 anchors.fill: parent
@@ -173,7 +183,7 @@ Item {
                                     text: "Rail " + object.id
                                           + " (" + (object.type === 2 ? "SwitchLeft" : "SwitchRight") + ")"
                                           + "  pos " + object.switch_position
-                                          + "  —  " + switchDevices.deviceNameForRail(object)
+                                          + "  —  " + railRow.boundDeviceName
                                     Layout.fillWidth: true
                                 }
                             }
@@ -189,8 +199,8 @@ Item {
 
                             Connections {
                                 target: switchDevices
-                                function onBindingsChanged() {
-                                    railRow.visible = railRow.visible
+                                function onBindings_changed() {
+                                    railRow.refreshBoundDeviceName()
                                 }
                             }
                         }
