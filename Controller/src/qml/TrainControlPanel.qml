@@ -8,72 +8,110 @@ Item {
 
     property Train train: model.object
     property var device: root.train.device
+    property int trainIndex: 0
 
-    GroupBox {
-        title: root.device.name
-        enabled: root.device.initialized
+    readonly property bool isPlanningTarget: Globals.planningTrainIndex === trainIndex
 
-        ColumnLayout {
-            anchors.fill: parent
+    Rectangle {
+        anchors.fill: parent
+        color: root.isPlanningTarget ? "#cce5ff" : "transparent"
+        border.color: root.isPlanningTarget ? "#6699cc" : "transparent"
+        border.width: 2
+        radius: 4
+    }
 
-            Text {
-                text: "Speed " + speedSlider.value
-                Layout.alignment: Qt.AlignHCenter
-            }
+    function selectAsPlanningTarget() {
+        Globals.planningTrainIndex = root.trainIndex
+        if (ListView.view)
+            ListView.view.currentIndex = root.trainIndex
+    }
 
-            Slider {
-                id: speedSlider
+    TapHandler {
+        acceptedButtons: Qt.LeftButton
+        gesturePolicy: TapHandler.DragThreshold
+        onTapped: root.selectAsPlanningTarget()
+    }
 
-                value: root.device.speed
-                orientation: Qt.Vertical
-                wheelEnabled: true
-                from: root.device.minimalSpeed
-                to: 100
-                stepSize: 10
-                snapMode: Slider.SnapAlways
+    ScrollView {
+        anchors.fill: parent
+        anchors.margins: 2
+        contentWidth: availableWidth
+        clip: true
 
-                Layout.alignment: Qt.AlignHCenter
+        GroupBox {
+            title: root.device.name + (root.isPlanningTarget ? " (planning)" : "")
+            enabled: root.device.initialized
+            width: root.width - 8
 
-                Binding {
-                    target: root.device
-                    property: "speed"
-                    value: speedSlider.value
+            ColumnLayout {
+                width: parent.width
+                spacing: 4
+
+                Text {
+                    text: "Speed " + speedSlider.value
+                    Layout.alignment: Qt.AlignHCenter
                 }
-            }
 
-            Button {
-                text: "Stop"
-                onClicked: speedSlider.value = 0
-                Layout.fillWidth: true
-            }
+                Slider {
+                    id: speedSlider
 
-            Text {
-                text: "Voltage " + (root.device.voltage / 1000).toFixed(1) + " V"
-                Layout.alignment: Qt.AlignHCenter
-            }
+                    value: root.device.speed
+                    orientation: Qt.Vertical
+                    wheelEnabled: true
+                    from: root.device.minimalSpeed
+                    to: 100
+                    stepSize: 10
+                    snapMode: Slider.SnapAlways
 
-            Rectangle {
-                id: detectedColor
-                border.width: 2
-                color: root.device.color
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredHeight: 80
 
-                Layout.preferredHeight: 50
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignHCenter
-            }
+                    Binding {
+                        target: root.device
+                        property: "speed"
+                        value: speedSlider.value
+                    }
+                }
 
-            Text {
-                text: "Segment:"
-                font.bold: true
-                Layout.alignment: Qt.AlignHCenter
-            }
+                Button {
+                    text: "Stop"
+                    onClicked: speedSlider.value = 0
+                    Layout.fillWidth: true
+                }
 
-            Text {
-                text: root.train.current_segment_id || "unknown"
-                wrapMode: Text.WrapAnywhere
-                horizontalAlignment: Text.AlignHCenter
-                Layout.fillWidth: true
-                Layout.maximumWidth: root.width
+                Text {
+                    text: "Voltage " + (root.device.voltage / 1000).toFixed(1) + " V"
+                    Layout.alignment: Qt.AlignHCenter
+                }
+
+                Rectangle {
+                    id: detectedColor
+                    border.width: 2
+                    color: root.device.color
+
+                    Layout.preferredHeight: 36
+                    Layout.preferredWidth: 36
+                    Layout.alignment: Qt.AlignHCenter
+                }
+
+                Text {
+                    text: "Segment:"
+                    font.bold: true
+                    Layout.alignment: Qt.AlignHCenter
+                }
+
+                Text {
+                    text: root.train.current_segment_id || "unknown"
+                    wrapMode: Text.WrapAnywhere
+                    horizontalAlignment: Text.AlignHCenter
+                    Layout.fillWidth: true
+                }
+
+                OrderListPanel {
+                    train: root.train
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: implicitHeight
+                }
             }
         }
     }

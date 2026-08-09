@@ -52,10 +52,13 @@ def test_unbind_and_reassign():
 
     devices.assignToRail(rail_a, device)
     assert devices.deviceNameForRail(rail_a) == device.name
+    revision_after_assign = devices.bindingsRevision
+    assert revision_after_assign > 0
 
     devices.unbindRail(rail_a)
     assert devices.deviceForRail(rail_a) is None
     assert device.bound_rail is None
+    assert devices.bindingsRevision > revision_after_assign
 
     devices.assignToRail(rail_b, device)
     assert devices.deviceForRail(rail_b) is device

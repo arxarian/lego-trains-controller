@@ -170,10 +170,13 @@ Item {
                                 visible: railRow.visible
 
                                 Text {
-                                    text: "Rail " + object.id
-                                          + " (" + (object.type === 2 ? "SwitchLeft" : "SwitchRight") + ")"
-                                          + "  pos " + object.switch_position
-                                          + "  —  " + switchDevices.deviceNameForRail(object)
+                                    text: {
+                                        var _ = switchDevices.bindingsRevision
+                                        return "Rail " + object.id
+                                              + " (" + (object.type === 2 ? "SwitchLeft" : "SwitchRight") + ")"
+                                              + "  pos " + object.switch_position
+                                              + "  —  " + (object ? switchDevices.deviceNameForRail(object) : "")
+                                    }
                                     Layout.fillWidth: true
                                 }
                             }
@@ -184,13 +187,6 @@ Item {
                                 onClicked: {
                                     root.selectedRailIndex = index
                                     root.selectedRail = object
-                                }
-                            }
-
-                            Connections {
-                                target: switchDevices
-                                function onBindingsChanged() {
-                                    railRow.visible = railRow.visible
                                 }
                             }
                         }

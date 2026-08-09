@@ -71,6 +71,7 @@
         "src/qml/DiscoverDevices.qml",
         "src/qml/DevicesPanel.qml",
         "src/qml/TrainControlPanel.qml",
+        "src/qml/OrderListPanel.qml",
         "src/qml/TrackCanvas.qml",
         "src/qml/RailItem.qml",
         "src/qml/Globals.qml",
