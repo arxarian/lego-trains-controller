@@ -16,12 +16,36 @@ Item {
         anchors.fill: parent
         spacing: 4
 
-        Text {
-            text: {
-                var mode = root.train.control_mode === Train.Automatic ? "Automatic" : "Manual"
-                return "Current stop: " + root.train.current_order_index + " · " + mode
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 6
+
+            Text {
+                text: "Current stop: " + root.train.current_order_index
+                font.bold: true
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
             }
-            font.bold: true
+
+            Text {
+                text: root.train.control_mode === Train.Automatic ? "Auto" : "Manual"
+                font.bold: true
+            }
+
+            Switch {
+                id: modeSwitch
+                checked: root.train.control_mode === Train.Automatic
+                onToggled: {
+                    root.train.control_mode = checked ? Train.Automatic : Train.Manual
+                }
+            }
+        }
+
+        Text {
+            visible: root.train.control_mode === Train.Automatic
+            text: "Auto (executor not ready)"
+            font.pixelSize: 11
+            color: palette.mid
             Layout.fillWidth: true
             wrapMode: Text.WordWrap
         }
