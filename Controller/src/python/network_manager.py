@@ -123,6 +123,13 @@ class NetworkManager(QObject):
                 continue
             self._color_map[color_key] = node_id
         print(f"Network: Color map built with {len(self._color_map)} entries: {self._color_map}")
+        self.marker_node_ids_changed.emit()
+
+    def marker_node_ids(self):
+        return sorted(self._color_map.values())
+
+    marker_node_ids_changed = Signal()
+    markerNodeIds = Property("QStringList", marker_node_ids, notify=marker_node_ids_changed)
 
     def find_node_marker(self, node_id: str):
         return self._nodeMarkerMap.get(node_id)

@@ -305,3 +305,17 @@ def test_color_for_node():
     assert net_manager.color_for_node("1A10") == red
     assert not net_manager.color_for_node("missing").isValid()
     assert not net_manager.color_for_node("").isValid()
+
+
+def test_marker_node_ids():
+    mock_rails = MagicMock()
+    mock_rails.items.return_value = []
+    net_manager = net.NetworkManager(mock_rails)
+
+    assert net_manager.markerNodeIds == []
+
+    net_manager._color_map = {
+        "#ff0000": "2B20",
+        "#00ff00": "1A10",
+    }
+    assert net_manager.marker_node_ids() == ["1A10", "2B20"]
