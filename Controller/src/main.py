@@ -4,6 +4,7 @@ import resources.rails_rc
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
+from PySide6.QtQuickControls2 import QQuickStyle
 from qasync import QEventLoop
 from pathlib import Path
 import asyncio
@@ -19,6 +20,7 @@ if __name__ == '__main__':
     app = QGuiApplication(sys.argv)
     QGuiApplication.setOrganizationName("arProjects")
     QGuiApplication.setApplicationName("Lego Trains Controller")
+    QQuickStyle.setStyle("Fusion")
     loop = QEventLoop(app)
     asyncio.set_event_loop(loop)
 
@@ -33,3 +35,6 @@ if __name__ == '__main__':
 
     with loop:  # TODO - why not to use app.exec()
         loop.run_forever()
+
+    # Destroy QML while AppContext (and its context properties) still exist.
+    del engine

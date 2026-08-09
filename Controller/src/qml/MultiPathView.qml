@@ -6,7 +6,7 @@ Item {
     property var model
 
     Repeater {
-        model: root.model.multiPathIndicators
+        model: root.model ? root.model.multiPathIndicators : null
 
         delegate: Item {
             id: item
@@ -17,11 +17,12 @@ Item {
 
             PathIndicatorView {
                 anchors.fill: parent
-                visible: root.model.path_id_active === item.indicator.path_id
+                visible: item.indicator && root.model
+                         && root.model.path_id_active === item.indicator.path_id
                 model: PathIndicatorsFilter {
                     id: filter
                     sourceModel: root.model // TODO - it's a bit confusing to use the same model as above
-                    path_id: item.indicator.path_id
+                    path_id: item.indicator ? item.indicator.path_id : ""
                 }
             }
         }
