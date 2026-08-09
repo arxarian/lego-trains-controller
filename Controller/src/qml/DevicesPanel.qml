@@ -171,8 +171,6 @@ Item {
                                     ? switchDevices.deviceNameForRail(object) : ""
                             }
 
-                            Component.onCompleted: refreshBoundDeviceName()
-
                             RowLayout {
                                 anchors.fill: parent
                                 anchors.margins: 4
