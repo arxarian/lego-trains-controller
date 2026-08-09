@@ -151,27 +151,32 @@ Item {
                     }
                 }
 
-                contentItem: RowLayout {
-                    spacing: 6
-                    leftPadding: 8
-                    rightPadding: markerPick.indicator.width + 8
+                contentItem: Item {
+                    implicitHeight: 24
 
-                    Rectangle {
-                        property color nodeColor: markerPick.currentIndex >= 0
-                            ? network.color_for_node(markerPick.currentText)
-                            : "transparent"
-                        visible: markerPick.currentIndex >= 0 && nodeColor.valid
-                        color: nodeColor
-                        border.width: 1
-                        Layout.preferredWidth: 12
-                        Layout.preferredHeight: 12
-                    }
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 8
+                        anchors.rightMargin: markerPick.indicator.width + 8
+                        spacing: 6
 
-                    Text {
-                        text: markerPick.displayText
-                        elide: Text.ElideRight
-                        Layout.fillWidth: true
-                        verticalAlignment: Text.AlignVCenter
+                        Rectangle {
+                            property color nodeColor: markerPick.currentIndex >= 0
+                                ? network.color_for_node(markerPick.currentText)
+                                : "transparent"
+                            visible: markerPick.currentIndex >= 0 && nodeColor.valid
+                            color: nodeColor
+                            border.width: 1
+                            Layout.preferredWidth: 12
+                            Layout.preferredHeight: 12
+                        }
+
+                        Text {
+                            text: markerPick.displayText
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                            verticalAlignment: Text.AlignVCenter
+                        }
                     }
                 }
             }
