@@ -55,12 +55,15 @@ class Train(QObject):
         if not new_segment_ids or end_node is None:
             return
 
-        self._network.unreserve_segments(self._current_segment_ids)
-        self._network.reserve_segments(new_segment_ids)
+        owner = self._device.name
+        for segment_id in self._current_segment_ids:
+            self._network.release_segment(segment_id, owner)
+        for segment_id in new_segment_ids:
+            self._network.try_reserve_segment(segment_id, owner)
 
         self.set_current_node_id(node_id)
         self.set_current_segment_ids(new_segment_ids, f"{node_id}:{end_node}")
-        print(f"Train '{self._device.name}': reserved {new_segment_ids} via node {node_id}")
+        print(f"Train '{owner}': reserved {new_segment_ids} via node {node_id}")
 
     def device(self):
         return self._device

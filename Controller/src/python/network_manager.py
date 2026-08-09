@@ -13,6 +13,7 @@ class NetworkManager(QObject):
         self._graph = None
         self._nodeMarkerMap = {}
         self._segments = {} # lookup table
+        self._owners = {}  # segment_id -> owner_id; missing key = free
         self._color_map = {} # color hex -> node_id
         self._has_graph = False
         self._marker_warnings = []
@@ -25,6 +26,9 @@ class NetworkManager(QObject):
 
     def segments(self):
         return self._segments
+
+    def owner_of(self, segment_id) -> str | None:
+        return self._owners.get(segment_id)
 
     def _apply_to_segment(self, segment_id, fn) -> bool:
         if segment_id not in self._segments:
@@ -52,6 +56,39 @@ class NetworkManager(QObject):
                 lambda rail, path_id, from_d, to_d: rail.unreserve_segment(path_id, from_d, to_d)
             )
         return False
+
+    def try_reserve_segment(self, segment_id, owner) -> bool:
+        if not segment_id or not owner:
+            return False
+        if segment_id not in self._segments:
+            print(f"segment {segment_id} not found")
+            return False
+
+        current = self._owners.get(segment_id)
+        if current is not None and current != owner:
+            return False
+        if current == owner:
+            return True
+
+        if not self.reserve(segment_id):
+            return False
+        self._owners[segment_id] = owner
+        return True
+
+    def release_segment(self, segment_id, owner) -> bool:
+        if not segment_id or not owner:
+            return False
+        if self._owners.get(segment_id) != owner:
+            return False
+
+        del self._owners[segment_id]
+        return self.unreserve(segment_id)
+
+    def release_all_for(self, owner) -> None:
+        if not owner:
+            return
+        for segment_id in [sid for sid, o in self._owners.items() if o == owner]:
+            self.release_segment(segment_id, owner)
 
     def reserve_segments(self, segment_ids) -> bool:
         ok = True
@@ -290,6 +327,7 @@ class NetworkManager(QObject):
     @Slot()
     def generate(self):
         self._segments = {}
+        self._owners = {}
         self._graph, self._nodeMarkerMap = self._generator.generate(self._rails.items(), True)
 
         edges = self._graph.edges(data=True)
