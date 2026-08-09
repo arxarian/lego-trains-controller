@@ -34,24 +34,27 @@ SelectableItem {
         property int type: Easing.InOutQuad
     }
 
+    // Animate pivot on plain reals — Behavior on Rotation.origin triggers interceptor warnings.
+    property real pivotX: transformation.rotator ? transformation.rotator.x : 0
+    property real pivotY: transformation.rotator ? transformation.rotator.y : 0
+
+    Behavior on pivotX {
+        enabled: animation.enabled
+        NumberAnimation { duration: animation.duration; easing.type: animation.type }
+    }
+    Behavior on pivotY {
+        enabled: animation.enabled
+        NumberAnimation { duration: animation.duration; easing.type: animation.type }
+    }
+
     transform: Rotation {
         id: transformation
         property Rotator rotator: root.railData ? root.railData.rotator : undefined
-        origin.x: transformation.rotator ? transformation.rotator.x : 0
-        origin.y: transformation.rotator ? transformation.rotator.y : 0
+        origin.x: root.pivotX
+        origin.y: root.pivotY
         angle: transformation.rotator ? transformation.rotator.angle : 0
 
         Behavior on angle {
-            enabled: animation.enabled
-            NumberAnimation { duration: animation.duration; easing.type: animation.type }
-        }
-
-        Behavior on origin.x {
-            enabled: animation.enabled
-            NumberAnimation { duration: animation.duration; easing.type: animation.type }
-        }
-
-        Behavior on origin.y {
             enabled: animation.enabled
             NumberAnimation { duration: animation.duration; easing.type: animation.type }
         }
