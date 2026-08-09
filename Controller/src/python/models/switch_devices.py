@@ -19,8 +19,22 @@ class SwitchDevices(ObjectBasedModel[SwitchDevice]):
         self._rails = None
         self._rail_to_device: dict[int, SwitchDevice] = {}
         self._sim_counter = 0
+        self._bindings_revision = 0
 
     bindings_changed = Signal()
+    bindings_revision_changed = Signal()
+
+    def bindings_revision(self):
+        return self._bindings_revision
+
+    bindingsRevision = Property(
+        int, bindings_revision, notify=bindings_revision_changed
+    )
+
+    def _notify_bindings_changed(self):
+        self._bindings_revision += 1
+        self.bindings_revision_changed.emit()
+        self.bindings_changed.emit()
 
     def set_rails_model(self, rails):
         self.clear_bindings()
@@ -31,7 +45,7 @@ class SwitchDevices(ObjectBasedModel[SwitchDevice]):
             self._disconnect_rail_signals(device)
             device.set_bound_rail(None)
         self._rail_to_device.clear()
-        self.bindings_changed.emit()
+        self._notify_bindings_changed()
 
     def clear_all(self):
         """Clear bindings and remove all devices (e.g. project change)."""
@@ -74,7 +88,7 @@ class SwitchDevices(ObjectBasedModel[SwitchDevice]):
         self._disconnect_rail_signals(device)
         self._rail_to_device.pop(rail.id, None)
         device.set_bound_rail(None)
-        self.bindings_changed.emit()
+        self._notify_bindings_changed()
 
     @Slot(result=QObject)
     def addSimulated(self):
@@ -101,7 +115,7 @@ class SwitchDevices(ObjectBasedModel[SwitchDevice]):
         self._rail_to_device[rail.id] = device
         rail.switch_position_changed.connect(self._on_rail_position_changed)
         device.set_position(rail.switch_position)
-        self.bindings_changed.emit()
+        self._notify_bindings_changed()
 
     @Slot(QObject)
     def unbindRail(self, rail):

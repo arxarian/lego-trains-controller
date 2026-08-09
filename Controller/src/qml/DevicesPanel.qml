@@ -158,18 +158,10 @@ Item {
                             required property var object
                             required property int index
 
-                            property string boundDeviceName: object
-                                ? switchDevices.deviceNameForRail(object) : ""
-
                             width: switchRails.width
                             height: object && object.is_switch() ? 40 : 0
                             visible: height > 0
                             color: root.selectedRailIndex === index ? "#cce5ff" : "transparent"
-
-                            function refreshBoundDeviceName() {
-                                boundDeviceName = object
-                                    ? switchDevices.deviceNameForRail(object) : ""
-                            }
 
                             RowLayout {
                                 anchors.fill: parent
@@ -178,10 +170,13 @@ Item {
                                 visible: railRow.visible
 
                                 Text {
-                                    text: "Rail " + object.id
-                                          + " (" + (object.type === 2 ? "SwitchLeft" : "SwitchRight") + ")"
-                                          + "  pos " + object.switch_position
-                                          + "  —  " + railRow.boundDeviceName
+                                    text: {
+                                        var _ = switchDevices.bindingsRevision
+                                        return "Rail " + object.id
+                                              + " (" + (object.type === 2 ? "SwitchLeft" : "SwitchRight") + ")"
+                                              + "  pos " + object.switch_position
+                                              + "  —  " + (object ? switchDevices.deviceNameForRail(object) : "")
+                                    }
                                     Layout.fillWidth: true
                                 }
                             }
@@ -192,13 +187,6 @@ Item {
                                 onClicked: {
                                     root.selectedRailIndex = index
                                     root.selectedRail = object
-                                }
-                            }
-
-                            Connections {
-                                target: switchDevices
-                                function onBindings_changed() {
-                                    railRow.refreshBoundDeviceName()
                                 }
                             }
                         }
