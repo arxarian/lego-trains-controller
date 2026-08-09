@@ -7,7 +7,7 @@ Item {
     id: root
 
     property Train train: model.object
-    property var device: root.train.device
+    property var device: root.train ? root.train.device : null
     property int trainIndex: 0
 
     readonly property bool isPlanningTarget: Globals.planningTrainIndex === trainIndex
@@ -39,8 +39,10 @@ Item {
         clip: true
 
         GroupBox {
-            title: root.device.name + (root.isPlanningTarget ? " (planning)" : "")
-            enabled: root.device.initialized
+            title: root.device
+                   ? root.device.name + (root.isPlanningTarget ? " (planning)" : "")
+                   : ""
+            enabled: root.device ? root.device.initialized : false
             width: root.width - 8
 
             ColumnLayout {
@@ -55,10 +57,10 @@ Item {
                 Slider {
                     id: speedSlider
 
-                    value: root.device.speed
+                    value: root.device ? root.device.speed : 0
                     orientation: Qt.Vertical
                     wheelEnabled: true
-                    from: root.device.minimalSpeed
+                    from: root.device ? root.device.minimalSpeed : 0
                     to: 100
                     stepSize: 10
                     snapMode: Slider.SnapAlways
@@ -70,6 +72,7 @@ Item {
                         target: root.device
                         property: "speed"
                         value: speedSlider.value
+                        when: root.device !== null
                     }
                 }
 
@@ -80,14 +83,16 @@ Item {
                 }
 
                 Text {
-                    text: "Voltage " + (root.device.voltage / 1000).toFixed(1) + " V"
+                    text: root.device
+                          ? "Voltage " + (root.device.voltage / 1000).toFixed(1) + " V"
+                          : "Voltage —"
                     Layout.alignment: Qt.AlignHCenter
                 }
 
                 Rectangle {
                     id: detectedColor
                     border.width: 2
-                    color: root.device.color
+                    color: root.device ? root.device.color : "transparent"
 
                     Layout.preferredHeight: 36
                     Layout.preferredWidth: 36
@@ -101,7 +106,9 @@ Item {
                 }
 
                 Text {
-                    text: root.train.current_segment_id || "unknown"
+                    text: root.train
+                          ? (root.train.current_segment_id || "unknown")
+                          : "unknown"
                     wrapMode: Text.WrapAnywhere
                     horizontalAlignment: Text.AlignHCenter
                     Layout.fillWidth: true
@@ -111,6 +118,7 @@ Item {
                     train: root.train
                     Layout.fillWidth: true
                     Layout.preferredHeight: implicitHeight
+                    visible: root.train !== null
                 }
             }
         }

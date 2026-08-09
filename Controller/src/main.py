@@ -33,3 +33,6 @@ if __name__ == '__main__':
 
     with loop:  # TODO - why not to use app.exec()
         loop.run_forever()
+
+    # Destroy QML while AppContext (and its context properties) still exist.
+    del engine

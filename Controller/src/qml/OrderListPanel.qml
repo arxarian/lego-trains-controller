@@ -15,34 +15,37 @@ Item {
         id: column
         anchors.fill: parent
         spacing: 4
+        enabled: root.train !== null
 
         RowLayout {
             Layout.fillWidth: true
             spacing: 6
 
             Text {
-                text: "Current stop: " + root.train.current_order_index
+                text: "Current stop: " + (root.train ? root.train.current_order_index : 0)
                 font.bold: true
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap
             }
 
             Text {
-                text: root.train.control_mode === Train.Automatic ? "Auto" : "Manual"
+                text: root.train && root.train.control_mode === Train.Automatic ? "Auto" : "Manual"
                 font.bold: true
             }
 
             Switch {
                 id: modeSwitch
-                checked: root.train.control_mode === Train.Automatic
+                checked: root.train && root.train.control_mode === Train.Automatic
                 onToggled: {
+                    if (!root.train)
+                        return
                     root.train.control_mode = checked ? Train.Automatic : Train.Manual
                 }
             }
         }
 
         Text {
-            visible: root.train.control_mode === Train.Automatic
+            visible: root.train && root.train.control_mode === Train.Automatic
             text: "Auto (executor not ready)"
             font.pixelSize: 11
             color: palette.mid
@@ -53,9 +56,12 @@ Item {
         ListView {
             id: orderView
             Layout.fillWidth: true
-            Layout.preferredHeight: Math.min(160, Math.max(40, root.train.orders.count * 36))
+            Layout.preferredHeight: Math.min(
+                160,
+                Math.max(40, root.train ? root.train.orders.count * 36 : 40)
+            )
             clip: true
-            model: root.train.orders
+            model: root.train ? root.train.orders : null
             spacing: 2
 
             delegate: RowLayout {
@@ -67,12 +73,14 @@ Item {
                 required property int index
 
                 Text {
-                    text: index === root.train.current_order_index ? "\u25B6" : " "
+                    text: root.train && index === root.train.current_order_index ? "\u25B6" : " "
                     Layout.preferredWidth: 14
                 }
 
                 Rectangle {
-                    property color nodeColor: network.color_for_node(object.target_node_id)
+                    property color nodeColor: network && object
+                        ? network.color_for_node(object.target_node_id)
+                        : "transparent"
                     visible: nodeColor.valid
                     color: nodeColor
                     border.width: 1
@@ -81,7 +89,7 @@ Item {
                 }
 
                 Text {
-                    text: object.target_node_id
+                    text: object ? object.target_node_id : ""
                     elide: Text.ElideRight
                     Layout.fillWidth: true
                 }
@@ -97,7 +105,7 @@ Item {
                     from: 0
                     to: 999
                     editable: true
-                    value: Math.round(object.wait_seconds)
+                    value: object ? Math.round(object.wait_seconds) : 0
                     Layout.preferredWidth: 72
                     ToolTip.visible: hovered
                     ToolTip.text: "Seconds to wait at this stop"
@@ -105,27 +113,39 @@ Item {
                     valueFromText: function(text, locale) {
                         return parseInt(String(text).replace("s", ""), 10) || 0
                     }
-                    onValueModified: root.train.set_wait(index, value)
+                    onValueModified: {
+                        if (root.train)
+                            root.train.set_wait(index, value)
+                    }
                 }
 
                 Button {
                     text: "\u2191"
                     enabled: index > 0
                     Layout.preferredWidth: 28
-                    onClicked: root.train.move_order(index, index - 1)
+                    onClicked: {
+                        if (root.train)
+                            root.train.move_order(index, index - 1)
+                    }
                 }
 
                 Button {
                     text: "\u2193"
-                    enabled: index < root.train.orders.count - 1
+                    enabled: root.train && index < root.train.orders.count - 1
                     Layout.preferredWidth: 28
-                    onClicked: root.train.move_order(index, index + 1)
+                    onClicked: {
+                        if (root.train)
+                            root.train.move_order(index, index + 1)
+                    }
                 }
 
                 Button {
                     text: "X"
                     Layout.preferredWidth: 28
-                    onClicked: root.train.remove_order(index)
+                    onClicked: {
+                        if (root.train)
+                            root.train.remove_order(index)
+                    }
                 }
             }
         }
@@ -134,10 +154,23 @@ Item {
             Layout.fillWidth: true
             spacing: 4
 
+            // Color swatch outside ComboBox — native Windows style forbids
+            // customizing ComboBox/ItemDelegate contentItem.
+            Rectangle {
+                property color nodeColor: markerPick.currentIndex >= 0 && network
+                    ? network.color_for_node(markerPick.currentText)
+                    : "transparent"
+                visible: markerPick.currentIndex >= 0 && nodeColor.valid
+                color: nodeColor
+                border.width: 1
+                Layout.preferredWidth: 12
+                Layout.preferredHeight: 12
+            }
+
             ComboBox {
                 id: markerPick
                 Layout.fillWidth: true
-                model: network.markerNodeIds
+                model: network ? network.markerNodeIds : []
                 enabled: count > 0
                 currentIndex: count > 0 ? 0 : -1
 
@@ -153,73 +186,32 @@ Item {
                     required property var modelData
                     required property int index
                     width: markerPick.width
+                    text: modelData
                     highlighted: markerPick.highlightedIndex === index
-
-                    contentItem: RowLayout {
-                        spacing: 6
-
-                        Rectangle {
-                            property color nodeColor: network.color_for_node(modelData)
-                            visible: nodeColor.valid
-                            color: nodeColor
-                            border.width: 1
-                            Layout.preferredWidth: 12
-                            Layout.preferredHeight: 12
-                        }
-
-                        Text {
-                            text: modelData
-                            elide: Text.ElideRight
-                            Layout.fillWidth: true
-                        }
-                    }
-                }
-
-                contentItem: Item {
-                    implicitHeight: 24
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 8
-                        anchors.rightMargin: markerPick.indicator.width + 8
-                        spacing: 6
-
-                        Rectangle {
-                            property color nodeColor: markerPick.currentIndex >= 0
-                                ? network.color_for_node(markerPick.currentText)
-                                : "transparent"
-                            visible: markerPick.currentIndex >= 0 && nodeColor.valid
-                            color: nodeColor
-                            border.width: 1
-                            Layout.preferredWidth: 12
-                            Layout.preferredHeight: 12
-                        }
-
-                        Text {
-                            text: markerPick.displayText
-                            elide: Text.ElideRight
-                            Layout.fillWidth: true
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                    }
                 }
             }
 
             Button {
                 text: "Add"
-                enabled: markerPick.currentIndex >= 0 && markerPick.count > 0
-                onClicked: root.train.add_order(markerPick.currentText, 0)
+                enabled: root.train && markerPick.currentIndex >= 0 && markerPick.count > 0
+                onClicked: {
+                    if (root.train)
+                        root.train.add_order(markerPick.currentText, 0)
+                }
             }
 
             Button {
                 text: "Clear"
-                enabled: root.train.orders.count > 0
-                onClicked: root.train.clear_orders()
+                enabled: root.train && root.train.orders.count > 0
+                onClicked: {
+                    if (root.train)
+                        root.train.clear_orders()
+                }
             }
         }
 
         Text {
-            visible: network.markerNodeIds.length === 0
+            visible: !network || network.markerNodeIds.length === 0
             text: "Generate network to list markers"
             font.pixelSize: 11
             color: palette.mid
