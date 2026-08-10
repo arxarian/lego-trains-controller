@@ -171,15 +171,13 @@ Item {
 
                                 Text {
                                     text: {
-                                        var _ = switchDevices ? switchDevices.bindingsRevision : 0
+                                        var _ = switchDevices.bindingsRevision
                                         if (!object)
                                             return ""
                                         return "Rail " + object.id
                                               + " (" + (object.type === 2 ? "SwitchLeft" : "SwitchRight") + ")"
                                               + "  pos " + object.switch_position
-                                              + "  —  " + (switchDevices
-                                                  ? switchDevices.deviceNameForRail(object)
-                                                  : "")
+                                              + "  —  " + switchDevices.deviceNameForRail(object)
                                     }
                                     Layout.fillWidth: true
                                 }
@@ -200,7 +198,6 @@ Item {
                         Button {
                             text: "Assign"
                             enabled: root.selectedRail !== null
-                                     && switchDevices
                                      && switchDevices.deviceForRail(root.selectedRail) === null
                                      && switchDevices.unboundDevices().length > 0
                             onClicked: assignDialog.open()
@@ -208,12 +205,8 @@ Item {
                         Button {
                             text: "Unbind"
                             enabled: root.selectedRail !== null
-                                     && switchDevices
                                      && switchDevices.deviceForRail(root.selectedRail) !== null
-                            onClicked: {
-                                if (switchDevices)
-                                    switchDevices.unbindRail(root.selectedRail)
-                            }
+                            onClicked: switchDevices.unbindRail(root.selectedRail)
                         }
                         Item { Layout.fillWidth: true }
                     }

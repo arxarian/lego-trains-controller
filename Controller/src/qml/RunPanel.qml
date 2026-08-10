@@ -9,13 +9,9 @@ Item {
         z: 1
 
         Button {
-            text: simulator && simulator.is_running ? "\u23F9 Stop Simulation" : "\u25B6 Simulate"
-            enabled: network && network.has_graph
-            onClicked: {
-                if (!simulator)
-                    return
-                simulator.is_running ? simulator.stop() : simulator.start()
-            }
+            text: simulator.is_running ? "\u23F9 Stop Simulation" : "\u25B6 Simulate"
+            enabled: network.has_graph
+            onClicked: simulator.is_running ? simulator.stop() : simulator.start()
         }
     }
 
@@ -24,8 +20,8 @@ Item {
 
         anchors.top: parent.top
         anchors.left: parent.left
-        height: trains && trains.count > 0 ? Math.min(420, parent.height) : 0
-        width: trains && trains.count > 0 ? Math.min(trains.count * 250, parent.width * 0.55) : 0
+        height: trains.count > 0 ? Math.min(420, parent.height) : 0
+        width: trains.count > 0 ? Math.min(trains.count * 250, parent.width * 0.55) : 0
 
         model: trains
         orientation: Qt.Horizontal
@@ -42,7 +38,7 @@ Item {
         Connections {
             target: trains
             function onCountChanged() {
-                if (!trains || trains.count === 0) {
+                if (trains.count === 0) {
                     Globals.planningTrainIndex = 0
                     return
                 }
