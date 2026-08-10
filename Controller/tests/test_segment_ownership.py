@@ -78,3 +78,56 @@ def test_generate_clears_owners(net_manager):
     assert net_manager.try_reserve_segment(SEGMENT_ID, "train-a")
     net_manager.generate()
     assert net_manager.owner_of(SEGMENT_ID) is None
+
+
+def _two_segments(net_manager):
+    segment_ids = list(net_manager.segments().keys())[:2]
+    assert len(segment_ids) == 2
+    return segment_ids
+
+
+def test_try_reserve_leg_blocks_other_owner(net_manager):
+    leg = _two_segments(net_manager)
+    assert net_manager.try_reserve_leg("train-a", leg)
+    assert all(net_manager.owner_of(sid) == "train-a" for sid in leg)
+
+    assert not net_manager.try_reserve_leg("train-b", leg)
+    assert all(net_manager.owner_of(sid) == "train-a" for sid in leg)
+
+
+def test_release_leg_then_other_owner_succeeds(net_manager):
+    leg = _two_segments(net_manager)
+    assert net_manager.try_reserve_leg("train-a", leg)
+    assert net_manager.release_leg("train-a", leg)
+    assert all(net_manager.owner_of(sid) is None for sid in leg)
+
+    assert net_manager.try_reserve_leg("train-b", leg)
+    assert all(net_manager.owner_of(sid) == "train-b" for sid in leg)
+
+
+def test_try_reserve_leg_partial_overlap_is_atomic(net_manager):
+    s1, s2 = _two_segments(net_manager)
+    assert net_manager.try_reserve_segment(s1, "train-a")
+
+    assert not net_manager.try_reserve_leg("train-b", [s1, s2])
+    assert net_manager.owner_of(s1) == "train-a"
+    assert net_manager.owner_of(s2) is None
+
+
+def test_try_reserve_leg_idempotent_for_same_owner(net_manager):
+    leg = _two_segments(net_manager)
+    assert net_manager.try_reserve_leg("train-a", leg)
+    assert net_manager.try_reserve_leg("train-a", leg)
+    assert all(net_manager.owner_of(sid) == "train-a" for sid in leg)
+
+
+def test_try_reserve_leg_empty_succeeds(net_manager):
+    assert net_manager.try_reserve_leg("train-a", [])
+    assert net_manager.try_reserve_leg("train-a", None)
+
+
+def test_try_reserve_leg_unknown_segment_fails_atomically(net_manager):
+    s1 = _two_segments(net_manager)[0]
+    assert not net_manager.try_reserve_leg("train-a", [s1, "XXX"])
+    assert net_manager.owner_of(s1) is None
+    assert net_manager.owner_of("XXX") is None

@@ -90,6 +90,61 @@ class NetworkManager(QObject):
         for segment_id in [sid for sid, o in self._owners.items() if o == owner]:
             self.release_segment(segment_id, owner)
 
+    def try_reserve_leg(self, owner, segment_ids) -> bool:
+        """Atomically reserve every segment of a planned leg for owner.
+
+        Auto executor (B1) entry point: call before departure with
+        LegResult.segments. Returns True if all segments are free or already
+        owned by owner (then owns all). Returns False on conflict or unknown
+        segment id — ownership is unchanged (Hold). Empty leg succeeds.
+        """
+        if not owner:
+            return False
+        ids = list(segment_ids) if segment_ids else []
+        if not ids:
+            return True
+
+        for segment_id in ids:
+            if segment_id not in self._segments:
+                return False
+            current = self._owners.get(segment_id)
+            if current is not None and current != owner:
+                return False
+
+        newly_taken = []
+        for segment_id in ids:
+            if self._owners.get(segment_id) == owner:
+                continue
+            if not self.try_reserve_segment(segment_id, owner):
+                for taken in newly_taken:
+                    self.release_segment(taken, owner)
+                return False
+            newly_taken.append(segment_id)
+        return True
+
+    def release_leg(self, owner, segment_ids) -> bool:
+        """Release listed segments owned by owner (arrival / cancel cleanup).
+
+        Free segments are skipped. Segments owned by another party are left
+        alone and cause False, but this owner's segments in the list are still
+        released (best-effort). Empty list succeeds. Use release_all_for for
+        pause/manual full cleanup.
+        """
+        if not owner:
+            return False
+        ids = list(segment_ids) if segment_ids else []
+        ok = True
+        for segment_id in ids:
+            current = self._owners.get(segment_id)
+            if current is None:
+                continue
+            if current != owner:
+                ok = False
+                continue
+            if not self.release_segment(segment_id, owner):
+                ok = False
+        return ok
+
     def reserve_segments(self, segment_ids) -> bool:
         ok = True
         for segment_id in segment_ids or []:
