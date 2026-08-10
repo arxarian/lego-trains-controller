@@ -26,6 +26,14 @@ if __name__ == '__main__':
     importPaths(engine)
     context = AppContext(engine)
 
+    def _on_about_to_quit():
+        # Drop the QML tree while AppContext backends are still alive so
+        # bindings are not re-evaluated against cleared context properties.
+        for obj in list(engine.rootObjects()):
+            obj.deleteLater()
+
+    app.aboutToQuit.connect(_on_about_to_quit)
+
     engine.load(str("src/qml/Main.qml"))
 
     if not engine.rootObjects():
