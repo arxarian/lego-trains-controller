@@ -26,7 +26,6 @@ Implement issues in order within each slice; do not start a slice before its dep
 | B1.1 | #137 order list model | S–M | — |
 | C2.1 | #142 click switch toggle | S–M | A1.1 |
 | E1 | #184 persist stops/waits | M | C1.1 (done) |
-| B2.1 | #185 Stop pause/resume | S–M | B1.2 (done) |
 | E4 | #148 deadlock design note | S | — |
 
 ### Phase 0 — Foundations
@@ -43,13 +42,13 @@ Editor multi-color chip and other UX/UI polish: see GitHub epic **[#158](https:/
 5. A2.3 (**S**, A2.1) anytime after A2.1
 
 ### Phase 2 — One Auto train (sim)
-6. S1 (**M–L**, A1) → B1.1 (**S–M**) → B1.2 (**L**, A2+A3+B1.1) → **B1.3** #187 (**M**, B1.2) → S2 (**L**, S1+B1.2)  
-7. B2 (**M**, B1.2) later; **B2.1** #185 (**S–M**, B1.2) Stop/Resume toggle (P1)
+6. S1 (**M–L**, A1) → B1.1 (**S–M**) → B1.2 (**L**, A2+A3+B1.1) → **B1.3** #187 (**M**, B1.2, done) → S2 (**L**, S1+B1.2)  
+7. B2 (**M**, B1.2, done) later; **B2.1** #185 (**S–M**, B1.2, done) Stop/Resume toggle (P1)
 
 ### Phase 3 — Switches + plan UI
 8. SW1 (**L**, A1.1; F3 for HW role routing) → C2.1 (**S–M**, A1.1) → C2.2 (**M–L**)  
-9. C1.1 (**M**, B1.1) → **E1** #184 (**M**, C1.1) persist stops/waits (P0 for testing) → C1.2 (**M**, C1.1)  
-   C1.3 #186 (**S**, C1.1) wider panel + stop list fills space (P2 layout)  
+9. C1.1 (**M**, B1.1) → **E1** #184 (**M**, C1.1) persist stops/waits (P0 for testing) → C1.2 (**M**, C1.1, done)  
+   C1.3 #186 (**S**, C1.1, done) wider panel + stop list fills space (P2 layout)  
 10. SW2 (**L**, SW1) when hardware ready; pairs with F3 switch role on hub  
 11. SW3 (**L**, SW2) one hub → up to four turnouts (multi-channel)
 
