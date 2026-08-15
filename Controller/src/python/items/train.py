@@ -7,6 +7,7 @@ from PySide6.QtQml import QmlElement
 
 from python.items.order import Order
 from python.models.orders import Orders
+from python.plan_executor import PlanExecutor
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -22,10 +23,11 @@ class ControlMode(IntEnum):
 class Train(QObject):
     QEnum(ControlMode)
 
-    def __init__(self, device, network, parent=None):
+    def __init__(self, device, network, planner=None, parent=None):
         super().__init__(parent)
         self._device = device
         self._network = network
+        self._planner = planner
         self._current_segment_ids = []
         self._leg_label = ""
         self._current_node_id = ""
@@ -34,6 +36,7 @@ class Train(QObject):
         self._orders = Orders(parent=self)
         self._current_order_index = 0
         self._control_mode = ControlMode.Manual
+        self._executor = PlanExecutor(self, planner, network, parent=self) if planner is not None else None
 
         device.color_changed.connect(self.on_color_changed)
 
@@ -48,6 +51,10 @@ class Train(QObject):
         node_id = self._network.find_node_by_color(color_key)
         if node_id is None:
             print(f"Train: no marker node found for color {color_key}")
+            return
+
+        if self._control_mode == ControlMode.Automatic and self._executor is not None:
+            self._executor.on_marker(node_id)
             return
 
         new_segment_ids, end_node = self._network.walk_to_next_marker(node_id, self._current_node_id or None)
@@ -162,9 +169,19 @@ class Train(QObject):
         if self._control_mode != value:
             self._control_mode = value
             self.control_mode_changed.emit()
+            if self._executor is not None:
+                if value == ControlMode.Automatic:
+                    self._executor.resume()
+                else:
+                    self._executor.pause()
 
     control_mode_changed = Signal()
     control_mode = Property(int, control_mode, set_control_mode, notify=control_mode_changed)
+
+    def executor(self):
+        return self._executor
+
+    executor = Property(QObject, executor, constant=True)
 
     def _clamp_current_order_index(self):
         count = self._orders.rowCount()
