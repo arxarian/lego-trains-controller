@@ -246,6 +246,29 @@ def test_oval_two_stops_loop_forward_without_reverse():
     assert all(network.owner_of(sid) == device.name for sid in forward.segments)
 
 
+def test_allow_reverse_uses_shortest_path_even_if_reverse():
+    planner, network = _planner_from_track(TEST_TRACK)
+    blue = network.find_node_by_color("#0000ff")
+    red = network.find_node_by_color(RED)
+    assert blue == "10A0"
+    assert red == "13A0"
+
+    train, device = _auto_train(planner, network)
+    device.set_speed(40)
+    train.set_allow_reverse(True)
+    train.set_current_node_id(red)
+    train.executor.set_previous_node_id(blue)
+    train.add_order(blue, 0.0)
+    train.set_control_mode(ControlMode.Automatic)
+
+    assert train.executor.status == ExecutorState.MOVING
+    assert device.speed == -40
+    short = planner.compute_leg(red, blue)
+    assert short.nodes[1] == blue
+    assert train.current_segment_id == f"{red}:{blue}"
+    assert all(network.owner_of(sid) == device.name for sid in short.segments)
+
+
 def test_dead_end_reverse_allowed_flips_signed_speed():
     planner, network, _switch = _planner_from_switch_y_with_markers()
     approach = network.find_node_by_color("#ff0000")

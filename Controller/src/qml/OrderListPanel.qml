@@ -52,7 +52,7 @@ Item {
                     root.train.allow_reverse = checked
             }
             ToolTip.visible: hovered
-            ToolTip.text: "When Auto cannot continue forward, reverse instead of Hold"
+            ToolTip.text: "Use the shortest path even if that means reversing"
             Layout.fillWidth: true
         }
 

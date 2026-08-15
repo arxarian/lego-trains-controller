@@ -185,7 +185,9 @@ class PlanExecutor(QObject):
             return
 
         previous = self._previous_node_id or None
-        exclude = previous if previous and not self._network.is_dead_end(current) else None
+        exclude = None
+        if previous and not self._network.is_dead_end(current) and not self._train.allow_reverse:
+            exclude = previous
 
         leg = self._planner.compute_leg(current, order.target_node_id, exclude_neighbor=exclude)
         if leg is None:
