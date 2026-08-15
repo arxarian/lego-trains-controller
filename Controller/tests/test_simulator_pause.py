@@ -100,3 +100,23 @@ def test_step_delay_uses_abs_speed():
     sim._sim_device.set_speed(-50)
     sim.onSpeedChanged()
     assert sim._step_delay == 40 / 50
+
+
+def test_restoring_speed_unpauses_simulation():
+    network = MagicMock()
+    trains = MagicMock()
+    sim = Simulator(network, trains)
+    sim._current_node_id = "nodeA"
+    sim._previous_node_id = None
+    sim._marker_consumed = False
+    sim._sim_device = TrainDeviceSim()
+    sim.set_is_running(True)
+    sim._sim_device.speed_changed.connect(sim.onSpeedChanged)
+
+    sim.onSpeedChanged()
+    assert sim._run_task is None
+
+    with patch("python.simulator.asyncio.ensure_future", side_effect=_close_coro) as ensure_future:
+        sim._sim_device.set_speed(30)
+
+    ensure_future.assert_called_once()

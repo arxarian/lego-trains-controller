@@ -64,6 +64,7 @@ Item {
                     to: 100
                     stepSize: 10
                     snapMode: Slider.SnapAlways
+                    enabled: root.train && root.train.control_mode !== Train.Automatic
 
                     Layout.alignment: Qt.AlignHCenter
                     Layout.preferredHeight: 80
@@ -72,13 +73,17 @@ Item {
                         target: root.device
                         property: "speed"
                         value: speedSlider.value
-                        when: root.device !== null
+                        when: root.device !== null && (!root.train || root.train.control_mode !== Train.Automatic)
                     }
                 }
 
                 Button {
-                    text: "Stop"
-                    onClicked: speedSlider.value = 0
+                    text: root.train && root.train.halted_by_stop ? "Resume" : "Stop"
+                    highlighted: root.train && root.train.halted_by_stop
+                    onClicked: {
+                        if (root.train)
+                            root.train.toggle_stop()
+                    }
                     Layout.fillWidth: true
                 }
 
