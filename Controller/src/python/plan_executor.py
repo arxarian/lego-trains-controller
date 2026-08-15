@@ -184,10 +184,19 @@ class PlanExecutor(QObject):
             self._set_state(ExecutorState.WAITING_FOR_LOCALIZATION)
             return
 
-        leg = self._planner.compute_leg(current, order.target_node_id)
+        previous = self._previous_node_id or None
+        exclude = previous if previous and not self._network.is_dead_end(current) else None
+
+        leg = self._planner.compute_leg(current, order.target_node_id, exclude_neighbor=exclude)
         if leg is None:
-            self._hold("no path")
-            return
+            unrestricted = self._planner.compute_leg(current, order.target_node_id)
+            if unrestricted is None:
+                self._hold("no path")
+                return
+            if not self._train.allow_reverse:
+                self._hold("no reverse")
+                return
+            leg = unrestricted
 
         if len(leg.nodes) <= 1 or not leg.segments:
             if self._state == ExecutorState.WAITING:
@@ -197,8 +206,8 @@ class PlanExecutor(QObject):
             return
 
         first_hop = leg.nodes[1]
-        previous = self._previous_node_id or None
-        if self._network.is_reverse_depart(current, previous, first_hop):
+        reversing = self._network.is_reverse_depart(current, previous, first_hop)
+        if reversing and not self._train.allow_reverse:
             self._hold("no reverse")
             return
 
@@ -208,7 +217,7 @@ class PlanExecutor(QObject):
 
         self._current_leg = leg
         self._cancel_task()
-        flip = bool(previous) and self._network.is_dead_end(current)
+        flip = reversing or (bool(previous) and self._network.is_dead_end(current))
         self._apply_moving_speed(flip=flip)
         self._train.set_current_segment_ids(leg.segments, f"{leg.nodes[0]}:{leg.nodes[-1]}")
         self._set_state(ExecutorState.MOVING)

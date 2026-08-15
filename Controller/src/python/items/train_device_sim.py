@@ -13,4 +13,4 @@ class TrainDeviceSim(TrainDevice):
     """Simulated train hub with no BLE connection."""
 
     def __init__(self, name="Simulator", parent=None):
-        super().__init__(name=name, initialized=True, minimal_speed=0, parent=parent)
+        super().__init__(name=name, initialized=True, minimal_speed=-100, parent=parent)

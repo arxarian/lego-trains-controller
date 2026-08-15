@@ -21,7 +21,7 @@ def test_train_device_sim_exposes_shared_property_names():
     assert isinstance(device, TrainDevice)
     assert device.name == "sim"
     assert device.initialized is True
-    assert device.minimalSpeed == 0
+    assert device.minimalSpeed == -100
 
 
 def test_train_accepts_train_device_sim():

@@ -36,6 +36,7 @@ class Train(QObject):
         self._orders = Orders(parent=self)
         self._current_order_index = 0
         self._control_mode = ControlMode.Manual
+        self._allow_reverse = False
         self._executor = PlanExecutor(self, planner, network, parent=self) if planner is not None else None
 
         device.color_changed.connect(self.on_color_changed)
@@ -177,6 +178,18 @@ class Train(QObject):
 
     control_mode_changed = Signal()
     control_mode = Property(int, control_mode, set_control_mode, notify=control_mode_changed)
+
+    def allow_reverse(self):
+        return self._allow_reverse
+
+    def set_allow_reverse(self, value):
+        value = bool(value)
+        if self._allow_reverse != value:
+            self._allow_reverse = value
+            self.allow_reverse_changed.emit()
+
+    allow_reverse_changed = Signal()
+    allow_reverse = Property(bool, allow_reverse, set_allow_reverse, notify=allow_reverse_changed)
 
     def executor(self):
         return self._executor
