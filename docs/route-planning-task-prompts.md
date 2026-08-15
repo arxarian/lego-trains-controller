@@ -41,7 +41,7 @@ Editor multi-color chip and other UX/UI polish: see GitHub epic **[#158](https:/
 5. A2.3 (**S**, A2.1) anytime after A2.1
 
 ### Phase 2 — One Auto train (sim)
-6. S1 (**M–L**, A1) → B1.1 (**S–M**) → B1.2 (**L**, A2+A3+B1.1) → S2 (**L**, S1+B1.2)  
+6. S1 (**M–L**, A1) → B1.1 (**S–M**) → B1.2 (**L**, A2+A3+B1.1) → **B1.3** #187 (**M**, B1.2) → S2 (**L**, S1+B1.2)  
 7. B2 (**M**, B1.2) later
 
 ### Phase 3 — Switches + plan UI
@@ -81,7 +81,7 @@ These decisions are final for MVP:
 | Switch modes | Per-switch **Manual** \| **Automatic** (logical first) |
 | Physical switches | Later; same style BLE hub as trains — not in early slices |
 | Auto speed | Reuse last non-zero speed; fallback constant (e.g. 40) |
-| Auto travel direction | Prefer continue **forward** along arrival direction (same `exclude_node` idea as NetworkManager). Reverse only at **dead-ends** (sole neighbor). Executor sets signed speed (`fwd`/`rev`) to match the reserved leg’s first hop. Mid-leg reverse forbidden. |
+| Auto travel direction | Prefer continue **forward** along arrival direction (same `exclude_node` idea as NetworkManager). Reverse only at **dead-ends** (sole neighbor), unless **Allow reverse** is on (B1.3): then use Dijkstra’s true shortest path, including reverse, and flip signed speed. Executor sets signed speed (`fwd`/`rev`) to match the reserved leg’s first hop. Mid-leg reverse forbidden. |
 | Manual during plan | **Pause** executor; keep orders; release current leg reservation |
 | Persist orders | Session-only in MVP |
 | First verification | Simulator first, then real hub |
@@ -634,6 +634,41 @@ Canvas order editing UI (C1), switch click UI (C2), physical hubs, order persist
 Changing compute_leg graph search / A2.2 required_switches (planner stays undirected; orientation is executor-side at depart time).
 ```
 
+### Subtask B1.3 — Auto routing: forward loop, allow reverse, cruise speed (#187)
+
+GitHub: https://github.com/arxarian/lego-trains-controller/issues/187
+
+**P0.** Follow-up to B1.2 so a looping oval plan behaves well.
+
+**Prompt:**
+
+```
+Harden Auto so a looping oval plan behaves well: keep cruise speed, prefer the long forward way when reverse is off, and take Dijkstra’s true shortest path (including reverse) when Allow reverse is on.
+
+## Depends on
+B1.2 (done). C1.2 not required.
+
+## Why
+B1.2 Hold-on-reverse made two nearby oval stops reverse or Hold. Wait-0 arrive also froze cruise speed. Sim could not walk a reverse hop.
+
+## Requirements
+1. Cruise: PlanExecutor listens to device.speed_changed; wait 0 does not zero speed.
+2. allow_reverse off (default): compute_leg(..., exclude_neighbor=previous) unless dead-end; Hold if only reverse exists.
+3. allow_reverse on: no exclude; if first hop is reverse, stay Moving and flip signed speed.
+4. Per-train Allow reverse checkbox on OrderListPanel; tooltip: “Use the shortest path even if that means reversing.”
+5. Sim: negative speed walks the previous marker (minimal_speed -100).
+
+## Acceptance
+- Oval 10A0→13A0→10A0, reverse off: long forward way, not Hold.
+- Same layout, reverse on, at 13A0 previous 10A0, next 10A0: first hop 10A0, speed negative, Moving.
+- Dead-end reverse still allowed with the checkbox off.
+- Slider change while Auto updates cruise; wait 0 does not stop.
+- pytest in test_plan_executor.py / test_planner.py / sim tests.
+
+## Out of scope
+Canvas click-to-order (C1.2). Physical switch throwing (C2.2). Persist allow_reverse (E1).
+```
+
 ---
 
 ## Issue B2 — Train Manual / Automatic mode
@@ -1068,6 +1103,7 @@ Design-only or later implementation: allow meets at sidings; reserve only to nex
 | A3.2 | feat(network): atomic leg reserve/release |
 | B1.1 | feat(train): Tycoon-style order list model |
 | B1.2 | feat(train): plan executor with hold + looping orders |
+| B1.3 | feat(train): Auto routing — forward loop, allow reverse, cruise speed (#187) |
 | B2 | feat(train): Manual vs Automatic control mode |
 | C1.1 | feat(ui): order list panel in Run mode |
 | C1.2 | feat(ui): click canvas marker to add order |
