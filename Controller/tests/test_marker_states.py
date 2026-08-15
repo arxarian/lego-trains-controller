@@ -134,3 +134,17 @@ def test_switch_path_id_filtering():
     # path B markers sharing nearby distances are unaffected
     assert marker(switch, 34, "B").state == MarkerState.Free
     assert marker(switch, 35, "B").state == MarkerState.Free
+
+
+def test_marker_rail_id():
+    rails = make_rails((RailType.Straight, 7))
+    rail = rails.findRailData(7)
+    taken = marker(rail, 8)
+    assert taken.rail_id == 7
+    assert all(m.rail_id == 7 for m in rail.markers._items)
+
+
+def test_marker_rail_id_without_parent():
+    from python.items.marker import Marker
+
+    assert Marker().rail_id == -1

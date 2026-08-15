@@ -1,9 +1,18 @@
 from unittest.mock import MagicMock
 
+import pytest
 from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QApplication
 
 from python.items.train_device_sim import TrainDeviceSim
 from python.items.train import Train, ControlMode
+from python.models.trains import Trains
+
+
+@pytest.fixture(scope="session", autouse=True)
+def ensure_qapp():
+    app = QApplication.instance() or QApplication([])
+    yield app
 
 
 def _make_train():
@@ -79,3 +88,56 @@ def test_localization_unchanged_with_orders():
     network.find_node_by_color.assert_called()
     assert train.orders.count == 1
     assert train.current_node_id == ""
+
+
+def _make_trains(network=None):
+    if network is None:
+        network = MagicMock()
+        network.has_graph = True
+        network.node_id_for_marker.return_value = "13A0"
+    devices = MagicMock()
+    return Trains(network, devices), network
+
+
+def test_add_order_for_marker():
+    trains, network = _make_trains()
+    trains.add_train(TrainDeviceSim(name="sim"))
+
+    assert trains.add_order_for_marker(0, 13, "A", 0) is True
+    network.node_id_for_marker.assert_called_with(13, "A", 0)
+    train = trains.get(0)
+    assert train.orders.count == 1
+    assert train.orders.get(0).target_node_id == "13A0"
+    assert train.orders.get(0).wait_seconds == 0.0
+    assert trains.last_order_hint == "Added order 13A0"
+
+
+def test_add_order_for_marker_no_train():
+    trains, _ = _make_trains()
+
+    assert trains.add_order_for_marker(0, 13, "A", 0) is False
+    assert trains.last_order_hint == "No planning-target train"
+
+
+def test_add_order_for_marker_no_graph():
+    network = MagicMock()
+    network.has_graph = False
+    network.node_id_for_marker.return_value = ""
+    trains, _ = _make_trains(network)
+    trains.add_train(TrainDeviceSim(name="sim"))
+
+    assert trains.add_order_for_marker(0, 13, "A", 0) is False
+    assert trains.get(0).orders.count == 0
+    assert trains.last_order_hint == "No graph"
+
+
+def test_add_order_for_marker_unknown_node():
+    network = MagicMock()
+    network.has_graph = True
+    network.node_id_for_marker.return_value = ""
+    trains, _ = _make_trains(network)
+    trains.add_train(TrainDeviceSim(name="sim"))
+
+    assert trains.add_order_for_marker(0, 13, "A", 0) is False
+    assert trains.get(0).orders.count == 0
+    assert trains.last_order_hint == "Marker is not a graph node"

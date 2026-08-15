@@ -35,6 +35,26 @@ Item {
             visible: item.marker.taken
             color: item.marker.color
 
+            SequentialAnimation {
+                id: orderFlash
+                NumberAnimation { target: markerBrick; property: "opacity"; to: 0.4; duration: 80 }
+                NumberAnimation { target: markerBrick; property: "opacity"; to: 1.0; duration: 120 }
+            }
+
+            MouseArea {
+                enabled: !Globals.editMode && item.marker.taken
+                onClicked: {
+                    if (trains.add_order_for_marker(
+                            Globals.planningTrainIndex,
+                            item.marker.rail_id,
+                            item.marker.path_id,
+                            item.marker.distance)) {
+                        orderFlash.restart()
+                    }
+                }
+                anchors.fill: parent
+            }
+
             onVisibleChanged: { if (visible) {
                     selectableItem.forceActiveFocus()
                 } else {
