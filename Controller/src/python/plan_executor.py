@@ -37,6 +37,7 @@ class PlanExecutor(QObject):
         self._current_leg = None
         self._cruise_speed = 0
         self._task = None
+        self._train.device.speed_changed.connect(self._capture_cruise)
 
     def status(self):
         if self._state == ExecutorState.HOLD and self._hold_reason:
@@ -155,13 +156,13 @@ class PlanExecutor(QObject):
         self.try_depart()
 
     def _arrive(self, order):
-        self._set_speed(0)
-        self._release_current_leg()
-        self._set_state(ExecutorState.WAITING)
         wait = float(order.wait_seconds) if order is not None else 0.0
+        self._release_current_leg()
         if wait <= 0:
             self._advance_and_depart()
             return
+        self._set_speed(0)
+        self._set_state(ExecutorState.WAITING)
         self._schedule_wait(wait)
 
     @Slot()
