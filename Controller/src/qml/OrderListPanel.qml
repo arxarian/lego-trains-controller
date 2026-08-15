@@ -211,6 +211,15 @@ Item {
         }
 
         Text {
+            visible: trains && trains.last_order_hint.length > 0
+            text: trains ? trains.last_order_hint : ""
+            font.pixelSize: 11
+            color: palette.mid
+            Layout.fillWidth: true
+            wrapMode: Text.WordWrap
+        }
+
+        Text {
             visible: !network || network.markerNodeIds.length === 0
             text: "Generate network to list markers"
             font.pixelSize: 11

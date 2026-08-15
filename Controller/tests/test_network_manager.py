@@ -319,3 +319,30 @@ def test_marker_node_ids():
         "#00ff00": "1A10",
     }
     assert net_manager.marker_node_ids() == ["1A10", "2B20"]
+
+
+def test_node_id_for_marker():
+    data = project.loadDataFromFile(Path(TEST_TRACK))
+    rails = [Rail.load_data(d) for d in data.get("rails", [])]
+    mock_rails = MagicMock()
+    mock_rails.items.return_value = rails
+    net_manager = net.NetworkManager(mock_rails)
+
+    assert net_manager.node_id_for_marker(13, "A", 0) == ""
+
+    net_manager.generate()
+    red = next(entry for entry in net_manager._collect_graph_markers() if entry["color_key"] == "#ff0000")
+    assert net_manager.node_id_for_marker(red["rail_id"], red["path_id"], red["distance"]) == red["node_id"]
+    assert net_manager.node_id_for_marker(red["rail_id"], "", red["distance"]) == red["node_id"]
+    assert net_manager.node_id_for_marker(999, "A", 0) == ""
+
+
+def test_node_id_for_marker_ambiguous_switch_stem():
+    rails, switch = _make_switch_y_layout()
+    _force_take(switch, 1, "#ff0000")
+    net_manager = net.NetworkManager(rails)
+    net_manager.generate()
+
+    assert net_manager.node_id_for_marker(switch.id, "", 1) == ""
+    assert net_manager.node_id_for_marker(switch.id, "A", 1) == f"{switch.id}A1"
+    assert net_manager.node_id_for_marker(switch.id, "B", 1) == f"{switch.id}B1"
