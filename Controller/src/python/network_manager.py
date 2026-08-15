@@ -233,6 +233,21 @@ class NetworkManager(QObject):
             return QColor()
         return marker.color
 
+    @Slot(int, str, int, result=str)
+    def node_id_for_marker(self, rail_id: int, path_id: str, distance: int) -> str:
+        """Return the unique graph node id for a placed marker, or empty if unknown/ambiguous."""
+        node_ids = []
+        for entry in self._collect_graph_markers():
+            if entry["rail_id"] != rail_id or entry["distance"] != distance:
+                continue
+            if path_id not in (None, "", entry["path_id"]):
+                continue
+            if entry["node_id"] not in node_ids:
+                node_ids.append(entry["node_id"])
+        if len(node_ids) == 1:
+            return node_ids[0]
+        return ""
+
     def find_node_by_color(self, color_key: str):
         """color_key should be a lowercase hex string e.g. '#ff0000'"""
         return self._color_map.get(color_key)

@@ -25,6 +25,8 @@ Implement issues in order within each slice; do not start a slice before its dep
 | A2.3 | #134 multi-waypoint list | S | A2.1 |
 | B1.1 | #137 order list model | S–M | — |
 | C2.1 | #142 click switch toggle | S–M | A1.1 |
+| E1 | #184 persist stops/waits | M | C1.1 (done) |
+| B2.1 | #185 Stop pause/resume | S–M | B1.2 (done) |
 | E4 | #148 deadlock design note | S | — |
 
 ### Phase 0 — Foundations
@@ -42,16 +44,17 @@ Editor multi-color chip and other UX/UI polish: see GitHub epic **[#158](https:/
 
 ### Phase 2 — One Auto train (sim)
 6. S1 (**M–L**, A1) → B1.1 (**S–M**) → B1.2 (**L**, A2+A3+B1.1) → **B1.3** #187 (**M**, B1.2) → S2 (**L**, S1+B1.2)  
-7. B2 (**M**, B1.2) later
+7. B2 (**M**, B1.2) later; **B2.1** #185 (**S–M**, B1.2) Stop/Resume toggle (P1)
 
 ### Phase 3 — Switches + plan UI
 8. SW1 (**L**, A1.1; F3 for HW role routing) → C2.1 (**S–M**, A1.1) → C2.2 (**M–L**)  
-9. C1.1 (**M**, B1.1) → C1.2 (**M**, C1.1)  
+9. C1.1 (**M**, B1.1) → **E1** #184 (**M**, C1.1) persist stops/waits (P0 for testing) → C1.2 (**M**, C1.1)  
+   C1.3 #186 (**S**, C1.1) wider panel + stop list fills space (P2 layout)  
 10. SW2 (**L**, SW1) when hardware ready; pairs with F3 switch role on hub  
 11. SW3 (**L**, SW2) one hub → up to four turnouts (multi-channel)
 
 ### Phase 4 — Multi-train + polish
-12. S3 (**L–XL**) → E3 (**M**) → E1/E2 (**M**); E4 (**S**) design only  
+12. S3 (**L–XL**) → E3 (**M**) → E2 (**M**); E4 (**S**) design only  
 13. **F2** #68 (**M–L**, F0) when layouts outgrow ~5 unique single-color markers; editor chip #157 lives under UX/UI epic #158
 
 ### Architecture constraints (do not violate)
@@ -83,7 +86,8 @@ These decisions are final for MVP:
 | Auto speed | Reuse last non-zero speed; fallback constant (e.g. 40) |
 | Auto travel direction | Prefer continue **forward** along arrival direction (same `exclude_node` idea as NetworkManager). Reverse only at **dead-ends** (sole neighbor), unless **Allow reverse** is on (B1.3): then use Dijkstra’s true shortest path, including reverse, and flip signed speed. Executor sets signed speed (`fwd`/`rev`) to match the reserved leg’s first hop. Mid-leg reverse forbidden. |
 | Manual during plan | **Pause** executor; keep orders; release current leg reservation |
-| Persist orders | Session-only in MVP |
+| Stop button | Pause/resume toggle (B2.1): remember last speed; Auto stays Auto and continues the same next stop |
+| Persist orders | Project JSON (E1 #184) — do early so Auto/sim tests survive reload |
 | First verification | Simulator first, then real hub |
 | Localization | Markers are the only position source; react only at markers |
 
@@ -708,6 +712,35 @@ B1.2 (executor exists). B1.1 mode field may already exist — finish wiring.
 Order editing UI, switch modes, BLE switches.
 ```
 
+### Subtask B2.1 — Stop button pause/resume with previous speed (#185)
+
+GitHub: https://github.com/arxarian/lego-trains-controller/issues/185
+
+**P1.** Existing Stop on `TrainControlPanel` only zeros the slider. Make it a toggle.
+
+**Prompt:**
+
+```
+Give the Stop button a second press: pause, then resume at the previous speed. Same control in Manual and Automatic; do not flip control_mode.
+
+## Manual
+First press: remember last non-zero signed speed, set 0. Second press: restore that speed. Stay Manual.
+
+## Automatic
+First press: PlanExecutor.pause(), speed 0, keep Automatic and the order list / current_order_index.
+Second press: resume() with previous cruise speed toward the same next stop (do not skip; do not restart the list).
+Pause may release the reserved leg (existing pause()); resume re-reserves / Hold if needed.
+
+## UI
+Button text Stop vs Resume. Per train. Not RunPanel simulator Start/Stop.
+
+## Depends on
+B1.2 (done). B2 not required.
+
+## Acceptance
+Manual restore of +speed and -speed. Auto pause/resume without changing mode. pytest. Sim continues after restore.
+```
+
 ---
 
 # Slice C — UI
@@ -780,6 +813,30 @@ Node id format must match NetworkManager.build_color_map / generator: f"{rail.id
 
 ## Out of scope
 Drag-reorder on canvas, drawing the reserved leg polyline, multi-select.
+```
+
+### Subtask C1.3 — Wider train panel + stop list fills space (#186)
+
+GitHub: https://github.com/arxarian/lego-trains-controller/issues/186
+
+**P2** layout polish. Train panel is 240px; stop list height capped at 160px.
+
+**Prompt:**
+
+```
+Widen the Run-mode train / stop-list UI and make the order list use leftover panel height.
+
+## Current
+RunPanel delegate width 240; OrderListPanel list max 160px; window 800x800; whole panel in a ScrollView.
+
+## Requirements
+Wider panel (~300-360 or grow with window) without stealing the canvas. Stop ListView fills leftover height and scrolls; pin speed/Stop/add-clear. Horizontal multi-train strip still works.
+
+## Depends on
+C1.1 (done).
+
+## Out of scope
+New editing features, C1.2, B2.1, Edit-mode layout.
 ```
 
 ---
@@ -1040,20 +1097,39 @@ Physics-perfect timing, canvas animation interpolation (#120), real hubs.
 
 ---
 
-# Slice E — Polish (later)
+# Slice E — Polish (E1 pulled forward)
 
-## Issue E1 — Persist order lists in project JSON
+## Issue E1 — Persist train stops and wait settings (#184)
+
+GitHub: https://github.com/arxarian/lego-trains-controller/issues/184  
+Supersedes thin slice #145.
+
+**P0** — C1.1 is done; saved plans make Auto/sim testing repeatable. Do before or with S2.
 
 **Prompt:**
 
 ```
-Persist per-train (or per-device-name) Tycoon order lists in project save/load.
+Persist each train’s stop list and related plan settings in project JSON so a layout reopens with the same routes, waits, and train identity.
 
 ## Depends on
-B1.1, C1.
+B1.1, C1.1 (both done).
 
-## Notes
-Trains are often created from connected devices and may not exist at project load. Define a clear key strategy (e.g. device name / hub id) and document behavior when device missing. Keep schema backward compatible.
+## Persist
+Per-train, keyed by device.name (sim: "Simulator"; BLE: hub name):
+- ordered stops (Order.target_node_id)
+- wait condition (today: wait_seconds; store as { "type": "seconds", "seconds": N })
+- control_mode, allow_reverse
+- optional current_order_index
+
+Do not persist live occupancy (node, reservations, speed, in-progress waits).
+
+Trains often do not exist at project load: keep saved plans, attach when a matching device/sim appears. Stale marker node ids: drop/flag, visible hint. Old files without trains still load.
+
+## Acceptance
+Save+reload restores stops, waits, mode, allow-reverse. Sim train re-gets its list on start. pytest round-trip + missing-device-then-attach + stale node. Order panel shows restored stops.
+
+## Out of scope
+New wait types beyond seconds (schema only); reservations/live position; switch-hub bindings.
 ```
 
 ## Issue E2 — Draw planned / reserved leg on canvas
@@ -1105,8 +1181,10 @@ Design-only or later implementation: allow meets at sidings; reserve only to nex
 | B1.2 | feat(train): plan executor with hold + looping orders |
 | B1.3 | feat(train): Auto routing — forward loop, allow reverse, cruise speed (#187) |
 | B2 | feat(train): Manual vs Automatic control mode |
+| B2.1 | feat(ui): Stop button pause/resume with previous speed (#185) |
 | C1.1 | feat(ui): order list panel in Run mode |
 | C1.2 | feat(ui): click canvas marker to add order |
+| C1.3 | feat(ui): wider train panel and stop list that fills space (#186) |
 | C2.1 | feat(ui): click switch to toggle logical position |
 | C2.2 | feat(switch): Manual/Auto mode + lock on reserved leg |
 | F3 | feat(device): hub role identification (train vs switch) |
@@ -1116,7 +1194,8 @@ Design-only or later implementation: allow meets at sidings; reserve only to nex
 | S1 | feat(sim): path-aware single simulated train |
 | S2 | feat(sim): plan route for one simulated train |
 | S3 | feat(sim): multiple simulated trains + planning |
-| E1–E4 | polish / future (as titled above) |
+| E1 | feat(project): persist train stops and wait settings (#184; supersedes #145) |
+| E2–E4 | polish / future (as titled above) |
 | ~~D1~~ | superseded by SW1 + SW2 |
 
 ---

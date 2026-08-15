@@ -150,6 +150,15 @@ class Marker(QObject):
     path_id_changed = Signal()
     path_id = Property(str, path_id, set_path_id, notify=path_id_changed)
 
+    def rail_id(self):
+        parent = self.parent()
+        rail = getattr(parent, "rail", None) if parent is not None else None
+        if rail is None:
+            return -1
+        return rail.id
+
+    rail_id = Property(int, rail_id, constant=True)
+
     def at_boundary(self):
         return self._connector != None
 
