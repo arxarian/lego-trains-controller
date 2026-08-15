@@ -295,6 +295,27 @@ class NetworkManager(QObject):
             return None
         return resolved
 
+    def is_dead_end(self, node_id) -> bool:
+        """True if node_id exists and has exactly one graph neighbor."""
+        if self._graph is None or not node_id or node_id not in self._graph:
+            return False
+        return self._graph.degree(node_id) == 1
+
+    def is_reverse_depart(self, current_node, previous_node, first_hop) -> bool:
+        """True if first_hop goes back along arrival and current is not a dead-end.
+
+        Uses the same entry-edge resolution as exclude_node. Dead-ends return
+        False so the executor may reverse. Unknown/missing previous is not reverse.
+        """
+        if not current_node or not first_hop:
+            return False
+        if self.is_dead_end(current_node):
+            return False
+        entry = self._resolve_exclude_neighbor(current_node, previous_node)
+        if entry is None:
+            return False
+        return first_hop == entry
+
     def _select_next_node(self, node_id: str, exclude_node: str = None) -> str | None:
         """Pick the next graph neighbor from node_id.
 

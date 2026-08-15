@@ -46,7 +46,7 @@ Item {
 
         Text {
             visible: root.train && root.train.control_mode === Train.Automatic
-            text: "Auto (executor not ready)"
+            text: root.train && root.train.executor ? root.train.executor.status : ""
             font.pixelSize: 11
             color: palette.mid
             Layout.fillWidth: true
