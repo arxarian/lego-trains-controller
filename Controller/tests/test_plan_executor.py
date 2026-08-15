@@ -165,24 +165,108 @@ def test_hold_retry_moves_when_leg_frees():
     asyncio.run(scenario())
 
 
+def _planner_from_linear_three_markers():
+    """Three connected straights — middle marker has two neighbors, no loop."""
+    rails = Rails(ConnectorRegister())
+    rails._items = [
+        Rail(type=RailType.Straight, id=1, parent=rails),
+        Rail(type=RailType.Straight, id=2, parent=rails),
+        Rail(type=RailType.Straight, id=3, parent=rails),
+    ]
+    a, b, c = rails._items
+    a.connectTo(b.id, 1)
+    b.connectTo(a.id, 0)
+    b.connectTo(c.id, 1)
+    c.connectTo(b.id, 0)
+    _force_take(a, 8, "#ff0000")
+    _force_take(b, 8, "#00ff00")
+    _force_take(c, 8, "#0000ff")
+    network = net.NetworkManager(rails)
+    network.generate()
+    return Planner(rails, network), network
+
+
 def test_non_dead_end_reverse_holds():
-    planner, network = _planner_from_track(TEST_TRACK)
-    yellow = network.find_node_by_color(YELLOW)
-    red = network.find_node_by_color(RED)
-    leg = planner.compute_leg(red, yellow)
-    assert leg is not None
-    assert network.graph().degree(red) > 1
-    assert network.is_reverse_depart(red, yellow, leg.nodes[1])
+    planner, network = _planner_from_linear_three_markers()
+    red = network.find_node_by_color("#ff0000")
+    green = network.find_node_by_color("#00ff00")
+    assert red and green
+    assert network.graph().degree(green) > 1
 
     train, device = _auto_train(planner, network)
-    train.set_current_node_id(red)
-    train.executor.set_previous_node_id(yellow)
-    train.add_order(yellow, 0.0)
+    train.set_current_node_id(green)
+    train.executor.set_previous_node_id(red)
+    train.add_order(red, 0.0)
     train.set_control_mode(ControlMode.Automatic)
 
     assert train.executor.status == "Hold: no reverse"
     assert device.speed == 0
-    assert network.owner_of(leg.segments[0]) is None
+
+
+def test_allow_reverse_departs_when_no_forward_path():
+    planner, network = _planner_from_linear_three_markers()
+    red = network.find_node_by_color("#ff0000")
+    green = network.find_node_by_color("#00ff00")
+
+    train, device = _auto_train(planner, network)
+    device.set_speed(40)
+    train.set_allow_reverse(True)
+    train.set_current_node_id(green)
+    train.executor.set_previous_node_id(red)
+    train.add_order(red, 0.0)
+    train.set_control_mode(ControlMode.Automatic)
+
+    assert train.executor.status == ExecutorState.MOVING
+    assert device.speed == -40
+
+
+def test_oval_two_stops_loop_forward_without_reverse():
+    planner, network = _planner_from_track(TEST_TRACK)
+    blue = network.find_node_by_color("#0000ff")
+    red = network.find_node_by_color(RED)
+    assert blue == "10A0"
+    assert red == "13A0"
+
+    train, device = _auto_train(planner, network)
+    device.set_speed(40)
+    train.set_current_node_id(blue)
+    train.add_order(red, 0.0)
+    train.add_order(blue, 0.0)
+    train.set_control_mode(ControlMode.Automatic)
+
+    assert train.executor.status == ExecutorState.MOVING
+    assert device.speed > 0
+
+    device.set_color(QColor(RED))
+    assert train.current_node_id == red
+    assert train.executor.status == ExecutorState.MOVING
+    assert device.speed != 0
+    assert train.executor.status != "Hold: no reverse"
+    forward = planner.compute_leg(red, blue, exclude_neighbor=blue)
+    assert all(network.owner_of(sid) == device.name for sid in forward.segments)
+
+
+def test_allow_reverse_uses_shortest_path_even_if_reverse():
+    planner, network = _planner_from_track(TEST_TRACK)
+    blue = network.find_node_by_color("#0000ff")
+    red = network.find_node_by_color(RED)
+    assert blue == "10A0"
+    assert red == "13A0"
+
+    train, device = _auto_train(planner, network)
+    device.set_speed(40)
+    train.set_allow_reverse(True)
+    train.set_current_node_id(red)
+    train.executor.set_previous_node_id(blue)
+    train.add_order(blue, 0.0)
+    train.set_control_mode(ControlMode.Automatic)
+
+    assert train.executor.status == ExecutorState.MOVING
+    assert device.speed == -40
+    short = planner.compute_leg(red, blue)
+    assert short.nodes[1] == blue
+    assert train.current_segment_id == f"{red}:{blue}"
+    assert all(network.owner_of(sid) == device.name for sid in short.segments)
 
 
 def test_dead_end_reverse_allowed_flips_signed_speed():
@@ -231,6 +315,55 @@ def test_fallback_speed_when_last_speed_is_zero():
 
     assert train.executor.status == ExecutorState.MOVING
     assert device.speed == FALLBACK_SPEED
+
+
+def test_live_speed_survives_wait0_arrive():
+    planner, network, _switch = _planner_from_switch_y_with_markers()
+    start = network.find_node_by_color("#ff0000")
+    dest = network.find_node_by_color("#00ff00")
+    assert start and dest
+
+    train, device = _auto_train(planner, network)
+    device.set_speed(40)
+    train.set_current_node_id(start)
+    train.add_order(dest, 0.0)
+    train.add_order(start, 0.0)
+    train.set_control_mode(ControlMode.Automatic)
+
+    assert train.executor.status == ExecutorState.MOVING
+    assert abs(device.speed) == 40
+
+    device.set_speed(80 if device.speed > 0 else -80)
+    device.set_color(QColor("#00ff00"))
+    assert train.current_node_id == dest
+    assert train.executor.status == ExecutorState.MOVING
+    assert abs(device.speed) == 80
+
+
+def test_positive_wait_stops_then_departs():
+    planner, network, _switch = _planner_from_switch_y_with_markers()
+    start = network.find_node_by_color("#ff0000")
+    dest = network.find_node_by_color("#00ff00")
+    assert start and dest
+
+    train, device = _auto_train(planner, network)
+    train.executor._hold_retry_s = 0.02
+    device.set_speed(40)
+    train.set_current_node_id(start)
+    train.add_order(dest, 0.05)
+    train.add_order(start, 0.0)
+
+    async def scenario():
+        train.set_control_mode(ControlMode.Automatic)
+        assert train.executor.status == ExecutorState.MOVING
+        device.set_color(QColor("#00ff00"))
+        assert train.executor.status == ExecutorState.WAITING
+        assert device.speed == 0
+        await asyncio.sleep(0.08)
+        assert train.executor.status == ExecutorState.MOVING
+        assert abs(device.speed) == 40
+
+    asyncio.run(scenario())
 
 
 def test_pause_releases_leg_and_keeps_orders():

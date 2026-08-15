@@ -166,3 +166,17 @@ def test_collect_required_switches_conflict_returns_none():
     )
 
     assert collect_required_switches(rails, graph, ["n0", "n1", "n2"]) is None
+
+
+def test_compute_leg_exclude_neighbor_takes_long_way_on_oval():
+    planner, network = _planner_from_track(TEST_TRACK)
+    reverse = planner.compute_leg("13A0", "10A0")
+    assert reverse is not None
+    assert reverse.nodes[1] == "10A0"
+
+    forward = planner.compute_leg("13A0", "10A0", exclude_neighbor="10A0")
+    assert forward is not None
+    assert forward.nodes[0] == "13A0"
+    assert forward.nodes[-1] == "10A0"
+    assert forward.nodes[1] != "10A0"
+    assert len(forward.segments) > len(reverse.segments)

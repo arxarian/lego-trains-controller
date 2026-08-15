@@ -43,6 +43,13 @@ class Simulator(QObject):
 
     def _advance_to_next_marker(self) -> bool:
         """Move current/previous to the next switch-aware marker. Returns False if stuck."""
+        going_reverse = self._sim_device is not None and self._sim_device.speed < 0
+        if going_reverse and self._previous_node_id:
+            next_node = self._previous_node_id
+            self._previous_node_id = self._current_node_id
+            self._current_node_id = next_node
+            return True
+
         next_node = self._network.find_next_marker_node(self._current_node_id, self._previous_node_id)
 
         if next_node is None:
@@ -72,7 +79,7 @@ class Simulator(QObject):
         # 25 = 1.6
         # 50 = 0.8
         # 100 = 0.4
-        self._step_delay = 40 / self._sim_device.speed
+        self._step_delay = 40 / abs(self._sim_device.speed)
         print("speed changed", self._sim_device.speed, "simulation speed", self._step_delay)
 
     def _cancel_run_task(self):

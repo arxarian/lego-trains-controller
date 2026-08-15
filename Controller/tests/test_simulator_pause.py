@@ -78,3 +78,25 @@ def test_unpause_does_not_start_second_loop_while_running():
     ensure_future.assert_not_called()
     assert sim._run_task is first
     assert sim._current_node_id == "nodeA"
+
+
+def test_negative_speed_advances_to_previous_marker():
+    network = MagicMock()
+    sim = Simulator(network, MagicMock())
+    sim._current_node_id = "nodeB"
+    sim._previous_node_id = "nodeA"
+    sim._sim_device = TrainDeviceSim()
+    sim._sim_device.set_speed(-40)
+
+    assert sim._advance_to_next_marker() is True
+    assert sim._current_node_id == "nodeA"
+    assert sim._previous_node_id == "nodeB"
+    network.find_next_marker_node.assert_not_called()
+
+
+def test_step_delay_uses_abs_speed():
+    sim = Simulator(MagicMock(), MagicMock())
+    sim._sim_device = TrainDeviceSim()
+    sim._sim_device.set_speed(-50)
+    sim.onSpeedChanged()
+    assert sim._step_delay == 40 / 50

@@ -44,6 +44,18 @@ Item {
             }
         }
 
+        CheckBox {
+            text: "Allow reverse"
+            checked: root.train && root.train.allow_reverse
+            onToggled: {
+                if (root.train)
+                    root.train.allow_reverse = checked
+            }
+            ToolTip.visible: hovered
+            ToolTip.text: "Use the shortest path even if that means reversing"
+            Layout.fillWidth: true
+        }
+
         Text {
             visible: root.train && root.train.control_mode === Train.Automatic
             text: root.train && root.train.executor ? root.train.executor.status : ""

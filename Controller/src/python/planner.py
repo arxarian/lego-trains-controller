@@ -61,25 +61,37 @@ class Planner(QObject):
     def updateRailsModel(self, rails):
         self._rails = rails
 
-    def compute_leg(self, from_node: str, to_node: str) -> LegResult | None:
+    def compute_leg(self, from_node: str, to_node: str, exclude_neighbor: str | None = None) -> LegResult | None:
         """Shortest path between two marker (or graph) nodes.
 
         Uses undirected edge weights. Switch position is not applied during search —
         either branch may appear. required_switches lists SwitchLeft/SwitchRight
         path_ids from the chosen path's segment_data (not live rail.switch_position).
 
-        Same-node (when the node exists): trivial leg with that node, empty
-        segments, length 0, and no required switches. Unknown nodes, missing
-        graph, no path, or conflicting switch path_ids on one leg: None.
+        If exclude_neighbor is set, the arrival edge from that neighbor (or the
+        graph neighbor used to enter from_node) is removed on a copy so search
+        continues forward. Same-node (when the node exists): trivial leg with that
+        node, empty segments, length 0, and no required switches. Unknown nodes,
+        missing graph, no path, or conflicting switch path_ids on one leg: None.
         """
         graph = self._network.graph()
         if graph is None or from_node not in graph or to_node not in graph:
             return None
         if from_node == to_node:
             return LegResult(nodes=[from_node], segments=[], length=0.0, required_switches=())
+
+        search = graph
+        if exclude_neighbor:
+            blocked = exclude_neighbor
+            if not graph.has_edge(from_node, blocked):
+                blocked = self._network._resolve_exclude_neighbor(from_node, exclude_neighbor)
+            if blocked and graph.has_edge(from_node, blocked):
+                search = graph.copy()
+                search.remove_edge(from_node, blocked)
+
         try:
-            nodes = nx.shortest_path(graph, from_node, to_node, weight="weight")
-            length = nx.shortest_path_length(graph, from_node, to_node, weight="weight")
+            nodes = nx.shortest_path(search, from_node, to_node, weight="weight")
+            length = nx.shortest_path_length(search, from_node, to_node, weight="weight")
         except nx.NetworkXNoPath:
             return None
         segments = [
