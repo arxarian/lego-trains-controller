@@ -37,9 +37,12 @@ class Train(QObject):
         self._current_order_index = 0
         self._control_mode = ControlMode.Manual
         self._allow_reverse = False
+        self._halted_by_stop = False
+        self._resume_speed = 0
         self._executor = PlanExecutor(self, planner, network, parent=self) if planner is not None else None
 
         device.color_changed.connect(self.on_color_changed)
+        device.speed_changed.connect(self._on_speed_changed)
 
     def on_color_changed(self):
         color = self._device.color
@@ -170,6 +173,7 @@ class Train(QObject):
         if self._control_mode != value:
             self._control_mode = value
             self.control_mode_changed.emit()
+            self.set_halted_by_stop(False)
             if self._executor is not None:
                 if value == ControlMode.Automatic:
                     self._executor.resume()
@@ -191,10 +195,52 @@ class Train(QObject):
     allow_reverse_changed = Signal()
     allow_reverse = Property(bool, allow_reverse, set_allow_reverse, notify=allow_reverse_changed)
 
+    def halted_by_stop(self):
+        return self._halted_by_stop
+
+    def set_halted_by_stop(self, value):
+        value = bool(value)
+        if self._halted_by_stop != value:
+            self._halted_by_stop = value
+            self.halted_by_stop_changed.emit()
+
+    halted_by_stop_changed = Signal()
+    halted_by_stop = Property(bool, halted_by_stop, set_halted_by_stop, notify=halted_by_stop_changed)
+
     def executor(self):
         return self._executor
 
     executor = Property(QObject, executor, constant=True)
+
+    def _on_speed_changed(self):
+        speed = self._device.speed
+        if speed == 0:
+            return
+        self._resume_speed = speed
+        if self._halted_by_stop and self._control_mode == ControlMode.Manual:
+            self.set_halted_by_stop(False)
+
+    def _halt_by_stop(self):
+        if self._device.speed != 0:
+            self._resume_speed = self._device.speed
+        if self._control_mode == ControlMode.Automatic and self._executor is not None:
+            self._executor.pause()
+        self._device.set_speed(0)
+        self.set_halted_by_stop(True)
+
+    def _resume_from_stop(self):
+        self.set_halted_by_stop(False)
+        if self._control_mode == ControlMode.Automatic and self._executor is not None:
+            self._executor.resume()
+            return
+        self._device.set_speed(self._resume_speed)
+
+    @Slot()
+    def toggle_stop(self):
+        if self._halted_by_stop:
+            self._resume_from_stop()
+        else:
+            self._halt_by_stop()
 
     def _clamp_current_order_index(self):
         count = self._orders.rowCount()

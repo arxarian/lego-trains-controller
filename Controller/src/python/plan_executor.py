@@ -36,6 +36,7 @@ class PlanExecutor(QObject):
         self._previous_node_id = ""
         self._current_leg = None
         self._cruise_speed = 0
+        self._paused_while_waiting = False
         self._task = None
         self._train.device.speed_changed.connect(self._capture_cruise)
 
@@ -250,6 +251,7 @@ class PlanExecutor(QObject):
 
     @Slot()
     def pause(self):
+        self._paused_while_waiting = self._state == ExecutorState.WAITING
         self._cancel_task()
         self._release_current_leg()
         if self._network is not None:
@@ -264,8 +266,14 @@ class PlanExecutor(QObject):
         self._current_leg = None
         self._capture_cruise()
         if not self._train.current_node_id:
+            self._paused_while_waiting = False
             self._set_speed(0)
             self._set_state(ExecutorState.WAITING_FOR_LOCALIZATION)
+            return
+        if self._paused_while_waiting:
+            self._paused_while_waiting = False
+            self._set_state(ExecutorState.IDLE)
+            self._advance_and_depart()
             return
         self._set_state(ExecutorState.IDLE)
         self.try_depart()

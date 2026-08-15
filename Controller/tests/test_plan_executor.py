@@ -382,6 +382,7 @@ def test_pause_releases_leg_and_keeps_orders():
 
     train.set_control_mode(ControlMode.Manual)
     assert train.executor.status == ExecutorState.PAUSED
+    assert not train.halted_by_stop
     assert network.owner_of(leg.segments[0]) is None
     assert train.orders.count == 2
     assert train.current_order_index == 0
