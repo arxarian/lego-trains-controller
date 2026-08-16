@@ -27,6 +27,10 @@ class ProjectStorage(QObject):
         self.base_path = Path("src/projects")
         self.base_path.mkdir(parents=True, exist_ok=True)
         self._currentProject = Project(DEFAULT_NAME, parent=self)
+        self._trains = None
+
+    def set_trains(self, trains):
+        self._trains = trains
 
     def currentProject(self):
         return self._currentProject
@@ -51,6 +55,8 @@ class ProjectStorage(QObject):
 
     @Slot(QObject)
     def saveProject(self, project: Project):
+        if self._trains is not None:
+            self._trains.sync_live_into_project(project)
         data = project.save_data()
         path = self.base_path.joinpath(project.name + ".json")
         saveDataToFile(path, data)

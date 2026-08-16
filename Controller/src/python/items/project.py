@@ -5,6 +5,7 @@ from PySide6.QtCore import QObject, Signal, Property
 from python.settings import Settings
 from python.connectorregister import ConnectorRegister
 from python.models.rails import Rails
+from python.train_plan import parse_plans
 
 class Project(QObject):
     def __init__(self, name: str="", data: dict=None, parent=None):
@@ -13,19 +14,44 @@ class Project(QObject):
         self._connectorRegister = ConnectorRegister(self)
         self._rails = Rails(self._connectorRegister, self)
         self._settings = Settings(parent=self)
+        self._train_plans = []
 
         if data:
             self._rails.load_data(data.get("rails", []))
             self._settings.deleteLater()
             self._settings = Settings.load_data(data.get("settings", {}), self)
+            self._train_plans = list(parse_plans(data.get("trains", [])).values())
 
         self.set_name(name)
 
     def save_data(self) -> dict:
         return {
             "rails": self._rails.save_data(),
-            "settings": self._settings.save_data()
+            "settings": self._settings.save_data(),
+            "trains": self._train_plans,
         }
+
+    def train_plans(self) -> list:
+        return self._train_plans
+
+    def set_train_plans(self, plans: list):
+        self._train_plans = list(plans)
+
+    def train_plan_for(self, key: str):
+        for plan in self._train_plans:
+            if plan.get("key") == key:
+                return plan
+        return None
+
+    def upsert_train_plan(self, plan: dict):
+        key = plan.get("key")
+        if not key:
+            return
+        for index, existing in enumerate(self._train_plans):
+            if existing.get("key") == key:
+                self._train_plans[index] = plan
+                return
+        self._train_plans.append(plan)
 
     def name(self):
         return self._name
