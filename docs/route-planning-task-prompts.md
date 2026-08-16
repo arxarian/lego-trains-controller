@@ -25,7 +25,6 @@ Implement issues in order within each slice; do not start a slice before its dep
 | A2.3 | #134 multi-waypoint list | S | A2.1 |
 | B1.1 | #137 order list model | S–M | — |
 | C2.1 | #142 click switch toggle | S–M | A1.1 |
-| E1 | #184 persist stops/waits | M | C1.1 (done) |
 | E4 | #148 deadlock design note | S | — |
 
 ### Phase 0 — Foundations
@@ -47,7 +46,7 @@ Editor multi-color chip and other UX/UI polish: see GitHub epic **[#158](https:/
 
 ### Phase 3 — Switches + plan UI
 8. SW1 (**L**, A1.1; F3 for HW role routing) → C2.1 (**S–M**, A1.1) → C2.2 (**M–L**)  
-9. C1.1 (**M**, B1.1) → **E1** #184 (**M**, C1.1) persist stops/waits (P0 for testing) → C1.2 (**M**, C1.1, done)  
+9. C1.1 (**M**, B1.1) → **E1** #184 (**M**, C1.1, done) persist stops/waits (P0 for testing) → C1.2 (**M**, C1.1, done)  
    C1.3 #186 (**S**, C1.1, done) wider panel + stop list fills space (P2 layout)  
 10. SW2 (**L**, SW1) when hardware ready; pairs with F3 switch role on hub  
 11. SW3 (**L**, SW2) one hub → up to four turnouts (multi-channel)
@@ -86,7 +85,7 @@ These decisions are final for MVP:
 | Auto travel direction | Prefer continue **forward** along arrival direction (same `exclude_node` idea as NetworkManager). Reverse only at **dead-ends** (sole neighbor), unless **Allow reverse** is on (B1.3): then use Dijkstra’s true shortest path, including reverse, and flip signed speed. Executor sets signed speed (`fwd`/`rev`) to match the reserved leg’s first hop. Mid-leg reverse forbidden. |
 | Manual during plan | **Pause** executor; keep orders; release current leg reservation |
 | Stop button | Pause/resume toggle (B2.1): remember last speed; Auto stays Auto and continues the same next stop |
-| Persist orders | Project JSON (E1 #184) — do early so Auto/sim tests survive reload |
+| Persist orders | Project JSON (E1 #184, done) — save/reload restores Auto/sim test plans |
 | First verification | Simulator first, then real hub |
 | Localization | Markers are the only position source; react only at markers |
 
@@ -669,7 +668,7 @@ B1.2 Hold-on-reverse made two nearby oval stops reverse or Hold. Wait-0 arrive a
 - pytest in test_plan_executor.py / test_planner.py / sim tests.
 
 ## Out of scope
-Canvas click-to-order (C1.2). Physical switch throwing (C2.2). Persist allow_reverse (E1).
+Canvas click-to-order (C1.2). Physical switch throwing (C2.2). Persist allow_reverse (E1, done).
 ```
 
 ---
@@ -1098,12 +1097,12 @@ Physics-perfect timing, canvas animation interpolation (#120), real hubs.
 
 # Slice E — Polish (E1 pulled forward)
 
-## Issue E1 — Persist train stops and wait settings (#184)
+## Issue E1 — Persist train stops and wait settings (#184) **Done**
 
 GitHub: https://github.com/arxarian/lego-trains-controller/issues/184  
 Supersedes thin slice #145.
 
-**P0** — C1.1 is done; saved plans make Auto/sim testing repeatable. Do before or with S2.
+**Done** via #192. C1.1 is done; saved plans make Auto/sim testing repeatable.
 
 **Prompt:**
 
