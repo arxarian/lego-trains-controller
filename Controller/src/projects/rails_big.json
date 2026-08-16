@@ -754,8 +754,77 @@
         }
     ],
     "settings": {
-        "canvas_x": 261.0,
-        "canvas_y": 385.0,
-        "canvas_zoom": 0.2
-    }
+        "canvas_x": 315.0,
+        "canvas_y": -16.0,
+        "canvas_zoom": 0.09
+    },
+    "trains": [
+        {
+            "key": "Simulator",
+            "kind": "sim",
+            "control_mode": "automatic",
+            "allow_reverse": false,
+            "current_order_index": 2,
+            "orders": [
+                {
+                    "target_node_id": "13A16",
+                    "wait": {
+                        "type": "seconds",
+                        "seconds": 1.0
+                    }
+                },
+                {
+                    "target_node_id": "22A16",
+                    "wait": {
+                        "type": "seconds",
+                        "seconds": 2.0
+                    }
+                },
+                {
+                    "target_node_id": "44A8",
+                    "wait": {
+                        "type": "seconds",
+                        "seconds": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "key": "City Hub 1",
+            "kind": "ble",
+            "control_mode": "automatic",
+            "allow_reverse": true,
+            "current_order_index": 0,
+            "orders": [
+                {
+                    "target_node_id": "19A8",
+                    "wait": {
+                        "type": "seconds",
+                        "seconds": 1.0
+                    }
+                },
+                {
+                    "target_node_id": "22A16",
+                    "wait": {
+                        "type": "seconds",
+                        "seconds": 1.0
+                    }
+                },
+                {
+                    "target_node_id": "13A16",
+                    "wait": {
+                        "type": "seconds",
+                        "seconds": 0.0
+                    }
+                },
+                {
+                    "target_node_id": "44A8",
+                    "wait": {
+                        "type": "seconds",
+                        "seconds": 1.0
+                    }
+                }
+            ]
+        }
+    ]
 }
