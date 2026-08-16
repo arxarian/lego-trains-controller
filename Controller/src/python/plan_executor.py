@@ -10,6 +10,7 @@ QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
 
 FALLBACK_SPEED = 40
+MIN_AUTO_SPEED = 30
 
 
 class ExecutorState:
@@ -74,9 +75,13 @@ class PlanExecutor(QObject):
         if speed != 0:
             self._cruise_speed = speed
 
-    def _apply_moving_speed(self, flip=False):
+    def _auto_speed_magnitude(self):
         self._capture_cruise()
         magnitude = abs(self._cruise_speed) if self._cruise_speed else FALLBACK_SPEED
+        return max(magnitude, MIN_AUTO_SPEED)
+
+    def _apply_moving_speed(self, flip=False):
+        magnitude = self._auto_speed_magnitude()
         sign = 1 if self._cruise_speed >= 0 else -1
         if flip:
             sign = -sign
@@ -270,7 +275,8 @@ class PlanExecutor(QObject):
         self._capture_cruise()
         if not self._train.current_node_id:
             self._paused_while_waiting = False
-            self._set_speed(0)
+            sign = 1 if self._cruise_speed >= 0 else -1
+            self._set_speed(sign * MIN_AUTO_SPEED)
             self._set_state(ExecutorState.WAITING_FOR_LOCALIZATION)
             return
         if self._paused_while_waiting:

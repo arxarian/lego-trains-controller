@@ -16,7 +16,7 @@ from python.items.rail import Rail, RailType
 from python.items.train import ControlMode, Train
 from python.items.train_device_sim import TrainDeviceSim
 from python.models.rails import Rails
-from python.plan_executor import ExecutorState, FALLBACK_SPEED
+from python.plan_executor import ExecutorState, FALLBACK_SPEED, MIN_AUTO_SPEED
 from python.planner import Planner
 
 TEST_TRACK = "tests/tracks/rails.json"
@@ -242,7 +242,7 @@ def test_auto_stop_resume_stays_waiting_for_localization():
     train.add_order(red, 0.0)
     train.set_control_mode(ControlMode.Automatic)
     assert train.executor.status == ExecutorState.WAITING_FOR_LOCALIZATION
-    assert device.speed == 0
+    assert abs(device.speed) >= MIN_AUTO_SPEED
 
     train.toggle_stop()
     assert train.halted_by_stop
@@ -254,7 +254,7 @@ def test_auto_stop_resume_stays_waiting_for_localization():
     assert not train.halted_by_stop
     assert train.control_mode == ControlMode.Automatic
     assert train.executor.status == ExecutorState.WAITING_FOR_LOCALIZATION
-    assert device.speed == 0
+    assert abs(device.speed) >= MIN_AUTO_SPEED
 
 
 def test_mode_switch_does_not_set_halted_by_stop():
