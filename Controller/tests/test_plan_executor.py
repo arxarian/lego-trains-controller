@@ -427,6 +427,23 @@ def test_waits_for_localization_before_depart():
     assert device.speed > 0
 
 
+def test_paused_executor_still_localizes():
+    planner, network = _planner_from_track(TEST_TRACK)
+    yellow = network.find_node_by_color(YELLOW)
+    red = network.find_node_by_color(RED)
+
+    train, device = _auto_train(planner, network)
+    train.add_order(red, 0.0)
+    train.set_control_mode(ControlMode.Automatic, resume_executor=False)
+    train.set_halted_by_stop(True)
+    assert train.executor.status == ExecutorState.PAUSED
+
+    device.set_color(QColor(YELLOW))
+    assert train.current_node_id == yellow
+    assert train.executor.status == ExecutorState.PAUSED
+    assert train.halted_by_stop
+
+
 def test_is_reverse_depart_helper():
     planner, network = _planner_from_track(TEST_TRACK)
     yellow = network.find_node_by_color(YELLOW)

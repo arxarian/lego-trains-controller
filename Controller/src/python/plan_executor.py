@@ -226,13 +226,16 @@ class PlanExecutor(QObject):
         self._set_state(ExecutorState.MOVING)
 
     def on_marker(self, node_id):
-        if self._state == ExecutorState.PAUSED or not node_id:
+        if not node_id:
             return
 
         old = self._train.current_node_id
         if old and old != node_id:
             self._previous_node_id = old
         self._train.set_current_node_id(node_id)
+
+        if self._state == ExecutorState.PAUSED:
+            return
 
         if self._state in (
             ExecutorState.IDLE,

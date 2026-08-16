@@ -173,16 +173,16 @@ class Train(QObject):
     def control_mode(self):
         return self._control_mode
 
-    def set_control_mode(self, value):
+    def set_control_mode(self, value, *, resume_executor=True):
         value = ControlMode(int(value))
         if self._control_mode != value:
             self._control_mode = value
             self.control_mode_changed.emit()
             self.set_halted_by_stop(False)
             if self._executor is not None:
-                if value == ControlMode.Automatic:
+                if value == ControlMode.Automatic and resume_executor:
                     self._executor.resume()
-                else:
+                elif value != ControlMode.Automatic:
                     self._executor.pause()
 
     control_mode_changed = Signal()
@@ -327,9 +327,9 @@ class Train(QObject):
         mode, mode_warn = control_mode_from_json(plan.get("control_mode"))
         if mode_warn:
             warnings.append(mode_warn)
-        self.set_control_mode(ControlMode(mode))
-        if self._control_mode == ControlMode.Automatic and self._executor is not None:
-            self._executor.resume()
+        self.set_control_mode(ControlMode(mode), resume_executor=False)
+        if self._control_mode == ControlMode.Automatic:
+            self.set_halted_by_stop(True)
         return dropped
 
     def drop_stale_orders(self, node_ids) -> list[str]:

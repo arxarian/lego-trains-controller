@@ -11,6 +11,9 @@ from python.items.rail import Rail
 from python.items.train import ControlMode, Train
 from python.items.train_device_sim import TrainDeviceSim
 from python.models.trains import Trains
+from python.plan_executor import ExecutorState
+from python.planner import Planner
+from python.simulator import Simulator
 from python.train_plan import snapshot_train, wait_from_json
 
 TEST_TRACK = "tests/tracks/rails.json"
@@ -36,8 +39,12 @@ def _network_from_track(path: str, *, generate=True):
     return network, data
 
 
-def _make_trains(network):
-    return Trains(network, MagicMock())
+def _make_trains(network, planner=None):
+    return Trains(network, MagicMock(), planner)
+
+
+def _planner_for(network):
+    return Planner(network._rails, network)
 
 
 def _simulator_plan(orders, *, control_mode="automatic", allow_reverse=True, current_order_index=1):
@@ -88,7 +95,7 @@ def test_round_trip_train_plan():
     assert data["trains"][0]["orders"][1]["wait"] == {"type": "seconds", "seconds": 5.0}
 
     loaded = Project("round", data)
-    trains = _make_trains(network)
+    trains = _make_trains(network, _planner_for(network))
     trains.set_project(loaded)
     restored = trains.add_train(TrainDeviceSim(name="Simulator"))
 
@@ -99,6 +106,13 @@ def test_round_trip_train_plan():
     assert restored.current_order_index == 1
     assert restored.allow_reverse is True
     assert restored.control_mode == ControlMode.Automatic
+    assert restored.halted_by_stop
+    assert restored.executor.status == ExecutorState.PAUSED
+
+    restored.toggle_stop()
+    assert not restored.halted_by_stop
+    assert restored.control_mode == ControlMode.Automatic
+    assert restored.executor.status != ExecutorState.PAUSED
 
 
 def test_missing_device_then_attach():
@@ -109,7 +123,7 @@ def test_missing_device_then_attach():
         {"target_node_id": node_ids[1], "wait": {"type": "seconds", "seconds": 5}},
     ])
     project = Project("orphan", {"rails": [], "settings": {}, "trains": [plan]})
-    trains = _make_trains(network)
+    trains = _make_trains(network, _planner_for(network))
     trains.set_project(project)
 
     assert trains.rowCount() == 0
@@ -123,6 +137,8 @@ def test_missing_device_then_attach():
     assert attached.orders.get(1).wait_seconds == 5.0
     assert attached.control_mode == ControlMode.Automatic
     assert attached.allow_reverse is True
+    assert attached.halted_by_stop
+    assert attached.executor.status == ExecutorState.PAUSED
 
 
 def test_stale_node_dropped_after_generate():
@@ -220,3 +236,59 @@ def test_project_switch_clears_unmatched_train():
     trains.set_project(empty)
     assert train.orders.count == 0
     assert train.control_mode == ControlMode.Manual
+    assert not train.halted_by_stop
+
+
+def test_manual_plan_attach_is_not_halted():
+    network, _ = _network_from_track(TEST_TRACK)
+    node_ids = network.marker_node_ids()
+    plan = _simulator_plan(
+        [{"target_node_id": node_ids[0], "wait": {"type": "seconds", "seconds": 0}}],
+        control_mode="manual",
+        allow_reverse=False,
+        current_order_index=0,
+    )
+    project = Project("manual", {"rails": [], "settings": {}, "trains": [plan]})
+    trains = _make_trains(network, _planner_for(network))
+    trains.set_project(project)
+    train = trains.add_train(TrainDeviceSim(name="Simulator"))
+
+    assert train.control_mode == ControlMode.Manual
+    assert not train.halted_by_stop
+    assert train.executor.status == ExecutorState.PAUSED
+
+
+def test_simulator_starts_parked_at_zero_speed():
+    network, _ = _network_from_track(TEST_TRACK)
+    trains = _make_trains(network, _planner_for(network))
+    sim = Simulator(network, trains)
+    sim.start()
+
+    assert sim.is_running
+    assert sim._sim_device.speed == 0
+    assert sim._run_task is None
+    assert sim._marker_consumed is True
+    train = trains.get(0)
+    assert train.current_node_id != ""
+
+
+def test_simulator_start_with_auto_plan_stays_parked():
+    network, _ = _network_from_track(TEST_TRACK)
+    node_ids = network.marker_node_ids()
+    plan = _simulator_plan(
+        [{"target_node_id": node_ids[0], "wait": {"type": "seconds", "seconds": 0}}],
+        current_order_index=0,
+    )
+    project = Project("auto-sim", {"rails": [], "settings": {}, "trains": [plan]})
+    trains = _make_trains(network, _planner_for(network))
+    trains.set_project(project)
+    sim = Simulator(network, trains)
+    sim.start()
+
+    train = trains.get(0)
+    assert train.control_mode == ControlMode.Automatic
+    assert train.halted_by_stop
+    assert train.executor.status == ExecutorState.PAUSED
+    assert sim._sim_device.speed == 0
+    assert sim._run_task is None
+    assert train.current_node_id != ""

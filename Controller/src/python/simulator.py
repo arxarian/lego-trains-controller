@@ -101,13 +101,15 @@ class Simulator(QObject):
         self._previous_node_id = None
         self._marker_consumed = False
         self._sim_device = TrainDeviceSim(name="Simulator", parent=self)
-        self._sim_device.set_speed(30)
         self._train = self._trains.add_train(self._sim_device)
         self._sim_device.disconnected.connect(self.on_sim_device_disconnected)
         self._sim_device.speed_changed.connect(self.onSpeedChanged)
 
         self.set_is_running(True)
-        self._run_task = asyncio.ensure_future(self.run_loop())
+        color_hex = self._color_for_node(self._current_node_id)
+        if color_hex:
+            self._sim_device.set_color(QColor(color_hex))
+            self._marker_consumed = True
 
     @Slot()
     def stop(self):
