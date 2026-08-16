@@ -33,10 +33,17 @@ RailSource = {
 SWITCH_PATH_IDS = ("A", "B")
 DEFAULT_SWITCH_POSITION = "A"
 
+
+class ControlMode(IntEnum):
+    Manual = 1
+    Automatic = 2
+
+
 @QmlElement
 class Rail(QObject):
     last_id = 0  # static variable
     QEnum(RailType)
+    QEnum(ControlMode)
 
     def generate_id(id):   # static method
         if id == 0:
@@ -93,8 +100,10 @@ class Rail(QObject):
         self._path_indicators = PathIndicators(parent=self)
         self._reservation_indicators = PathIndicators(parent=self)
         self._reserved = False  # reserved by train
-        # Session-only logical turnout position; TODO sync from switch hub on BLE connect (Auto/Manual = C2)
+        # Session-only logical turnout; mode/lock are not persisted (C2.2)
         self._switch_position = DEFAULT_SWITCH_POSITION
+        self._control_mode = ControlMode.Manual
+        self._locked_by = ""
 
         self._paths = {}                            # dictionary
 
@@ -267,6 +276,56 @@ class Rail(QObject):
     switch_position_changed = Signal()
     switch_position = Property(str, switch_position, set_switch_position, notify=switch_position_changed)
 
+    def control_mode(self):
+        return self._control_mode
+
+    def set_control_mode(self, value):
+        if not self.is_switch():
+            return
+        value = ControlMode(int(value))
+        if self._control_mode == value:
+            return
+        self._control_mode = value
+        self.control_mode_changed.emit()
+
+    control_mode_changed = Signal()
+    control_mode = Property(int, control_mode, set_control_mode, notify=control_mode_changed)
+
+    def locked(self):
+        return bool(self._locked_by)
+
+    locked_changed = Signal()
+    locked = Property(bool, locked, notify=locked_changed)
+
+    def locked_by(self):
+        return self._locked_by
+
+    locked_by_changed = Signal()
+    locked_by = Property(str, locked_by, notify=locked_by_changed)
+
+    def lock_for(self, owner):
+        if not self.is_switch() or not owner:
+            return
+        if self._locked_by == owner:
+            return
+        self._locked_by = owner
+        self.locked_changed.emit()
+        self.locked_by_changed.emit()
+
+    def unlock_for(self, owner):
+        if not self.is_switch() or not owner:
+            return
+        if self._locked_by != owner:
+            return
+        self.unlock()
+
+    def unlock(self):
+        if not self._locked_by:
+            return
+        self._locked_by = ""
+        self.locked_changed.emit()
+        self.locked_by_changed.emit()
+
     @Slot(str)
     def setSwitchPosition(self, path_id):
         self.set_switch_position(path_id)
@@ -274,6 +333,12 @@ class Rail(QObject):
     @Slot()
     def toggleSwitchPosition(self):
         if not self.is_switch():
+            return
+        if self._locked_by:
+            print(f"Rail {self._id}: switch toggle rejected (locked by {self._locked_by})")
+            return
+        if self._control_mode != ControlMode.Manual:
+            print(f"Rail {self._id}: switch toggle rejected (Automatic mode)")
             return
         self.set_switch_position("B" if self._switch_position == "A" else "A")
 
