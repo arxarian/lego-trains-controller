@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from PySide6.QtCore import QObject, Slot, Property, Signal
 from PySide6.QtGui import QColor
+from python.items.rail import Rail
 from python.network_generator import NetworkGenerator
 
 class NetworkManager(QObject):
@@ -89,14 +90,53 @@ class NetworkManager(QObject):
             return
         for segment_id in [sid for sid, o in self._owners.items() if o == owner]:
             self.release_segment(segment_id, owner)
+        self._unlock_switches_for(owner)
+
+    def _required_switches_for_segments(self, segment_ids) -> list[tuple[Rail, str]] | None:
+        """Switch rails and path_ids required by segment_data, or None on path_id conflict.
+
+        Non-Rail / non-switch entries are ignored (keeps MagicMock rails in unit tests inert).
+        """
+        ordered: dict[int, tuple[Rail, str]] = {}
+        for segment_id in segment_ids:
+            segment = self._segments.get(segment_id)
+            if segment is None:
+                continue
+            for rail_data in segment[2].get("segment_data", []):
+                rail = self._rails.findRailData(rail_data["rail_id"])
+                if not isinstance(rail, Rail) or not rail.is_switch():
+                    continue
+                path_id = rail_data["path_id"]
+                if rail.id in ordered and ordered[rail.id][1] != path_id:
+                    return None
+                if rail.id not in ordered:
+                    ordered[rail.id] = (rail, path_id)
+        return list(ordered.values())
+
+    def _unlock_switches_for(self, owner) -> None:
+        for rail in self._rails.items():
+            if isinstance(rail, Rail) and rail.is_switch():
+                rail.unlock_for(owner)
+
+    def _unlock_all_switches(self) -> None:
+        for rail in self._rails.items():
+            if isinstance(rail, Rail) and rail.is_switch():
+                rail.unlock()
+
+    def _apply_switch_locks(self, owner, required: list[tuple[Rail, str]]) -> None:
+        for rail, path_id in required:
+            rail.set_switch_position(path_id)
+            rail.lock_for(owner)
 
     def try_reserve_leg(self, owner, segment_ids) -> bool:
         """Atomically reserve every segment of a planned leg for owner.
 
         Auto executor (B1) entry point: call before departure with
         LegResult.segments. Returns True if all segments are free or already
-        owned by owner (then owns all). Returns False on conflict or unknown
-        segment id — ownership is unchanged (Hold). Empty leg succeeds.
+        owned by owner (then owns all). Sets and locks required switch rails.
+        Returns False on conflict, unknown segment, switch path conflict, or
+        a required switch locked by another owner — ownership is unchanged (Hold).
+        Empty leg succeeds.
         """
         if not owner:
             return False
@@ -111,6 +151,14 @@ class NetworkManager(QObject):
             if current is not None and current != owner:
                 return False
 
+        required = self._required_switches_for_segments(ids)
+        if required is None:
+            return False
+        for rail, _path_id in required:
+            locked_by = rail.locked_by
+            if locked_by and locked_by != owner:
+                return False
+
         newly_taken = []
         for segment_id in ids:
             if self._owners.get(segment_id) == owner:
@@ -120,6 +168,8 @@ class NetworkManager(QObject):
                     self.release_segment(taken, owner)
                 return False
             newly_taken.append(segment_id)
+
+        self._apply_switch_locks(owner, required)
         return True
 
     def release_leg(self, owner, segment_ids) -> bool:
@@ -127,8 +177,8 @@ class NetworkManager(QObject):
 
         Free segments are skipped. Segments owned by another party are left
         alone and cause False, but this owner's segments in the list are still
-        released (best-effort). Empty list succeeds. Use release_all_for for
-        pause/manual full cleanup.
+        released (best-effort). Unlocks switches locked by this owner. Empty
+        list succeeds. Use release_all_for for pause/manual full cleanup.
         """
         if not owner:
             return False
@@ -143,6 +193,7 @@ class NetworkManager(QObject):
                 continue
             if not self.release_segment(segment_id, owner):
                 ok = False
+        self._unlock_switches_for(owner)
         return ok
 
     def reserve_segments(self, segment_ids) -> bool:
@@ -419,6 +470,7 @@ class NetworkManager(QObject):
     def generate(self):
         self._segments = {}
         self._owners = {}
+        self._unlock_all_switches()
         self._graph, self._nodeMarkerMap = self._generator.generate(self._rails.items(), True)
 
         edges = self._graph.edges(data=True)

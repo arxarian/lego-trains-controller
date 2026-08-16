@@ -159,7 +159,7 @@ Item {
                             required property int index
 
                             width: switchRails.width
-                            height: object && object.is_switch() ? 40 : 0
+                            height: object && object.is_switch() ? 48 : 0
                             visible: height > 0
                             color: root.selectedRailIndex === index ? "#cce5ff" : "transparent"
 
@@ -177,18 +177,29 @@ Item {
                                         return "Rail " + object.id
                                               + " (" + (object.type === 2 ? "SwitchLeft" : "SwitchRight") + ")"
                                               + "  pos " + object.switch_position
+                                              + (object.locked ? "  locked" : "")
                                               + "  —  " + switchDevices.deviceNameForRail(object)
                                     }
                                     Layout.fillWidth: true
-                                }
-                            }
 
-                            MouseArea {
-                                anchors.fill: parent
-                                enabled: railRow.visible
-                                onClicked: {
-                                    root.selectedRailIndex = index
-                                    root.selectedRail = object
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            root.selectedRailIndex = railRow.index
+                                            root.selectedRail = railRow.object
+                                        }
+                                    }
+                                }
+
+                                Switch {
+                                    checked: object && object.control_mode === Rail.Automatic
+                                    enabled: object && !object.locked
+                                    text: checked ? "Auto" : "Manual"
+                                    onToggled: {
+                                        if (!object)
+                                            return
+                                        object.control_mode = checked ? Rail.Automatic : Rail.Manual
+                                    }
                                 }
                             }
                         }
