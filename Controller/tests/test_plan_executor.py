@@ -20,7 +20,7 @@ from python.items.rail import Rail, RailType
 from python.items.train import ControlMode, Train
 from python.items.train_device_sim import TrainDeviceSim
 from python.models.rails import Rails
-from python.plan_executor import ExecutorState, FALLBACK_SPEED
+from python.plan_executor import ExecutorState, FALLBACK_SPEED, MIN_AUTO_SPEED
 from python.planner import LegResult, Planner
 
 TEST_TRACK = "tests/tracks/rails.json"
@@ -419,12 +419,66 @@ def test_waits_for_localization_before_depart():
     train.add_order(red, 0.0)
     train.set_control_mode(ControlMode.Automatic)
     assert train.executor.status == ExecutorState.WAITING_FOR_LOCALIZATION
-    assert device.speed == 0
+    assert abs(device.speed) >= MIN_AUTO_SPEED
 
     device.set_color(QColor(YELLOW))
     assert train.current_node_id == yellow
     assert train.executor.status == ExecutorState.MOVING
-    assert device.speed > 0
+    assert abs(device.speed) >= MIN_AUTO_SPEED
+
+
+def test_resume_without_node_rolls_at_min_auto_speed():
+    planner, network = _planner_from_track(TEST_TRACK)
+    yellow = network.find_node_by_color(YELLOW)
+    red = network.find_node_by_color(RED)
+
+    train, device = _auto_train(planner, network)
+    train.add_order(red, 0.0)
+    train.set_control_mode(ControlMode.Automatic, resume_executor=False)
+    train.set_halted_by_stop(True)
+    assert train.current_node_id == ""
+
+    train.toggle_stop()
+    assert not train.halted_by_stop
+    assert train.executor.status == ExecutorState.WAITING_FOR_LOCALIZATION
+    assert abs(device.speed) >= MIN_AUTO_SPEED
+
+    device.set_color(QColor(YELLOW))
+    assert train.current_node_id == yellow
+    assert train.executor.status == ExecutorState.MOVING
+    assert abs(device.speed) >= MIN_AUTO_SPEED
+
+
+def test_auto_speed_floors_cruise_below_min():
+    planner, network = _planner_from_track(TEST_TRACK)
+    yellow = network.find_node_by_color(YELLOW)
+    red = network.find_node_by_color(RED)
+
+    train, device = _auto_train(planner, network)
+    device.set_speed(10)
+    train.set_current_node_id(yellow)
+    train.add_order(red, 0.0)
+    train.set_control_mode(ControlMode.Automatic)
+
+    assert train.executor.status == ExecutorState.MOVING
+    assert abs(device.speed) == MIN_AUTO_SPEED
+
+
+def test_paused_executor_still_localizes():
+    planner, network = _planner_from_track(TEST_TRACK)
+    yellow = network.find_node_by_color(YELLOW)
+    red = network.find_node_by_color(RED)
+
+    train, device = _auto_train(planner, network)
+    train.add_order(red, 0.0)
+    train.set_control_mode(ControlMode.Automatic, resume_executor=False)
+    train.set_halted_by_stop(True)
+    assert train.executor.status == ExecutorState.PAUSED
+
+    device.set_color(QColor(YELLOW))
+    assert train.current_node_id == yellow
+    assert train.executor.status == ExecutorState.PAUSED
+    assert train.halted_by_stop
 
 
 def test_is_reverse_depart_helper():

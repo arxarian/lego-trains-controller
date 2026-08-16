@@ -8,6 +8,11 @@ from PySide6.QtQml import QmlElement
 from python.items.order import Order
 from python.models.orders import Orders
 from python.plan_executor import PlanExecutor
+from python.train_plan import (
+    control_mode_from_json,
+    valid_orders,
+    wait_from_json,
+)
 
 QML_IMPORT_NAME = "TrainView"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -168,16 +173,16 @@ class Train(QObject):
     def control_mode(self):
         return self._control_mode
 
-    def set_control_mode(self, value):
+    def set_control_mode(self, value, *, resume_executor=True):
         value = ControlMode(int(value))
         if self._control_mode != value:
             self._control_mode = value
             self.control_mode_changed.emit()
             self.set_halted_by_stop(False)
             if self._executor is not None:
-                if value == ControlMode.Automatic:
+                if value == ControlMode.Automatic and resume_executor:
                     self._executor.resume()
-                else:
+                elif value != ControlMode.Automatic:
                     self._executor.pause()
 
     control_mode_changed = Signal()
@@ -289,3 +294,55 @@ class Train(QObject):
         if order is None:
             return
         order.set_wait_seconds(seconds)
+
+    def apply_plan(self, plan, *, valid_node_ids=None, warnings=None) -> list[str]:
+        if self._executor is not None:
+            self._executor.pause()
+
+        if warnings is None:
+            warnings = []
+
+        if plan is None:
+            self.clear_orders()
+            self.set_allow_reverse(False)
+            self.set_control_mode(ControlMode.Manual)
+            return []
+
+        kept, dropped = valid_orders(plan, valid_node_ids)
+        self.clear_orders()
+        for order in kept:
+            seconds, warn = wait_from_json(order.get("wait"))
+            if warn:
+                warnings.append(warn)
+            self.add_order(order["target_node_id"], seconds)
+
+        count = self._orders.rowCount()
+        index = int(plan.get("current_order_index") or 0)
+        if count == 0:
+            self.set_current_order_index(0)
+        else:
+            self.set_current_order_index(max(0, min(index, count - 1)))
+
+        self.set_allow_reverse(bool(plan.get("allow_reverse", False)))
+        mode, mode_warn = control_mode_from_json(plan.get("control_mode"))
+        if mode_warn:
+            warnings.append(mode_warn)
+        self.set_control_mode(ControlMode(mode), resume_executor=False)
+        if self._control_mode == ControlMode.Automatic:
+            self.set_halted_by_stop(True)
+        return dropped
+
+    def drop_stale_orders(self, node_ids) -> list[str]:
+        if node_ids is None:
+            return []
+
+        node_set = set(node_ids)
+        dropped = []
+        for index in range(self._orders.rowCount() - 1, -1, -1):
+            order = self._orders.get(index)
+            if order.target_node_id in node_set:
+                continue
+            dropped.append(order.target_node_id)
+            self.remove_order(index)
+        dropped.reverse()
+        return dropped

@@ -30,6 +30,7 @@ class AppContext:
         self.planner = Planner(self.projectStorage.currentProject.rails, self.network)
         self.trains = Trains(self.network, self.trainDevices, self.planner)
         self.simulator = Simulator(self.network, self.trains)
+        self.projectStorage.set_trains(self.trains)
 
         self.projectStorage.currentProject_changed.connect(self.updateProjectProperties)
         self.updateProjectProperties()
@@ -53,6 +54,7 @@ class AppContext:
         self.planner.updateRailsModel(self.projectStorage.currentProject.rails)
         self.network.updateRailsModel(self.projectStorage.currentProject.rails)
         self.switchDevices.set_rails_model(self.projectStorage.currentProject.rails)
+        self.trains.set_project(self.projectStorage.currentProject)
         self.setContextProperty("project", self.projectStorage.currentProject)
         self.setContextProperty("settings", self.projectStorage.currentProject.settings)
         self.setContextProperty("connectorRegister", self.projectStorage.currentProject.connectorRegister)
