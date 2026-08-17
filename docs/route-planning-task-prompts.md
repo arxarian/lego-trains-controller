@@ -26,6 +26,9 @@ Implement issues in order within each slice; do not start a slice before its dep
 | B1.1 | #137 order list model | S–M | — |
 | C2.1 | #142 click switch toggle | S–M | A1.1 |
 | E4 | #148 deadlock design note | S | — |
+| **A2.4** | #199 Hold no path / switch frog | S–M | A2.1+A2.2 (done) |
+
+**P0 bug (do before double-loop Auto):** **A2.4** [#199](https://github.com/arxarian/lego-trains-controller/issues/199) (**S–M**) — `Hold: no path` when Dijkstra crosses a switch frog; legal longer route exists.
 
 ### Phase 0 — Foundations
 1. **F0** #114 (**S**, —)  
@@ -38,7 +41,8 @@ Editor multi-color chip and other UX/UI polish: see GitHub epic **[#158](https:/
 ### Phase 1 — Backend critical path
 3. A1.1 (**S–M**) → A1.2 (**M**, needs A1.1)  
 4. A2.1 (**S–M**) → A2.2 (**S–M**, A2.1+A1.1) → A3.1 (**M**) → A3.2 (**M**, A3.1+A2.1)  
-5. A2.3 (**S**, A2.1) anytime after A2.1
+5. A2.3 (**S**, A2.1) anytime after A2.1  
+   **A2.4** #199 (**S–M**, P0 bug, A2.1+A2.2 done) before relying on inner↔outer Auto on `rails_big`
 
 ### Phase 2 — One Auto train (sim)
 6. S1 (**M–L**, A1) → B1.1 (**S–M**) → B1.2 (**L**, A2+A3+B1.1) → **B1.3** #187 (**M**, B1.2, done) → S2 (**L**, S1+B1.2)  
@@ -467,6 +471,70 @@ A2.1 (A2.2 nice-to-have in same PR).
 
 ## Out of scope
 Executor, reservation, UI.
+```
+
+### Subtask A2.4 — Hold: no path when shortest route crosses a switch frog (#199)
+
+**Complexity:** **S–M** · **Prerequisites:** A2.1 (#132, done), A2.2 (#133, done) · **Priority:** **P0** (blocks Auto inner↔outer on `rails_big`)
+
+GitHub: https://github.com/arxarian/lego-trains-controller/issues/199
+
+**Prompt:**
+
+```
+Fix Hold: no path when the shortest undirected walk between two markers crosses a switch frog (same switch rail on path A and path B). compute_leg must return a longer legal route instead of giving up.
+
+## Why
+A2.1 Dijkstra treats a turnout as a 3-way junction. The shortest walk can go branch A → stem → branch B on one switch. That is physically impossible (one rail cannot be A and B at once), and the walker already forbids it (NetworkManager._select_next_node: never across the frog).
+
+A2.2 collect_required_switches correctly returns None for that conflict. Planner.compute_leg then returns None, and the executor shows Hold: no path, even though a legal path around the other loop exists. This blocks Auto on the real double-loop layout (rails_big).
+
+## Repro (Run mode, rails_big)
+Layout: concentric inner + outer loops, switches 23 (right) and 24 (left). Markers:
+
+- White 28A8 — inner loop (rail 28, between 27 and 29)
+- Green 44A8 — outer bottom
+- Blue 22A16 — outer right (not the white stop)
+
+1. Load Controller/src/projects/rails_big.json, generate the network.
+2. Auto on, Allow reverse on.
+3. Last visited marker = white 28A8; next order = green 44A8.
+4. Observe: Hold: no path. Train sits on the inner loop. Blue→green and yellow→green still work.
+
+Confirmed in planner (graph is connected):
+
+- Dijkstra: 28A8 → 23-25 → 22-23 → 23-38 → 44A8 (length 211) — switch 23 A and B → collect_required_switches is None
+- Legal: 28A8 → 23-25 → 22-23 → 22A16 → 19A8 → 13A16 → 13-24 → 24-33 → 44A8 (length 419) — switch 23 = A, switch 24 = B
+
+## Depends on
+A2.1 (#132, done), A2.2 (#133, done). Bug in those APIs, not a new routing feature.
+
+## Current code (start here)
+- Planner.compute_leg in Controller/src/python/planner.py: nx.shortest_path; if collect_required_switches(...) is None, return None.
+- collect_required_switches: same switch rail with two path_ids → None (keep this).
+- PlanExecutor.try_depart: unrestricted compute_leg is None → _hold("no path") (Controller/src/python/plan_executor.py).
+- Walk already rejects frog-cross: NetworkManager._select_next_node trailing rule.
+
+## Requirements
+1. Keep the graph undirected. Pathfind on the full graph, then set/lock required switches (architecture rule). Do not Dijkstra on currently set branches only.
+2. If the shortest path has a switch path_id conflict, search next-shortest simple paths (nx.shortest_simple_paths) and return the first path where collect_required_switches succeeds.
+3. Cap the search (e.g. first 20 simple paths) so a large layout cannot hang.
+4. Unknown nodes / truly disconnected graph still return None.
+5. Pytest on rails_big (or a fixture copy under tests/tracks/):
+   - compute_leg("28A8", "44A8") is not None
+   - required_switches is consistent (no A+B on one rail)
+   - Path is not a frog-cross (legal examples: via 22A16 or the left-side mirror via 13A16)
+6. Existing oval / Y-switch test_planner.py cases still pass.
+7. Follow project-spec / coding-spec.
+
+## Acceptance
+- White 28A8 → green 44A8 on rails_big: Auto can depart (no Hold: no path); leg has consistent required_switches.
+- Illegal frog-cross is never returned as a LegResult.
+- Blue 22A16 → green and yellow 13A16 → green still succeed.
+- No QML required.
+
+## Out of scope
+Remodeling the graph as MultiGraph or splitting switch stem nodes (would churn A1.2 walk/trailing). Executor Hold UX copy (E3). Highlighting the reserved leg (E2). Changing reservation / interlocking APIs.
 ```
 
 ---
@@ -1173,6 +1241,7 @@ Design-only or later implementation: allow meets at sidings; reserve only to nex
 | A2.1 | feat(planner): shortest-path leg between marker nodes |
 | A2.2 | feat(planner): required switch positions for a leg |
 | A2.3 | feat(planner): multi-waypoint route as list of legs |
+| A2.4 | fix(planner): Hold no path when shortest route crosses a switch frog (#199) |
 | A3.1 | feat(network): segment ownership for interlocking |
 | A3.2 | feat(network): atomic leg reserve/release |
 | B1.1 | feat(train): Tycoon-style order list model |
