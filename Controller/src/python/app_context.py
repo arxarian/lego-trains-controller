@@ -28,7 +28,7 @@ class AppContext:
         self.railTypes = RailTypes()
         self.network = NetworkManager(self.projectStorage.currentProject.rails)
         self.planner = Planner(self.projectStorage.currentProject.rails, self.network)
-        self.trains = Trains(self.network, self.trainDevices, self.planner)
+        self.trains = Trains(self.network, self.trainDevices, self.planner, switch_devices=self.switchDevices)
         self.simulator = Simulator(self.network, self.trains)
         self.projectStorage.set_trains(self.trains)
 

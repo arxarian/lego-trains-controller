@@ -24,6 +24,6 @@ class SwitchDeviceSim(SwitchDevice):
 
     def _apply_position(self, value):
         rail = self._bound_rail
-        if rail is None:
-            return
-        rail.set_switch_position(value)
+        if rail is not None:
+            rail.set_switch_position(value)
+        self._confirm_position(value)

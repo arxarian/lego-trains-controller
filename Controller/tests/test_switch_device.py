@@ -2,6 +2,7 @@ import pytest
 from PySide6.QtWidgets import QApplication
 
 from python.items.rail import Rail, RailType
+from python.items.switch_device_hw import SwitchDeviceHW
 from python.items.switch_device_sim import SwitchDeviceSim
 from python.models.switch_devices import SwitchDevices
 
@@ -30,6 +31,7 @@ def test_set_position_updates_rail():
     assert rail.switch_position == "B"
     assert rail.path_indicators.path_id_active == "B"
     assert device.position == "B"
+    assert device.is_confirmed("B")
 
 
 def test_rail_toggle_syncs_device_position():
@@ -78,3 +80,29 @@ def test_switch_rails_helper_excludes_non_switches():
     only_switches = devices.switchRails()
     assert switch in only_switches
     assert straight not in only_switches
+
+
+def test_unconfirmed_hardware_skips_sim_and_lists_pending_hubs():
+    sim_rail = Rail(type=RailType.SwitchLeft, id=1)
+    hw_rail = Rail(type=RailType.SwitchRight, id=2)
+    devices = SwitchDevices()
+    sim = devices.addSimulated()
+    devices.assignToRail(sim_rail, sim)
+
+    class _FakeBle:
+        def __init__(self):
+            self.client = object()
+
+        def send(self, cmd, data=b"", response=True):
+            pass
+
+    hw = SwitchDeviceHW(client=object(), hub_name="sw", ble=_FakeBle())
+    devices.append(hw)
+    devices.assignToRail(hw_rail, hw)
+    hw.set_position("B")
+
+    pending = devices.unconfirmed_hardware([(sim_rail, "B"), (hw_rail, "B")])
+    assert pending == [(hw, "B")]
+
+    hw._on_position_ack("B")
+    assert devices.unconfirmed_hardware([(sim_rail, "B"), (hw_rail, "B")]) == []

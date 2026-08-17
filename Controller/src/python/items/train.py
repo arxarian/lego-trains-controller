@@ -28,7 +28,7 @@ class ControlMode(IntEnum):
 class Train(QObject):
     QEnum(ControlMode)
 
-    def __init__(self, device, network, planner=None, parent=None):
+    def __init__(self, device, network, planner=None, parent=None, switch_devices=None):
         super().__init__(parent)
         self._device = device
         self._network = network
@@ -44,7 +44,7 @@ class Train(QObject):
         self._allow_reverse = False
         self._halted_by_stop = False
         self._resume_speed = 0
-        self._executor = PlanExecutor(self, planner, network, parent=self) if planner is not None else None
+        self._executor = PlanExecutor(self, planner, network, parent=self, switch_devices=switch_devices) if planner is not None else None
 
         device.color_changed.connect(self.on_color_changed)
         device.speed_changed.connect(self._on_speed_changed)

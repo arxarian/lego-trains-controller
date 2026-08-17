@@ -148,3 +148,23 @@ class SwitchDevices(ObjectBasedModel[SwitchDevice]):
         if self._rails is None:
             return []
         return [r for r in self._rails.items() if r.is_switch()]
+
+    def unconfirmed_hardware(self, required: list[tuple[Rail, str]]) -> list[tuple[SwitchDevice, str]]:
+        """Bound hardware devices that still need a pos ack for the required path."""
+        pending = []
+        for rail, path_id in required or []:
+            device = self._rail_to_device.get(getattr(rail, "id", None))
+            if device is None or device.is_simulated():
+                continue
+            if device.is_confirmed(path_id):
+                continue
+            pending.append((device, path_id))
+        return pending
+
+    def command_required(self, required: list[tuple[Rail, str]]) -> None:
+        """Send set_position to each bound device for the reserved switch path."""
+        for rail, path_id in required or []:
+            device = self._rail_to_device.get(getattr(rail, "id", None))
+            if device is None:
+                continue
+            device.set_position(path_id)
