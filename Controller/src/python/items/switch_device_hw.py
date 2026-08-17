@@ -44,6 +44,10 @@ class SwitchDeviceHW(SwitchDevice):
         if rail is not None:
             rail.set_switch_position(value)
 
+    def _on_position_ack(self, ack: str):
+        print(f"SwitchDeviceHW {self._name}: position ack {ack}")
+        self._confirm_position(ack)
+
     async def _async_voltage_status(self):
         await self._ble.ready_event.wait()
         self.send("vol")
@@ -63,7 +67,7 @@ class SwitchDeviceHW(SwitchDevice):
                 print(f"SwitchDeviceHW {self._name}: voltage {self._voltage}")
             elif payload == b"pos":
                 ack = data[4:5].decode("utf-8", errors="replace")
-                print(f"SwitchDeviceHW {self._name}: position ack {ack}")
+                self._on_position_ack(ack)
             elif payload == b"int":
                 self.set_initialized(True)
             elif payload == b"rol":

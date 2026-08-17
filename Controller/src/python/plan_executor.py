@@ -11,6 +11,7 @@ QML_IMPORT_MAJOR_VERSION = 1
 
 FALLBACK_SPEED = 40
 MIN_AUTO_SPEED = 30
+SWITCH_CONFIRM_TIMEOUT_S = 2.0
 
 
 class ExecutorState:
@@ -20,18 +21,21 @@ class ExecutorState:
     MOVING = "Moving"
     WAITING = "Waiting"
     PAUSED = "Paused"
+    SETTING_SWITCHES = "Setting switches"
 
 
 @QmlElement
 class PlanExecutor(QObject):
     """Loops a train's orders with whole-leg reservation and Hold on conflict."""
 
-    def __init__(self, train, planner, network, parent=None, hold_retry_s=0.5):
+    def __init__(self, train, planner, network, parent=None, hold_retry_s=0.5, switch_devices=None, switch_confirm_timeout_s=SWITCH_CONFIRM_TIMEOUT_S):
         super().__init__(parent)
         self._train = train
         self._planner = planner
         self._network = network
+        self._switch_devices = switch_devices
         self._hold_retry_s = float(hold_retry_s)
+        self._switch_confirm_timeout_s = float(switch_confirm_timeout_s)
         self._state = ExecutorState.PAUSED
         self._hold_reason = ""
         self._previous_node_id = ""
@@ -134,6 +138,30 @@ class PlanExecutor(QObject):
         except asyncio.CancelledError:
             return
 
+    def _pending_switch_confirms(self, required):
+        if self._switch_devices is None:
+            return []
+        self._switch_devices.command_required(required)
+        return self._switch_devices.unconfirmed_hardware(required)
+
+    def _begin_moving(self, flip):
+        self._apply_moving_speed(flip=flip)
+        self._set_state(ExecutorState.MOVING)
+
+    async def _wait_switches_then_move(self, pending, flip):
+        try:
+            awaits = [device.wait_until_confirmed(path_id) for device, path_id in pending]
+            await asyncio.wait_for(asyncio.gather(*awaits), timeout=self._switch_confirm_timeout_s)
+            if self._state != ExecutorState.SETTING_SWITCHES:
+                return
+            self._begin_moving(flip)
+        except asyncio.TimeoutError:
+            if self._state != ExecutorState.SETTING_SWITCHES:
+                return
+            self._hold("switch")
+        except asyncio.CancelledError:
+            return
+
     def _release_current_leg(self):
         if self._current_leg is not None:
             self._network.release_leg(self._owner(), self._current_leg.segments)
@@ -173,7 +201,7 @@ class PlanExecutor(QObject):
 
     @Slot()
     def try_depart(self):
-        if self._state == ExecutorState.PAUSED:
+        if self._state in (ExecutorState.PAUSED, ExecutorState.SETTING_SWITCHES):
             return
         if self._planner is None or self._network is None:
             return
@@ -226,9 +254,18 @@ class PlanExecutor(QObject):
         self._current_leg = leg
         self._cancel_task()
         flip = reversing or (bool(previous) and self._network.is_dead_end(current))
-        self._apply_moving_speed(flip=flip)
         self._train.set_current_segment_ids(leg.segments, f"{leg.nodes[0]}:{leg.nodes[-1]}")
-        self._set_state(ExecutorState.MOVING)
+        self._set_speed(0)
+        required = self._network.required_switches_for_segments(leg.segments)
+        pending = self._pending_switch_confirms(required)
+        if not pending:
+            self._begin_moving(flip)
+            return
+        if self._running_loop() is None:
+            self._hold("switch")
+            return
+        self._set_state(ExecutorState.SETTING_SWITCHES)
+        self._task = asyncio.ensure_future(self._wait_switches_then_move(pending, flip))
 
     def on_marker(self, node_id):
         if not node_id:

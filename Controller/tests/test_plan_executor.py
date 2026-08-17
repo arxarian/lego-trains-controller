@@ -19,7 +19,9 @@ from python.items.marker import MarkerState
 from python.items.rail import Rail, RailType
 from python.items.train import ControlMode, Train
 from python.items.train_device_sim import TrainDeviceSim
+from python.items.switch_device_hw import SwitchDeviceHW
 from python.models.rails import Rails
+from python.models.switch_devices import SwitchDevices
 from python.plan_executor import ExecutorState, FALLBACK_SPEED, MIN_AUTO_SPEED
 from python.planner import LegResult, Planner
 
@@ -86,9 +88,9 @@ def _planner_from_switch_y_with_markers():
     return Planner(rails, network), network, switch
 
 
-def _auto_train(planner, network, name="auto"):
+def _auto_train(planner, network, name="auto", switch_devices=None):
     device = TrainDeviceSim(name=name)
-    train = Train(device, network, planner)
+    train = Train(device, network, planner, switch_devices=switch_devices)
     return train, device
 
 
@@ -496,3 +498,114 @@ def test_is_reverse_depart_helper():
     y_leg = y_planner.compute_leg(approach, exit_a)
     assert y_network.is_dead_end(approach)
     assert not y_network.is_reverse_depart(approach, "1-2", y_leg.nodes[1])
+
+
+class _FakeBle:
+    def __init__(self):
+        self.sent = []
+        self.client = object()
+
+    def send(self, cmd, data=b"", response=True):
+        self.sent.append((cmd, data, response))
+
+
+def _bind_hw_switch(switch_rail):
+    devices = SwitchDevices()
+    hw = SwitchDeviceHW(client=object(), hub_name="sw", ble=_FakeBle())
+    devices.append(hw)
+    devices.assignToRail(switch_rail, hw)
+    return devices, hw
+
+
+async def _until_status(train, status):
+    while train.executor.status != status:
+        await asyncio.sleep(0)
+
+
+def test_sim_switch_departs_immediately():
+    planner, network, switch = _planner_from_switch_y_with_markers()
+    start = network.find_node_by_color("#ff0000")
+    dest = network.find_node_by_color("#0000ff")
+    devices = SwitchDevices()
+    devices.assignToRail(switch, devices.addSimulated())
+
+    train, device = _auto_train(planner, network, switch_devices=devices)
+    train.set_current_node_id(start)
+    train.add_order(dest, 0.0)
+    train.set_control_mode(ControlMode.Automatic)
+
+    assert train.executor.status == ExecutorState.MOVING
+    assert device.speed > 0
+    assert switch.switch_position == "B"
+
+
+def test_hw_switch_waits_for_pos_ack_before_moving():
+    planner, network, switch = _planner_from_switch_y_with_markers()
+    start = network.find_node_by_color("#ff0000")
+    dest = network.find_node_by_color("#0000ff")
+    switch_devices, hw = _bind_hw_switch(switch)
+
+    train, device = _auto_train(planner, network, switch_devices=switch_devices)
+    train.set_current_node_id(start)
+    train.add_order(dest, 0.0)
+
+    async def scenario():
+        train.set_control_mode(ControlMode.Automatic)
+        assert train.executor.status == ExecutorState.SETTING_SWITCHES
+        assert device.speed == 0
+        assert switch.switch_position == "B"
+        assert hw.position == "B"
+        assert not hw.is_confirmed("B")
+        await asyncio.sleep(0)
+        hw._on_position_ack("B")
+        await asyncio.wait_for(_until_status(train, ExecutorState.MOVING), timeout=1)
+        assert device.speed > 0
+
+    asyncio.run(scenario())
+
+
+def test_hw_switch_timeout_holds():
+    planner, network, switch = _planner_from_switch_y_with_markers()
+    start = network.find_node_by_color("#ff0000")
+    dest = network.find_node_by_color("#0000ff")
+    switch_devices, _hw = _bind_hw_switch(switch)
+
+    train, device = _auto_train(planner, network, switch_devices=switch_devices)
+    train.executor._hold_retry_s = 10.0
+    train.executor._switch_confirm_timeout_s = 0.05
+    train.set_current_node_id(start)
+    train.add_order(dest, 0.0)
+
+    async def scenario():
+        train.set_control_mode(ControlMode.Automatic)
+        assert train.executor.status == ExecutorState.SETTING_SWITCHES
+        assert device.speed == 0
+        await asyncio.sleep(0.12)
+        assert train.executor.status == "Hold: switch"
+        assert device.speed == 0
+
+    asyncio.run(scenario())
+
+
+def test_localization_crawl_stops_while_waiting_for_switch():
+    planner, network, switch = _planner_from_switch_y_with_markers()
+    start = network.find_node_by_color("#ff0000")
+    dest = network.find_node_by_color("#0000ff")
+    switch_devices, hw = _bind_hw_switch(switch)
+
+    train, device = _auto_train(planner, network, switch_devices=switch_devices)
+    train.add_order(dest, 0.0)
+
+    async def scenario():
+        train.set_control_mode(ControlMode.Automatic)
+        assert train.executor.status == ExecutorState.WAITING_FOR_LOCALIZATION
+        assert device.speed != 0
+        train.executor.on_marker(start)
+        assert device.speed == 0
+        assert train.executor.status == ExecutorState.SETTING_SWITCHES
+        await asyncio.sleep(0)
+        hw._on_position_ack("B")
+        await asyncio.wait_for(_until_status(train, ExecutorState.MOVING), timeout=1)
+        assert device.speed > 0
+
+    asyncio.run(scenario())

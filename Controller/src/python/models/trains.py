@@ -11,10 +11,11 @@ class Trains(ObjectBasedModel[Train]):
 
     _item_class = Train
 
-    def __init__(self, network, train_devices, planner=None, parent=None):
+    def __init__(self, network, train_devices, planner=None, parent=None, switch_devices=None):
         super().__init__(parent)
         self._network = network
         self._planner = planner
+        self._switch_devices = switch_devices
         self._project = None
         self._last_order_hint = ""
         train_devices.device_connected.connect(self.add_train)
@@ -26,7 +27,7 @@ class Trains(ObjectBasedModel[Train]):
             self._apply_stored_plan(train)
 
     def add_train(self, device):
-        train = Train(device=device, network=self._network, planner=self._planner, parent=self)
+        train = Train(device=device, network=self._network, planner=self._planner, parent=self, switch_devices=self._switch_devices)
         device.disconnected.connect(lambda d: self.remove_by_device(d))
         self.append(train)
         self._apply_stored_plan(train)

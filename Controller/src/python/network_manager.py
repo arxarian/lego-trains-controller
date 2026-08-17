@@ -113,6 +113,11 @@ class NetworkManager(QObject):
                     ordered[rail.id] = (rail, path_id)
         return list(ordered.values())
 
+    def required_switches_for_segments(self, segment_ids) -> list[tuple[Rail, str]]:
+        """Switch rails required by the leg, or empty if none / path conflict."""
+        required = self._required_switches_for_segments(segment_ids)
+        return required if required else []
+
     def _unlock_switches_for(self, owner) -> None:
         for rail in self._rails.items():
             if isinstance(rail, Rail) and rail.is_switch():

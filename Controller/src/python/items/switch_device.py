@@ -1,6 +1,8 @@
 # This Python file uses the following encoding: utf-8
 from __future__ import annotations
 
+import asyncio
+
 from PySide6.QtCore import QObject, Property, Signal, Slot
 
 from python.items.rail import SWITCH_PATH_IDS, DEFAULT_SWITCH_POSITION
@@ -20,6 +22,8 @@ class SwitchDevice(QObject):
         self._name = name
         self._initialized = initialized
         self._position = DEFAULT_SWITCH_POSITION
+        self._confirmed_position = DEFAULT_SWITCH_POSITION
+        self._confirm_waiters: list[tuple[str, asyncio.Event]] = []
         self._bound_rail = None
 
     def role(self):
@@ -58,6 +62,7 @@ class SwitchDevice(QObject):
         if self._position == value:
             return
         self._position = value
+        self._confirmed_position = None
         self._apply_position(value)
         self.position_changed.emit()
 
@@ -66,6 +71,32 @@ class SwitchDevice(QObject):
         pass
 
     position = Property(str, position, set_position, notify=position_changed)
+
+    def is_confirmed(self, path_id: str) -> bool:
+        return self._confirmed_position == path_id
+
+    def _confirm_position(self, path_id: str):
+        if path_id not in SWITCH_PATH_IDS or path_id != self._position:
+            return
+        self._confirmed_position = path_id
+        remaining = []
+        for wanted, event in self._confirm_waiters:
+            if wanted == path_id:
+                event.set()
+            else:
+                remaining.append((wanted, event))
+        self._confirm_waiters = remaining
+
+    async def wait_until_confirmed(self, path_id: str) -> bool:
+        if self.is_confirmed(path_id):
+            return True
+        event = asyncio.Event()
+        self._confirm_waiters.append((path_id, event))
+        if self.is_confirmed(path_id):
+            self._confirm_waiters = [(wanted, waiter) for wanted, waiter in self._confirm_waiters if waiter is not event]
+            return True
+        await event.wait()
+        return self.is_confirmed(path_id)
 
     @Slot(str)
     def setPosition(self, path_id):
