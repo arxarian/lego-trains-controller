@@ -2,16 +2,17 @@ from pybricks.pupdevices import DCMotor
 from pybricks.parameters import Port
 from pybricks.tools import wait
 from pybricks.hubs import CityHub
+from pybricks.pupdevices import Motor
 
 from usys import stdin, stdout
 from uselect import poll
 
 # Tune for the physical turnout mechanism.
 MOTOR_DC = 50
-PULSE_MS = 300
+PULSE_MS = 200
 
 hub = CityHub()
-switch_motor = DCMotor(Port.A)
+switch_motor = Motor(Port.A)
 
 keyboard = poll()
 keyboard.register(stdin)
